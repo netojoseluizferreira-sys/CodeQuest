@@ -69,19 +69,9 @@ while True:
         print('\nPOR ENQUANTO O CODEQUEST SÓ TEM UM MUNDO, EM BREVE MAIS...\n')
         sleep(1.5)
         while True:
-            percurso = input('''ESSE É O MUNDO 1 DO CODEQUEST
-[0] - VOLTAR PARA O MENU
-[1] - AULA 1: VARIÁVEIS E VALORES
-[2] - EXERCICIO 1
-[3] - EXERCICIO 2
-[4] - AULA 2: OPERADORES MATEMÁTICO
-[5] - EXERCICIO 3
-[6] - EXERCICIO 4
-[7] - AULA 3: ENTRADA/SAIDA
-[8] - EXERCICIO 5
-[9] - EXERCICIO 6
+            print('ESSE É O MUNDO 1 DO CODEQUEST')
+            percurso = menus('CODEQUEST - MUNDO 1',menu_mundo1)
 
-DIGITE OPÇÃO QUE DESEJA SEGUIR: ''')
             sleep(1.0)
             if percurso == '0':
                 print('ABRINDO MENU...')
