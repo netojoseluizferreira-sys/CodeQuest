@@ -1,9 +1,12 @@
 from time import sleep
 from backend.usuario import criar_usuario, padronizar_idade
-from utils.json_utils import salvar_usuario
+from utils.json_utils import salvar_usuario, carregar_usuario
 
-usuario = {}
-tem_perfil =  False
+usuario = carregar_usuario()
+if usuario:
+    tem_perfil =  True
+else:
+    tem_perfil = False
 
 while True:
     menu = input('''Bem vindo ao CodeQuest
