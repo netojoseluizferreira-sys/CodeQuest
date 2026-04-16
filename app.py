@@ -30,14 +30,8 @@ else:
     tem_perfil = False
 
 while True:
-    menu = input('''Bem vindo ao CodeQuest
-OPÇÕES DO MENU:
-[0] - FECHAR O APP
-[1] - MEU PERFIL
-[2] - MUNDOS
-[3] - RANKEAMENTO
-
-Digite a ação que deseja realizar: ''')
+    print('Bem vindo ao CodeQuest')
+    menu = menus('MENU PRINCIPAL', menu_principal)
     
     if menu == '0':
         print('Fechando APP...\n')
