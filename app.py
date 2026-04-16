@@ -13,7 +13,7 @@ while True:
 OPÇÕES DO MENU:
 [0] - FECHAR O APP
 [1] - MEU PERFIL
-[2] - MUNDO 1
+[2] - MUNDOS
 [3] - RANKEAMENTO
 
 Digite a ação que deseja realizar: ''')
@@ -50,8 +50,48 @@ Digite a ação que deseja realizar: ''')
             print('\n')
             sleep(1)
     elif menu == '2':
-        print('EM BREVE...\n')
         sleep(1.0)
+        print('\nPOR ENQUANTO O CODEQUEST SÓ TEM UM MUNDO, EM BREVE MAIS...\n')
+        sleep(1.5)
+        while True:
+            percurso = input('''ESSE É O MUNDO 1 DO CODEQUEST
+[0] - VOLTAR PARA O MENU
+[1] - AULA 1: VARIÁVEIS E VALORES
+[2] - EXERCICIO 1
+[3] - EXERCICIO 2
+[4] - AULA 2: OPERADORES MATEMÁTICO
+[5] - EXERCICIO 3
+[6] - EXERCICIO 4
+[7] - AULA 3: ENTRADA/SAIDA
+[8] - EXERCICIO 5
+[9] - EXERCICIO 6
+
+DIGITE OPÇÃO QUE DESEJA SEGUIR: ''')
+            sleep(1.0)
+            if percurso == '0':
+                print('ABRINDO MENU...')
+                sleep(1.0)
+                break
+            elif percurso == '1':
+                print("EM BREVE...")
+            elif percurso == '2':
+                print("EM BREVE...")
+            elif percurso == '3':
+                print("EM BREVE...")
+            elif percurso == '4':
+                print("EM BREVE...")
+            elif percurso == '5':
+                print("EM BREVE...")
+            elif percurso == '6':
+                print("EM BREVE...")
+            elif percurso == '7':
+                print("EM BREVE...")
+            elif percurso == '8':
+                print("EM BREVE...")
+            else:
+                print("OPÇÃO INVÁLIDA, TENTE NOVAMENTE")
+            sleep(1.0)
+            
     elif menu == '3':
         print('EM BREVE...\n')
         sleep(1.0)

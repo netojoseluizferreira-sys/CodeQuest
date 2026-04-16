@@ -11,3 +11,6 @@ def padronizar_idade(texto):
         return int(texto.lower().replace(' anos', '').strip())
     except ValueError:
         return None
+    
+
+
