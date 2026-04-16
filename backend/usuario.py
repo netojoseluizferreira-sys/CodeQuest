@@ -7,10 +7,7 @@ def criar_usuario(nome, idade):
     }
 
 def padronizar_idade(texto):
-    while True:
-        try:
-            idade = int(input(texto).lower().replace(' anos', '').strip())
-            break
-        except ValueError:
-            print('ERRO, tente novamente, Somente números')
-    return idade
+    try:
+        return int(texto.lower().replace(' anos', '').strip())
+    except ValueError:
+        return None

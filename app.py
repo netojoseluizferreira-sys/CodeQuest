@@ -1,17 +1,20 @@
 from time import sleep
 from backend.usuario import criar_usuario, padronizar_idade
+from utils.json_utils import salvar_usuario
 
 usuario = {}
 tem_perfil =  False
 
 while True:
-    menu = input('Bem vindo ao CodeQuest\nOPÇÕES DO MENU:' + '\n' + 
-'''[0] - FECHAR O APP
+    menu = input('''Bem vindo ao CodeQuest
+OPÇÕES DO MENU:
+[0] - FECHAR O APP
 [1] - MEU PERFIL
 [2] - MUNDO 1
 [3] - RANKEAMENTO
 
 Digite a ação que deseja realizar: ''')
+    
     if menu == '0':
         print('Fechando APP...\n')
         sleep(1.0)
@@ -20,15 +23,29 @@ Digite a ação que deseja realizar: ''')
         if not tem_perfil:
             print('Estou vendo que você ainda não tem um perfil, vamos criar ele primeiro')
             sleep(1.0)
-            usuario = criar_usuario(input("Nome: "), padronizar_idade('Digite sua idade: '))
+
+            nome = input("Digite seu nome: ").title()
+
+            while True:
+                idade_input = input("Digite sua idade: ")
+                idade = padronizar_idade(idade_input)
+
+                if idade is not None:
+                    break
+                else:
+                    print("ERRO, tente novamente")
+
+            usuario = criar_usuario(nome, idade)
+            salvar_usuario(usuario)
             print('PERFIL CRIADO COM SUCESSO')
             sleep(1.0)
-            perfil = True
-        print('\nSeu PERFIL:')
-        for chave, valor in usuario.items():
-            print(f"{chave}: {valor}")
-        print('\n')
-        sleep(1)
+            tem_perfil = True
+        if tem_perfil:
+            print('\nSeu PERFIL:')
+            for chave, valor in usuario.items():
+                print(f"{chave}: {valor}")
+            print('\n')
+            sleep(1)
     elif menu == '2':
         print('EM BREVE...\n')
         sleep(1.0)
