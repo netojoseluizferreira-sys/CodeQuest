@@ -81,9 +81,9 @@ while True:
                 sleep(1.0)
                 break
             elif percurso == '1':
-                aula = carregar_aula('mundo_1', 'aula_1', 'conteudo')
-                print('\n' + carregar_aula('mundo_1', 'aula_1', 'titulo') + '\n')
-                for linha in aula:
+                aula = carregar_aula('mundo_1', 'aula_1')
+                print('\n' + carregar_aula('mundo_1', 'aula_1')['titulo'] + '\n')
+                for linha in aula['conteudo']:
                     print(f'  >  {linha}')
                     time = 1.2 if len(linha) < 40 else 2.2
                     sleep(time)
