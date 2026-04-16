@@ -1,4 +1,8 @@
 from time import sleep
+from backend.usuario import criar_usuario, padronizar_idade
+
+usuario = {}
+tem_perfil =  False
 
 while True:
     menu = input('Bem vindo ao CodeQuest\nOPÇÕES DO MENU:' + '\n' + 
@@ -13,8 +17,18 @@ Digite a ação que deseja realizar: ''')
         sleep(1.0)
         break
     elif menu == '1':
-        print('EM BREVE...\n')
-        sleep(1.0)
+        if not tem_perfil:
+            print('Estou vendo que você ainda não tem um perfil, vamos criar ele primeiro')
+            sleep(1.0)
+            usuario = criar_usuario(input("Nome: "), padronizar_idade('Digite sua idade: '))
+            print('PERFIL CRIADO COM SUCESSO')
+            sleep(1.0)
+            perfil = True
+        print('\nSeu PERFIL:')
+        for chave, valor in usuario.items():
+            print(f"{chave}: {valor}")
+        print('\n')
+        sleep(1)
     elif menu == '2':
         print('EM BREVE...\n')
         sleep(1.0)
