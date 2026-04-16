@@ -1,6 +1,9 @@
 from time import sleep
 from backend.usuario import criar_usuario, padronizar_idade, menus
+from backend.exercicios import carregar_aula
 from utils.json_utils import salvar_usuario, carregar_usuario
+
+aula = {}
 
 menu_principal = {
     '0':'FECHAR O APP',
@@ -78,7 +81,15 @@ while True:
                 sleep(1.0)
                 break
             elif percurso == '1':
-                print("EM BREVE...")
+                aula = carregar_aula('mundo_1', 'aula_1', 'conteudo')
+                print('\n' + carregar_aula('mundo_1', 'aula_1', 'titulo') + '\n')
+                for linha in aula:
+                    print(f'  >  {linha}')
+                    time = 1.2 if len(linha) < 40 else 2.2
+                    sleep(time)
+                print('\n')
+
+
             elif percurso == '2':
                 print("EM BREVE...")
             elif percurso == '3':

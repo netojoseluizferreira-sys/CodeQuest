@@ -1,0 +1,36 @@
+{
+  "mundo_1": {
+    "aula_1": {
+      "titulo": "VARIÁVEIS E VALORES: O PODER DA MEMÓRIA",
+      "conteudo": [
+        "Saudações, futuro mestre do código!",
+        "Para começar sua jornada no CodeQuest, você precisa de MEMÓRIA.",
+        "Programar nada mais é do que manipular dados e guardá-los.",
+        "Imagine que seu computador é um armário infinito de gavetas.",
+        "Cada gaveta pode guardar um segredo, um número ou um nome.",
+        "Essas gavetas são o que chamamos de VARIÁVEIS.",
+        "Quando você escreve 'xp = 100', você está fazendo três coisas:",
+        "1. Reservando uma gaveta e colando uma etiqueta chamada 'xp'.",
+        "2. Pegando o valor '100'.",
+        "3. Colocando esse valor dentro da gaveta.",
+        "O sinal de '=' é o seu braço robótico que faz essa entrega.",
+        "Em Python, as variáveis são dinâmicas e inteligentes.",
+        "Existem quatro tipos básicos de 'objetos' que você guardará:",
+        "STRINGS: São textos. Elas precisam de 'aspas' para não fugirem.",
+        "Exemplo: nome_missao = 'Resgate no Servidor'.",
+        "INTEGERS (INT): São números inteiros, sem frações.",
+        "Exemplo: vidas = 3 ou nivel = 1.",
+        "FLOATS: São números decimais, usados para precisão.",
+        "Exemplo: versao_sistema = 1.2 ou preco = 49.90.",
+        "BOOLEANS: São valores lógicos. Ou algo é True (Verdade) ou False (Falso).",
+        "Exemplo: missao_concluida = False.",
+        "Uma regra de ouro: O nome da gaveta (variável) deve ser claro!",
+        "Em vez de usar apenas 'x', use 'pontuacao_usuario'.",
+        "Python gosta de nomes organizados com 'underscore' (o tracinho baixo).",
+        "Agora, sua memória está pronta para ser usada.",
+        "Lembre-se: quem controla as variáveis, controla o destino do programa!",
+        "Está preparado para testar seu primeiro armazenamento?"
+      ]
+    }
+  }
+}
