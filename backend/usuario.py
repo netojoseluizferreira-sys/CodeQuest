@@ -12,5 +12,9 @@ def padronizar_idade(texto):
     except ValueError:
         return None
     
+def menus(texto, menu):
+    print(f'----{texto}----')
+    for chave, valor in menu.items():
+        print(f'[{chave}] - {valor}')
 
-
+    return input('Digite a ação que deseja realizar: ')

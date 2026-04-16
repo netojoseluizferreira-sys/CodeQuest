@@ -1,5 +1,5 @@
 from time import sleep
-from backend.usuario import criar_usuario, padronizar_idade
+from backend.usuario import criar_usuario, padronizar_idade, menus
 from utils.json_utils import salvar_usuario, carregar_usuario
 
 usuario = carregar_usuario()
