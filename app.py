@@ -2,6 +2,27 @@ from time import sleep
 from backend.usuario import criar_usuario, padronizar_idade, menus
 from utils.json_utils import salvar_usuario, carregar_usuario
 
+menu_principal = {
+    '0':'FECHAR O APP',
+    '1': 'MEU PERFIL',
+    '2': 'MUNDOS',
+    '3': 'RANKEAMENTO'
+}
+
+menu_mundo1 = {
+    '1':'AULA 1: VARIÁVEIS E VALORES',
+    '2':'EXERCICIO 1',
+    '3':'EXERCICIO 2',
+    '4':'AULA 2: OPERADORES MATEMÁTICO',
+    '5':'EXERCICIO 3',
+    '6':'EXERCICIO 4',
+    '7':'AULA 3: ENTRADA/SAIDA',
+    '8':'EXERCICIO 5',
+    '9':'EXERCICIO 6',
+    '0':'VOLTAR PARA O MENU'
+}
+
+
 usuario = carregar_usuario()
 if usuario:
     tem_perfil =  True
