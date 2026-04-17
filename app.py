@@ -77,36 +77,25 @@ while True:
                 percurso = menus('CODEQUEST - MUNDO 1',menu_mundo1)
 
                 sleep(1.0)
-                if percurso == '0':
-                    print('ABRINDO MENU...')
-                    sleep(1.0)
-                    break
-                elif percurso == '1':
-                    aula = carregar_aula('mundo_1', 'aula_1')
-                    print('\n' + carregar_aula('mundo_1', 'aula_1')['titulo'] + '\n')
-                    for linha in aula['conteudo']:
-                        print(f'  >  {linha}')
-                        time = 1.2 if len(linha) < 40 else 2.2
-                        sleep(time)
-                    print('\n')
+                
 
-
-                elif percurso == '2':
-                    print("EM BREVE...")
-                elif percurso == '3':
-                    print("EM BREVE...")
-                elif percurso == '4':
-                    print("EM BREVE...")
-                elif percurso == '5':
-                    print("EM BREVE...")
-                elif percurso == '6':
-                    print("EM BREVE...")
-                elif percurso == '7':
-                    print("EM BREVE...")
-                elif percurso == '8':
-                    print("EM BREVE...")
-                else:
-                    print("OPÇÃO INVÁLIDA, TENTE NOVAMENTE")
+                match percurso:
+                    case '0':
+                        print('ABRINDO MENU...')
+                        sleep(1.0)
+                        break
+                    case '1':
+                        aula = carregar_aula('mundo_1', 'aula_1')
+                        print('\n' + carregar_aula('mundo_1', 'aula_1')['titulo'] + '\n')
+                        for linha in aula['conteudo']:
+                            print(f'  >  {linha}')
+                            time = 1.2 if len(linha) < 40 else 2.2
+                            sleep(time)
+                        print('\n')
+                    case '2' | '3' | '4' | '6' | '7' | '8':
+                        print("EM BREVE...")
+                    case _ :
+                        print("OPÇÃO INVÁLIDA, TENTE NOVAMENTE")
                 sleep(1.0)
         case '3':
             print('EM BREVE...\n')
