@@ -35,82 +35,82 @@ else:
 while True:
     print('Bem vindo ao CodeQuest')
     menu = menus('MENU PRINCIPAL', menu_principal)
-    
-    if menu == '0':
-        print('Fechando APP...\n')
-        sleep(1.0)
-        break
-    elif menu == '1':
-        if not tem_perfil:
-            print('Estou vendo que você ainda não tem um perfil, vamos criar ele primeiro')
+
+    match menu:
+        case '0':
+            print('Fechando APP...\n')
             sleep(1.0)
-
-            nome = input("Digite seu nome: ").title()
-
-            while True:
-                idade_input = input("Digite sua idade: ")
-                idade = padronizar_idade(idade_input)
-
-                if idade is not None:
-                    break
-                else:
-                    print("ERRO, tente novamente")
-
-            usuario = criar_usuario(nome, idade)
-            salvar_usuario(usuario)
-            print('PERFIL CRIADO COM SUCESSO')
-            sleep(1.0)
-            tem_perfil = True
-        if tem_perfil:
-            print('\nSeu PERFIL:')
-            for chave, valor in usuario.items():
-                print(f"{chave}: {valor}")
-            print('\n')
-            sleep(1)
-    elif menu == '2':
-        sleep(1.0)
-        print('\nPOR ENQUANTO O CODEQUEST SÓ TEM UM MUNDO, EM BREVE MAIS...\n')
-        sleep(1.5)
-        while True:
-            print('ESSE É O MUNDO 1 DO CODEQUEST')
-            percurso = menus('CODEQUEST - MUNDO 1',menu_mundo1)
-
-            sleep(1.0)
-            if percurso == '0':
-                print('ABRINDO MENU...')
+            break
+        case '1':
+            if not tem_perfil:
+                print('Estou vendo que você ainda não tem um perfil, vamos criar ele primeiro')
                 sleep(1.0)
-                break
-            elif percurso == '1':
-                aula = carregar_aula('mundo_1', 'aula_1')
-                print('\n' + carregar_aula('mundo_1', 'aula_1')['titulo'] + '\n')
-                for linha in aula['conteudo']:
-                    print(f'  >  {linha}')
-                    time = 1.2 if len(linha) < 40 else 2.2
-                    sleep(time)
+
+                nome = input("Digite seu nome: ").title()
+
+                while True:
+                    idade_input = input("Digite sua idade: ")
+                    idade = padronizar_idade(idade_input)
+
+                    if idade is not None:
+                        break
+                    else:
+                        print("ERRO, tente novamente")
+
+                usuario = criar_usuario(nome, idade)
+                salvar_usuario(usuario)
+                print('PERFIL CRIADO COM SUCESSO')
+                sleep(1.0)
+                tem_perfil = True
+            if tem_perfil:
+                print('\nSeu PERFIL:')
+                for chave, valor in usuario.items():
+                    print(f"{chave}: {valor}")
                 print('\n')
-
-
-            elif percurso == '2':
-                print("EM BREVE...")
-            elif percurso == '3':
-                print("EM BREVE...")
-            elif percurso == '4':
-                print("EM BREVE...")
-            elif percurso == '5':
-                print("EM BREVE...")
-            elif percurso == '6':
-                print("EM BREVE...")
-            elif percurso == '7':
-                print("EM BREVE...")
-            elif percurso == '8':
-                print("EM BREVE...")
-            else:
-                print("OPÇÃO INVÁLIDA, TENTE NOVAMENTE")
+                sleep(1)
+        case '2':
             sleep(1.0)
-            
-    elif menu == '3':
-        print('EM BREVE...\n')
-        sleep(1.0)
-    else: 
-        print('OPÇÃO INEXISTENTE\nTENTE NOVAMENTE...\n')
-        sleep(1.0)
+            print('\nPOR ENQUANTO O CODEQUEST SÓ TEM UM MUNDO, EM BREVE MAIS...\n')
+            sleep(1.5)
+            while True:
+                print('ESSE É O MUNDO 1 DO CODEQUEST')
+                percurso = menus('CODEQUEST - MUNDO 1',menu_mundo1)
+
+                sleep(1.0)
+                if percurso == '0':
+                    print('ABRINDO MENU...')
+                    sleep(1.0)
+                    break
+                elif percurso == '1':
+                    aula = carregar_aula('mundo_1', 'aula_1')
+                    print('\n' + carregar_aula('mundo_1', 'aula_1')['titulo'] + '\n')
+                    for linha in aula['conteudo']:
+                        print(f'  >  {linha}')
+                        time = 1.2 if len(linha) < 40 else 2.2
+                        sleep(time)
+                    print('\n')
+
+
+                elif percurso == '2':
+                    print("EM BREVE...")
+                elif percurso == '3':
+                    print("EM BREVE...")
+                elif percurso == '4':
+                    print("EM BREVE...")
+                elif percurso == '5':
+                    print("EM BREVE...")
+                elif percurso == '6':
+                    print("EM BREVE...")
+                elif percurso == '7':
+                    print("EM BREVE...")
+                elif percurso == '8':
+                    print("EM BREVE...")
+                else:
+                    print("OPÇÃO INVÁLIDA, TENTE NOVAMENTE")
+                sleep(1.0)
+        case '3':
+            print('EM BREVE...\n')
+            sleep(1.0)
+        case _ :
+            print('OPÇÃO INEXISTENTE\nTENTE NOVAMENTE...\n')
+            sleep(1.0)
