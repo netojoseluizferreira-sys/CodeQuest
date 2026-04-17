@@ -86,7 +86,7 @@ while True:
                         break
                     case '1':
                         aula = carregar_aula('mundo_1', 'aula_1')
-                        print('\n' + carregar_aula('mundo_1', 'aula_1')['titulo'] + '\n')
+                        print('\n' + aula['titulo'] + '\n')
                         for linha in aula['conteudo']:
                             print(f'  >  {linha}')
                             time = 1.2 if len(linha) < 40 else 2.2
