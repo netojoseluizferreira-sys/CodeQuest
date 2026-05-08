@@ -3,3 +3,13 @@ data/*.json
 
 !data/.gitkeep
 !data/aulas.json
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.env
