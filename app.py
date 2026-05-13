@@ -1,49 +1,53 @@
+from pick import pick
 from time import sleep
-from backend.usuario import criar_usuario, padronizar_idade, menus
+from backend.usuario import criar_usuario, padronizar_idade
 from backend.exercicios import carregar_aula
 from utils.json_utils import salvar_usuario, carregar_usuario
 
 aula = {}
 
-menu_principal = {
-    '0':'FECHAR O APP',
-    '1': 'MEU PERFIL',
-    '2': 'MUNDOS',
-    '3': 'RANKEAMENTO'
-}
+# Menus apenas com os nomes das opções
+menu_principal = [
+    'FECHAR O APP',
+    'MEU PERFIL',
+    'MUNDOS',
+    'RANKEAMENTO'
+]
 
-menu_mundo1 = {
-    '1':'AULA 1: VARIÁVEIS E VALORES',
-    '2':'EXERCICIO 1',
-    '3':'EXERCICIO 2',
-    '4':'AULA 2: OPERADORES MATEMÁTICO',
-    '5':'EXERCICIO 3',
-    '6':'EXERCICIO 4',
-    '7':'AULA 3: ENTRADA/SAIDA',
-    '8':'EXERCICIO 5',
-    '9':'EXERCICIO 6',
-    '0':'VOLTAR PARA O MENU'
-}
-
+menu_mundo1 = [
+    'VOLTAR PARA O MENU',
+    'AULA 1: VARIÁVEIS E VALORES',
+    'EXERCICIO 1',
+    'EXERCICIO 2',
+    'AULA 2: OPERADORES MATEMÁTICO',
+    'EXERCICIO 3',
+    'EXERCICIO 4',
+    'AULA 3: ENTRADA/SAIDA',
+    'EXERCICIO 5',
+    'EXERCICIO 6'
+]
 
 usuario = carregar_usuario()
 if usuario:
-    tem_perfil =  True
+    tem_perfil = True
 else:
     tem_perfil = False
 
 while True:
-    print('Bem vindo ao CodeQuest')
-    menu = menus('MENU PRINCIPAL', menu_principal)
+    print('\n=== Bem vindo ao CodeQuest ===\n')
+    
+    # Usando pick - retorna a opção selecionada e o índice
+    opcao, index = pick(menu_principal, "MENU PRINCIPAL", indicator='=>')
 
-    match menu:
-        case '0':
-            print('Fechando APP...\n')
+    match opcao:
+        case 'FECHAR O APP':
+            print('\nFechando APP...\n')
             sleep(1.0)
             break
-        case '1':
+            
+        case 'MEU PERFIL':
             if not tem_perfil:
-                print('Estou vendo que você ainda não tem um perfil, vamos criar ele primeiro')
+                print('\nEstou vendo que você ainda não tem um perfil, vamos criar ele primeiro\n')
                 sleep(1.0)
 
                 nome = input("Digite seu nome: ").title()
@@ -59,47 +63,67 @@ while True:
 
                 usuario = criar_usuario(nome, idade)
                 salvar_usuario(usuario)
-                print('PERFIL CRIADO COM SUCESSO')
+                print('\n✅ PERFIL CRIADO COM SUCESSO!')
                 sleep(1.0)
                 tem_perfil = True
-            if tem_perfil:
-                print('\nSeu PERFIL:')
-                for chave, valor in usuario.items():
-                    print(f"{chave}: {valor}")
-                print('\n')
-                sleep(1)
-        case '2':
-            sleep(1.0)
-            print('\nPOR ENQUANTO O CODEQUEST SÓ TEM UM MUNDO, EM BREVE MAIS...\n')
-            sleep(1.5)
-            while True:
-                print('ESSE É O MUNDO 1 DO CODEQUEST')
-                percurso = menus('CODEQUEST - MUNDO 1',menu_mundo1)
-
-                sleep(1.0)
                 
+            if tem_perfil:
+                print('\n📋 SEU PERFIL:')
+                print('=' * 30)
+                for chave, valor in usuario.items():
+                    print(f"  {chave.upper()}: {valor}")
+                print('=' * 30)
+                input('\nPressione ENTER para continuar...')
+                
+        case 'MUNDOS':
+            sleep(1.0)
+            print('\n🌍 POR ENQUANTO O CODEQUEST SÓ TEM UM MUNDO, EM BREVE MAIS...\n')
+            sleep(1.5)
+            
+            while True:
+                print('\n🏰 MUNDO 1 DO CODEQUEST 🏰\n')
+                
+                # Usando pick para o menu do mundo 1
+                opcao_mundo, index_mundo = pick(menu_mundo1, "CODEQUEST - MUNDO 1", indicator='=>')
 
-                match percurso:
-                    case '0':
-                        print('ABRINDO MENU...')
+                match opcao_mundo:
+                    case 'VOLTAR PARA O MENU':
+                        print('\n⬅️ Voltando ao menu principal...\n')
                         sleep(1.0)
                         break
-                    case '1':
+                        
+                    case 'AULA 1: VARIÁVEIS E VALORES':
                         aula = carregar_aula('mundo_1', 'aula_1')
-                        print('\n' + aula['titulo'] + '\n')
-                        for linha in aula['conteudo']:
-                            print(f'  >  {linha}')
-                            time = 1.2 if len(linha) < 40 else 2.2
-                            sleep(time)
-                        print('\n')
-                    case '2' | '3' | '4' | '6' | '7' | '8':
-                        print("EM BREVE...")
-                    case _ :
-                        print("OPÇÃO INVÁLIDA, TENTE NOVAMENTE")
-                sleep(1.0)
-        case '3':
-            print('EM BREVE...\n')
+                        if aula:
+                            print(f'\n📚 {aula["titulo"]}\n')
+                            print('=' * 50)
+                            for linha in aula['conteudo']:
+                                print(f'  ➤ {linha}')
+                                # Ajustando o tempo de exibição
+                                tempo = 1.2 if len(linha) < 40 else 2.2
+                                sleep(tempo)
+                            print('=' * 50)
+                            input('\n📖 Pressione ENTER para continuar...')
+                        else:
+                            print('\n❌ Erro ao carregar a aula!\n')
+                            sleep(1)
+                            
+                    case 'EXERCICIO 1' | 'EXERCICIO 2' | 'EXERCICIO 3' | 'EXERCICIO 4' | 'EXERCICIO 5' | 'EXERCICIO 6':
+                        print(f"\n🚧 Opção '{opcao_mundo}' em desenvolvimento... Em breve! 🚧\n")
+                        sleep(1.5)
+                        
+                    case 'AULA 2: OPERADORES MATEMÁTICO' | 'AULA 3: ENTRADA/SAIDA':
+                        print(f"\n🚧 '{opcao_mundo}' em desenvolvimento... Em breve! 🚧\n")
+                        sleep(1.5)
+                        
+                    case _:
+                        print("\n❌ OPÇÃO INVÁLIDA, TENTE NOVAMENTE\n")
+                        sleep(1.0)
+                        
+        case 'RANKEAMENTO':
+            print('\n🏆 RANKEAMENTO - Em breve... 🏆\n')
             sleep(1.0)
-        case _ :
-            print('OPÇÃO INEXISTENTE\nTENTE NOVAMENTE...\n')
+            
+        case _:
+            print('\n❌ OPÇÃO INEXISTENTE\nTENTE NOVAMENTE...\n')
             sleep(1.0)
