@@ -23,3 +23,5 @@ Atualmente, o projeto valida sua lógica central através de uma interface simpl
 4. Execute o arquivo principal:
    ```bash
    python app.py
+
+#Eu sou a aura
