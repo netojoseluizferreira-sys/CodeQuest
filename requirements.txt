@@ -4,7 +4,7 @@ fastapi>=0.104.0
 uvicorn>=0.24.0
 pick
 
-pygame>=2.5.0
+pygame-ce
 
 sqlite3
 
