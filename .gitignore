@@ -3,6 +3,7 @@ data/*.json
 
 !data/.gitkeep
 !data/aulas.json
+!data/exercicios.json
 
 __pycache__/
 *.py[cod]
@@ -14,3 +15,5 @@ venv/
 ENV/
 .env
 .vscode/
+
+xp_system.py
