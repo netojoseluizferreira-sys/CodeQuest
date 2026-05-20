@@ -1,10 +1,25 @@
 # backend/exercicio.py
 import json
 import os
+import sys
+
+def get_base_dir():
+    """Encontra o diretório raiz do projeto"""
+    # Tenta encontrar onde está app_streamlit.py
+    if hasattr(sys, '_getframe'):
+        current_file = os.path.abspath(__file__)
+        # Sobe duas pastas (backend -> raiz)
+        return os.path.dirname(os.path.dirname(current_file))
+    
+    # Fallback
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BASE_DIR = get_base_dir()
 
 def carregar_aula(mundo, aula_id):
-    diretorio_atual = os.path.dirname(__file__)
-    caminho_aula = os.path.join(diretorio_atual, "..", "data", "aulas.json")
+    caminho_aula = os.path.join(BASE_DIR, "data", "aulas.json")
+    
+    print(f"Procurando arquivo em: {caminho_aula}")  # Debug
     
     try:
         with open(caminho_aula, 'r', encoding='utf-8') as f:
@@ -12,15 +27,5 @@ def carregar_aula(mundo, aula_id):
             return dados[mundo][aula_id]
     except FileNotFoundError:
         print(f"ERRO: Arquivo não encontrado em: {os.path.abspath(caminho_aula)}")
+        print(f"BASE_DIR = {BASE_DIR}")
         return None
-
-def carregar_exercicios(mundo):
-    """Carrega exercícios de um mundo"""
-    caminho_exercicios = os.path.join(diretorio_atual, "..", "data", "exercicios.json")
-    
-    try:
-        with open(caminho_exercicios, 'r', encoding='utf-8') as f:
-            dados = json.load(f)
-            return dados.get(mundo, {})
-    except FileNotFoundError:
-        return {}
