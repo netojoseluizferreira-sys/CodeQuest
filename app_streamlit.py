@@ -1,6 +1,6 @@
 import streamlit as st
-from backend.usuario import criar_usuario, padronizar_idade
-from backend.exercicio import carregar_aula
+from backend.usuario import criar_usuario
+from backend.exercicio import carregar_aula, carregar_exercicios
 from utils.json_utils import salvar_usuario, carregar_usuario
 from backend.xp_system import xp_para_proximo_nivel, progresso_para_proximo_nivel
 
@@ -58,11 +58,9 @@ elif st.session_state.pagina == 'perfil':
         with col2:
             st.metric("⭐ XP Total", usuario['xp'])
         
-        # Barra de progresso para o próximo nível
+        # Barra de progresso para o próximo nível (usando a função correta)
         falta_xp = xp_para_proximo_nivel(usuario['xp'])
-        progresso = (usuario['xp'] % 100) / 100.0 if usuario['xp'] < 100 else 1.0
-        # Versão melhorada usando a função que você pode criar:
-        # progresso = progresso_para_proximo_nivel(usuario['xp'])
+        progresso = progresso_para_proximo_nivel(usuario['xp'])  # ✅ USANDO A FUNÇÃO
         
         st.progress(progresso)
         st.caption(f"📈 Faltam {falta_xp} XP para o próximo nível!")
@@ -88,18 +86,37 @@ elif st.session_state.pagina == 'mundos':
         st.session_state.pagina = 'menu'
         st.rerun()
 
-# ==================== MUNDO 1 - AULA ====================
+# ==================== MUNDO 1 - AULA E EXERCÍCIOS ====================
 elif st.session_state.pagina == 'mundo1':
     st.subheader("🏰 Cabana do Oráculo - Mundo 1")
     
-    aula = carregar_aula('mundo_1', 'aula_1')
+    # Abas para organizar Aula e Exercícios
+    aba1, aba2 = st.tabs(["📚 AULA", "📝 EXERCÍCIOS"])
     
-    if aula:
-        st.markdown(f"## 📚 {aula['titulo']}")
-        st.divider()
+    with aba1:
+        aula = carregar_aula('mundo_1', 'aula_1')
+        if aula:
+            st.markdown(f"## {aula['titulo']}")
+            st.divider()
+            for linha in aula['conteudo']:
+                st.markdown(f"➤ {linha}")
+    
+    with aba2:
+        st.markdown("### 🎯 Desafios do Oráculo")
+        st.caption("Responda os exercícios para ganhar XP!")
         
-        for linha in aula['conteudo']:
-            st.markdown(f"➤ {linha}")
+        # Carregar exercícios
+        from backend.exercicio import carregar_exercicios
+        from frontend.pages.exercicio import mostrar_exercicio
+        
+        exercicios = carregar_exercicios('mundo_1')
+        
+        if exercicios:
+            for ex_id, exercicio in exercicios.items():
+                with st.expander(f"Exercício {ex_id}"):
+                    mostrar_exercicio('mundo_1', ex_id, exercicio)
+        else:
+            st.info("📝 Exercícios em breve!")
     
     if st.button("🔙 Voltar aos Mundos"):
         st.session_state.pagina = 'mundos'

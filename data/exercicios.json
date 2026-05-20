@@ -1,0 +1,38 @@
+{
+  "mundo_1": {
+    "1": {
+      "id": 1,
+      "titulo": "O que é uma variável?",
+      "pergunta": "Em programação, o que é uma variável?",
+      "opcoes": [
+        "Um valor que nunca muda",
+        "Um espaço na memória para armazenar dados",
+        "Um tipo de loop infinito",
+        "Uma função especial"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "titulo": "Strings em Python",
+      "pergunta": "Como se declara uma string (texto) em Python?",
+      "opcoes": [
+        "Com aspas: 'texto' ou \"texto\"",
+        "Com colchetes: [texto]",
+        "Com chaves: {texto}",
+        "Com parenteses: (texto)"
+      ],
+      "resposta": 0,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "titulo": "Operador de atribuição",
+      "pergunta": "Qual símbolo é usado para ATRIBUIR um valor a uma variável em Python?",
+      "opcoes": ["==", "=", "=>", "->"],
+      "resposta": 1,
+      "xp": 10
+    }
+  }
+}
