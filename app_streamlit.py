@@ -2,6 +2,7 @@ import streamlit as st
 from backend.usuario import criar_usuario, padronizar_idade
 from backend.exercicio import carregar_aula
 from utils.json_utils import salvar_usuario, carregar_usuario
+from backend.xp_system import xp_para_proximo_nivel, progresso_para_proximo_nivel
 
 st.set_page_config(page_title="CodeQuest", page_icon="🎮", layout="centered")
 
@@ -49,10 +50,26 @@ elif st.session_state.pagina == 'perfil':
                 st.rerun()
     else:
         usuario = st.session_state.usuario
+        
+        # Dados do perfil
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("🏅 Nível", usuario['nivel'])
+        with col2:
+            st.metric("⭐ XP Total", usuario['xp'])
+        
+        # Barra de progresso para o próximo nível
+        falta_xp = xp_para_proximo_nivel(usuario['xp'])
+        progresso = (usuario['xp'] % 100) / 100.0 if usuario['xp'] < 100 else 1.0
+        # Versão melhorada usando a função que você pode criar:
+        # progresso = progresso_para_proximo_nivel(usuario['xp'])
+        
+        st.progress(progresso)
+        st.caption(f"📈 Faltam {falta_xp} XP para o próximo nível!")
+        
+        # Nome e idade
         st.write(f"**Nome:** {usuario['nome']}")
         st.write(f"**Idade:** {usuario['idade']}")
-        st.write(f"**XP:** {usuario['xp']}")
-        st.write(f"**Nível:** {usuario['nivel']}")
         
         if st.button("🔙 Voltar ao Menu"):
             st.session_state.pagina = 'menu'

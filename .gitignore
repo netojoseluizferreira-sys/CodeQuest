@@ -15,5 +15,3 @@ venv/
 ENV/
 .env
 .vscode/
-
-xp_system.py
