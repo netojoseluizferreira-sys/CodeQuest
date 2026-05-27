@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 import streamlit as st
 
 from backend.xp_system import adicionar_xp
@@ -50,6 +53,26 @@ def premiar_usuario_com_xp(exercicio):
     return subiu, novo_nivel
 
 
+def normalizar_resposta_texto(texto):
+    """Normaliza texto para comparar respostas abertas com mais tolerancia."""
+    sem_acentos = unicodedata.normalize("NFD", texto.lower())
+    sem_acentos = "".join(char for char in sem_acentos if unicodedata.category(char) != "Mn")
+    return re.sub(r"[^a-z0-9]+", " ", sem_acentos).strip()
+
+
+def resposta_correta(exercicio, resposta):
+    """Valida respostas de multipla escolha e de completar."""
+    if exercicio.get("tipo", "multipla_escolha") == "completar":
+        resposta_normalizada = normalizar_resposta_texto(resposta or "")
+        respostas_aceitas = [
+            normalizar_resposta_texto(item)
+            for item in exercicio.get("respostas_aceitas", [])
+        ]
+        return resposta_normalizada in respostas_aceitas
+
+    return resposta == exercicio["opcoes"][exercicio["resposta"]]
+
+
 def mostrar_status_tentativas(mundo, exercicio_id, limite_tentativas=MAX_TENTATIVAS_COM_XP):
     """Mostra o status de tentativas e se o XP ainda esta disponivel."""
     tentativas = obter_tentativas_exercicio(mundo, exercicio_id)
@@ -59,6 +82,31 @@ def mostrar_status_tentativas(mundo, exercicio_id, limite_tentativas=MAX_TENTATI
         st.caption(f"⭐ Tentativas com XP restantes: {restantes}/{limite_tentativas}")
     else:
         st.warning("⚠️ Voce ainda pode continuar tentando, mas este exercicio nao dara mais XP.")
+
+
+def mostrar_campo_resposta(mundo, exercicio_id, exercicio):
+    """Renderiza o controle correto para o tipo de exercicio."""
+    if exercicio.get("tipo", "multipla_escolha") == "completar":
+        return st.text_input(
+            "Complete a resposta:",
+            placeholder=exercicio.get("placeholder", "Digite sua resposta"),
+            key=f"resp_{mundo}_{exercicio_id}",
+        )
+
+    return st.radio(
+        "Escolha uma opcao:",
+        exercicio["opcoes"],
+        index=None,
+        key=f"resp_{mundo}_{exercicio_id}",
+    )
+
+
+def resposta_vazia(exercicio, resposta):
+    """Verifica se o usuario ainda nao respondeu."""
+    if exercicio.get("tipo", "multipla_escolha") == "completar":
+        return not resposta or not resposta.strip()
+
+    return resposta is None
 
 
 def mostrar_exercicio(mundo, exercicio_id, exercicio, limite_tentativas=MAX_TENTATIVAS_COM_XP):
@@ -72,26 +120,21 @@ def mostrar_exercicio(mundo, exercicio_id, exercicio, limite_tentativas=MAX_TENT
     st.subheader(f"📝 {exercicio.get('titulo', f'Exercicio {exercicio_id}')}")
     st.write(exercicio["pergunta"])
 
-    resposta = st.radio(
-        "Escolha uma opcao:",
-        exercicio["opcoes"],
-        index=None,
-        key=f"resp_{mundo}_{exercicio_id}",
-    )
+    resposta = mostrar_campo_resposta(mundo, exercicio_id, exercicio)
 
     if st.button("✅ Responder", key=f"btn_{mundo}_{exercicio_id}"):
         if st.session_state.usuario is None:
             st.error("❌ Crie um perfil primeiro!")
             return None
 
-        if resposta is None:
-            st.warning("⚠️ Escolha uma opcao antes de responder.")
+        if resposta_vazia(exercicio, resposta):
+            st.warning("⚠️ Responda antes de continuar.")
             return None
 
         tentativa_atual = registrar_tentativa_exercicio(mundo, exercicio_id)
         pode_ganhar_xp = tentativa_vale_xp(tentativa_atual, limite_tentativas)
 
-        if resposta == exercicio["opcoes"][exercicio["resposta"]]:
+        if resposta_correta(exercicio, resposta):
             if pode_ganhar_xp:
                 st.success(f"🎉 Acertou! +{exercicio['xp']} XP")
 

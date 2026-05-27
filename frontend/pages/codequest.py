@@ -27,29 +27,40 @@ def chave_fluxo(mundo, aula_id, sufixo):
 
 
 def inicializar_fluxo_aula_exercicios(mundo, aula_id):
-    """Cria o estado inicial de um fluxo aula -> exercicios em sequencia."""
-    st.session_state.setdefault(chave_fluxo(mundo, aula_id, "etapa"), "aula")
+    """Cria o estado inicial de uma trilha de aula e exercicios intercalados."""
+    st.session_state.setdefault(chave_fluxo(mundo, aula_id, "indice_etapa"), 0)
     st.session_state.setdefault(chave_fluxo(mundo, aula_id, "indice_exercicio"), 0)
+    st.session_state.setdefault(chave_fluxo(mundo, aula_id, "concluido"), False)
 
 
-def obter_etapa_fluxo(mundo, aula_id):
-    """Retorna a etapa atual do fluxo."""
-    return st.session_state[chave_fluxo(mundo, aula_id, "etapa")]
+def obter_indice_etapa_atual(mundo, aula_id):
+    """Retorna o indice da etapa atual da trilha."""
+    return st.session_state[chave_fluxo(mundo, aula_id, "indice_etapa")]
 
 
-def definir_etapa_fluxo(mundo, aula_id, etapa):
-    """Atualiza a etapa atual do fluxo."""
-    st.session_state[chave_fluxo(mundo, aula_id, "etapa")] = etapa
+def definir_indice_etapa_atual(mundo, aula_id, indice):
+    """Atualiza o indice da etapa atual da trilha."""
+    st.session_state[chave_fluxo(mundo, aula_id, "indice_etapa")] = indice
 
 
 def obter_indice_exercicio_atual(mundo, aula_id):
-    """Retorna o indice do exercicio atual dentro do fluxo."""
+    """Retorna o indice do exercicio atual dentro de um bloco."""
     return st.session_state[chave_fluxo(mundo, aula_id, "indice_exercicio")]
 
 
 def definir_indice_exercicio_atual(mundo, aula_id, indice):
-    """Atualiza o indice do exercicio atual dentro do fluxo."""
+    """Atualiza o indice do exercicio atual dentro de um bloco."""
     st.session_state[chave_fluxo(mundo, aula_id, "indice_exercicio")] = indice
+
+
+def fluxo_concluido(mundo, aula_id):
+    """Verifica se a trilha foi concluida."""
+    return st.session_state[chave_fluxo(mundo, aula_id, "concluido")]
+
+
+def definir_fluxo_concluido(mundo, aula_id, concluido):
+    """Atualiza o status de conclusao da trilha."""
+    st.session_state[chave_fluxo(mundo, aula_id, "concluido")] = concluido
 
 
 def ordenar_ids_exercicios(exercicios):
@@ -57,71 +68,105 @@ def ordenar_ids_exercicios(exercicios):
     return sorted(exercicios.keys(), key=lambda item: int(item) if str(item).isdigit() else str(item))
 
 
+def obter_trilha_aula(aula, exercicios):
+    """Retorna a trilha configurada ou monta uma trilha legada para aulas antigas."""
+    if aula and aula.get("trilha"):
+        return aula["trilha"]
+
+    return [
+        {
+            "tipo": "aula",
+            "id": "texto_unico",
+            "titulo": aula.get("titulo", "Aula") if aula else "Aula",
+            "conteudo": aula.get("conteudo", []) if aula else [],
+        },
+        {
+            "tipo": "exercicios",
+            "id": "exercicios",
+            "titulo": "Exercicios",
+            "exercicios": ordenar_ids_exercicios(exercicios),
+        },
+    ]
+
+
 def reiniciar_fluxo_aula_exercicios(mundo, aula_id):
-    """Volta o fluxo para a aula inicial."""
-    definir_etapa_fluxo(mundo, aula_id, "aula")
+    """Volta a trilha para a primeira etapa."""
+    definir_indice_etapa_atual(mundo, aula_id, 0)
     definir_indice_exercicio_atual(mundo, aula_id, 0)
+    definir_fluxo_concluido(mundo, aula_id, False)
     st.rerun()
 
 
-def iniciar_exercicios_do_fluxo(mundo, aula_id):
-    """Move o fluxo da aula para o primeiro exercicio."""
-    definir_etapa_fluxo(mundo, aula_id, "exercicios")
+def avancar_etapa_do_fluxo(mundo, aula_id, total_etapas):
+    """Avanca para a proxima etapa ou conclui a trilha."""
+    proxima_etapa = obter_indice_etapa_atual(mundo, aula_id) + 1
     definir_indice_exercicio_atual(mundo, aula_id, 0)
-    st.rerun()
 
-
-def avancar_exercicio_do_fluxo(mundo, aula_id, total_exercicios):
-    """Avanca para o proximo exercicio ou encerra o fluxo."""
-    proximo_indice = obter_indice_exercicio_atual(mundo, aula_id) + 1
-
-    if proximo_indice >= total_exercicios:
-        definir_etapa_fluxo(mundo, aula_id, "concluido")
+    if proxima_etapa >= total_etapas:
+        definir_fluxo_concluido(mundo, aula_id, True)
     else:
-        definir_indice_exercicio_atual(mundo, aula_id, proximo_indice)
+        definir_indice_etapa_atual(mundo, aula_id, proxima_etapa)
 
     st.rerun()
 
 
-def mostrar_tela_aula(aula, mundo, aula_id):
-    """Renderiza a tela de aula do fluxo."""
-    if not aula:
-        st.info("📚 Aula nao encontrada.")
-        return
+def avancar_exercicio_ou_etapa(mundo, aula_id, etapa, total_etapas):
+    """Avanca dentro do bloco de exercicios ou passa para a proxima etapa."""
+    indice_exercicio = obter_indice_exercicio_atual(mundo, aula_id)
+    proximo_exercicio = indice_exercicio + 1
 
-    st.markdown(f"## 📚 {aula['titulo']}")
+    if proximo_exercicio >= len(etapa["exercicios"]):
+        avancar_etapa_do_fluxo(mundo, aula_id, total_etapas)
+    else:
+        definir_indice_exercicio_atual(mundo, aula_id, proximo_exercicio)
+        st.rerun()
+
+
+def mostrar_tela_aula(etapa, mundo, aula_id, total_etapas):
+    """Renderiza uma pagina de texto da aula."""
+    st.caption(f"📚 Aula • etapa {obter_indice_etapa_atual(mundo, aula_id) + 1} de {total_etapas}")
+    st.markdown(f"## 📚 {etapa['titulo']}")
     st.divider()
 
-    for linha in aula["conteudo"]:
+    for linha in etapa.get("conteudo", []):
         st.markdown(f"➤ {linha}")
 
-    if st.button("📝 Ir para os exercicios", use_container_width=True):
-        iniciar_exercicios_do_fluxo(mundo, aula_id)
+    if st.button("➡️ Continuar", use_container_width=True):
+        avancar_etapa_do_fluxo(mundo, aula_id, total_etapas)
 
 
-def mostrar_tela_exercicio_atual(mundo, aula_id, exercicios):
-    """Renderiza somente um exercicio por tela, seguindo a ordem configurada."""
-    if not exercicios:
+def mostrar_tela_exercicio_atual(mundo, aula_id, etapa, exercicios, total_etapas):
+    """Renderiza um exercicio por tela dentro do bloco atual."""
+    ids_exercicios = etapa.get("exercicios", [])
+
+    if not ids_exercicios:
         st.info("📝 Exercicios em breve!")
         return
 
-    ids_exercicios = ordenar_ids_exercicios(exercicios)
     indice_atual = min(obter_indice_exercicio_atual(mundo, aula_id), len(ids_exercicios) - 1)
     definir_indice_exercicio_atual(mundo, aula_id, indice_atual)
-    exercicio_id = ids_exercicios[indice_atual]
-    exercicio = exercicios[exercicio_id]
 
-    st.caption(f"🎯 Exercicio {indice_atual + 1} de {len(ids_exercicios)}")
+    exercicio_id = ids_exercicios[indice_atual]
+    exercicio = exercicios.get(exercicio_id)
+
+    if exercicio is None:
+        st.error(f"❌ Exercicio {exercicio_id} nao encontrado.")
+        return
+
+    st.caption(
+        f"🎯 {etapa.get('titulo', 'Pratica')} • exercicio {indice_atual + 1} de {len(ids_exercicios)}"
+    )
     resultado = mostrar_exercicio(mundo, exercicio_id, exercicio)
 
     if resultado in {"acertou", "concluido"}:
-        texto_botao = "🏁 Finalizar aula" if indice_atual == len(ids_exercicios) - 1 else "➡️ Proximo exercicio"
+        ultimo_exercicio = indice_atual == len(ids_exercicios) - 1
+        texto_botao = "➡️ Continuar aula" if ultimo_exercicio else "➡️ Proximo exercicio"
         if st.button(texto_botao, use_container_width=True):
-            avancar_exercicio_do_fluxo(mundo, aula_id, len(ids_exercicios))
+            avancar_exercicio_ou_etapa(mundo, aula_id, etapa, total_etapas)
 
 
 def mostrar_tela_fluxo_concluido(mundo, aula_id):
-    """Renderiza a tela final do fluxo."""
+    """Renderiza a tela final da trilha."""
     st.success("✅ Aula e exercicios concluidos!")
 
     col1, col2 = st.columns(2)
@@ -134,21 +179,30 @@ def mostrar_tela_fluxo_concluido(mundo, aula_id):
 
 
 def mostrar_fluxo_aula_exercicios(mundo, aula_id, titulo):
-    """Controla um fluxo reutilizavel de aula seguida por exercicios sequenciais."""
+    """Controla uma trilha reutilizavel de textos e exercicios intercalados."""
     inicializar_fluxo_aula_exercicios(mundo, aula_id)
 
     st.subheader(titulo)
 
-    etapa = obter_etapa_fluxo(mundo, aula_id)
     aula = carregar_aula(mundo, aula_id)
     exercicios = carregar_exercicios(mundo)
+    trilha = obter_trilha_aula(aula, exercicios)
 
-    if etapa == "aula":
-        mostrar_tela_aula(aula, mundo, aula_id)
-    elif etapa == "exercicios":
-        mostrar_tela_exercicio_atual(mundo, aula_id, exercicios)
-    else:
+    if not aula:
+        st.info("📚 Aula nao encontrada.")
+    elif fluxo_concluido(mundo, aula_id):
         mostrar_tela_fluxo_concluido(mundo, aula_id)
+    else:
+        indice_etapa = min(obter_indice_etapa_atual(mundo, aula_id), len(trilha) - 1)
+        definir_indice_etapa_atual(mundo, aula_id, indice_etapa)
+        etapa = trilha[indice_etapa]
+
+        if etapa["tipo"] == "aula":
+            mostrar_tela_aula(etapa, mundo, aula_id, len(trilha))
+        elif etapa["tipo"] == "exercicios":
+            mostrar_tela_exercicio_atual(mundo, aula_id, etapa, exercicios, len(trilha))
+        else:
+            st.error(f"❌ Tipo de etapa desconhecido: {etapa['tipo']}")
 
     if st.button("🔙 Voltar aos Mundos"):
         ir_para_pagina("mundos")

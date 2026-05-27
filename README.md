@@ -39,8 +39,8 @@ Arquivos locais ignorados pelo Git:
 
 - 👤 Criação e carregamento de perfil local.
 - 🌍 Menu de mundos com Mundo 1 disponível.
-- 📚 Aula teórica renderizada antes dos exercícios.
-- 📝 Exercícios em sequência, um por tela.
+- 📚 Aula teórica dividida em páginas curtas.
+- 📝 Exercícios em sequência, um por tela, intercalados com os textos da aula.
 - ⭐ Sistema de XP e níveis.
 - 🎯 Limite de 3 tentativas com XP por exercício.
 - ⚠️ Tentativas extras continuam liberadas, mas sem conceder XP.
@@ -54,9 +54,9 @@ Arquivos locais ignorados pelo Git:
 | Perfil do usuário | ✅ Feito | Nome, idade, XP, nível e conquistas. |
 | Salvamento local | ✅ Feito | Persistência via JSON. |
 | Mundo 1 | ✅ Parcial | Cabana do Oráculo disponível. |
-| Aula teórica | ✅ Feito | Aula 1 carregada de `data/aulas.json`. |
-| Exercícios | 🟡 Em progresso | Há 3 exercícios no JSON; documentação do MVP prevê 5. |
-| Fluxo aula → exercícios | ✅ Feito | Telas separadas e sequência controlada no frontend. |
+| Aula teórica | ✅ Feito | Aula 1 dividida em 3 textos de estudo. |
+| Exercícios | ✅ Feito | Aula 1 possui 15 exercícios intercalados em blocos de 5. |
+| Fluxo aula → exercícios | ✅ Feito | Trilha no padrão texto → 5 exercícios → texto → 5 exercícios. |
 | Sistema de XP | ✅ Feito | XP por acerto dentro do limite de tentativas. |
 | Sistema de níveis | ✅ Feito | Nível calculado por faixas de XP. |
 | Feedback acerto/erro | ✅ Feito | Feedback imediato no Streamlit. |
