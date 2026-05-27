@@ -7,7 +7,9 @@ from backend.xp_system import adicionar_xp
 from utils.json_utils import salvar_usuario
 
 
-MAX_TENTATIVAS_COM_XP = 3
+XP_BASE_PADRAO = 10
+XP_MINIMO_POR_EXERCICIO = 2
+PENALIDADE_XP_POR_ERRO = 2
 
 
 def chave_exercicio(mundo, exercicio_id, sufixo):
@@ -15,14 +17,14 @@ def chave_exercicio(mundo, exercicio_id, sufixo):
     return f"{mundo}_exercicio_{exercicio_id}_{sufixo}"
 
 
-def obter_tentativas_exercicio(mundo, exercicio_id):
-    """Retorna quantas respostas ja foram enviadas neste exercicio."""
-    return st.session_state.get(chave_exercicio(mundo, exercicio_id, "tentativas"), 0)
+def obter_erros_exercicio(mundo, exercicio_id):
+    """Retorna quantas respostas erradas ja foram enviadas neste exercicio."""
+    return st.session_state.get(chave_exercicio(mundo, exercicio_id, "erros"), 0)
 
 
-def registrar_tentativa_exercicio(mundo, exercicio_id):
-    """Incrementa e retorna o total de tentativas do exercicio."""
-    chave = chave_exercicio(mundo, exercicio_id, "tentativas")
+def registrar_erro_exercicio(mundo, exercicio_id):
+    """Incrementa e retorna o total de erros do exercicio."""
+    chave = chave_exercicio(mundo, exercicio_id, "erros")
     st.session_state[chave] = st.session_state.get(chave, 0) + 1
     return st.session_state[chave]
 
@@ -37,15 +39,29 @@ def marcar_exercicio_concluido(mundo, exercicio_id):
     st.session_state[chave_exercicio(mundo, exercicio_id, "concluido")] = True
 
 
-def tentativa_vale_xp(tentativa, limite_tentativas=MAX_TENTATIVAS_COM_XP):
-    """Define se a tentativa ainda permite ganhar XP."""
-    return tentativa <= limite_tentativas
+def calcular_xp_disponivel(exercicio, erros):
+    """Calcula o XP atual do exercicio com penalidade por erro e piso minimo."""
+    xp_base = exercicio.get("xp", XP_BASE_PADRAO)
+    xp_com_penalidade = xp_base - (erros * PENALIDADE_XP_POR_ERRO)
+    return max(XP_MINIMO_POR_EXERCICIO, xp_com_penalidade)
 
 
-def premiar_usuario_com_xp(exercicio):
+def frase_xp_disponivel(xp):
+    """Retorna uma frase diferente para cada faixa de XP disponivel."""
+    frases = {
+        10: "🌟 Perfeito até aqui: este desafio ainda vale 10 XP!",
+        8: "💪 Um tropeço só: ainda dá para garantir 8 XP.",
+        6: "🧠 Ajustando a rota: agora este desafio vale 6 XP.",
+        4: "🔥 Persistência conta: você ainda pode ganhar 4 XP.",
+        2: "🛡️ Modo resgate: o mínimo garantido agora é 2 XP.",
+    }
+    return frases.get(xp, f"⭐ Este desafio vale {xp} XP agora.")
+
+
+def premiar_usuario_com_xp(quantidade_xp):
     """Adiciona o XP do exercicio ao usuario e persiste os dados."""
     usuario = st.session_state.usuario
-    subiu, novo_nivel = adicionar_xp(usuario, exercicio["xp"])
+    subiu, novo_nivel = adicionar_xp(usuario, quantidade_xp)
 
     salvar_usuario(usuario)
     st.session_state.usuario = usuario
@@ -73,15 +89,14 @@ def resposta_correta(exercicio, resposta):
     return resposta == exercicio["opcoes"][exercicio["resposta"]]
 
 
-def mostrar_status_tentativas(mundo, exercicio_id, limite_tentativas=MAX_TENTATIVAS_COM_XP):
-    """Mostra o status de tentativas e se o XP ainda esta disponivel."""
-    tentativas = obter_tentativas_exercicio(mundo, exercicio_id)
-    restantes = max(limite_tentativas - tentativas, 0)
+def mostrar_status_xp(mundo, exercicio_id, exercicio):
+    """Mostra o XP atual do exercicio conforme os erros acumulados."""
+    erros = obter_erros_exercicio(mundo, exercicio_id)
+    xp_disponivel = calcular_xp_disponivel(exercicio, erros)
 
-    if restantes > 0:
-        st.caption(f"⭐ Tentativas com XP restantes: {restantes}/{limite_tentativas}")
-    else:
-        st.warning("⚠️ Voce ainda pode continuar tentando, mas este exercicio nao dara mais XP.")
+    st.caption(frase_xp_disponivel(xp_disponivel))
+    if erros > 0:
+        st.caption(f"Erros neste exercicio: {erros}")
 
 
 def mostrar_campo_resposta(mundo, exercicio_id, exercicio):
@@ -109,13 +124,13 @@ def resposta_vazia(exercicio, resposta):
     return resposta is None
 
 
-def mostrar_exercicio(mundo, exercicio_id, exercicio, limite_tentativas=MAX_TENTATIVAS_COM_XP):
+def mostrar_exercicio(mundo, exercicio_id, exercicio):
     """Renderiza um exercicio e retorna 'acertou', 'errou', 'concluido' ou None."""
     if exercicio_concluido(mundo, exercicio_id):
         st.info("✅ Voce ja completou este exercicio!")
         return "concluido"
 
-    mostrar_status_tentativas(mundo, exercicio_id, limite_tentativas)
+    mostrar_status_xp(mundo, exercicio_id, exercicio)
 
     st.subheader(f"📝 {exercicio.get('titulo', f'Exercicio {exercicio_id}')}")
     st.write(exercicio["pergunta"])
@@ -131,25 +146,24 @@ def mostrar_exercicio(mundo, exercicio_id, exercicio, limite_tentativas=MAX_TENT
             st.warning("⚠️ Responda antes de continuar.")
             return None
 
-        tentativa_atual = registrar_tentativa_exercicio(mundo, exercicio_id)
-        pode_ganhar_xp = tentativa_vale_xp(tentativa_atual, limite_tentativas)
+        erros_atuais = obter_erros_exercicio(mundo, exercicio_id)
+        xp_disponivel = calcular_xp_disponivel(exercicio, erros_atuais)
 
         if resposta_correta(exercicio, resposta):
-            if pode_ganhar_xp:
-                st.success(f"🎉 Acertou! +{exercicio['xp']} XP")
+            st.success(f"🎉 Acertou! {frase_xp_disponivel(xp_disponivel)} +{xp_disponivel} XP")
 
-                subiu, novo_nivel = premiar_usuario_com_xp(exercicio)
+            subiu, novo_nivel = premiar_usuario_com_xp(xp_disponivel)
 
-                if subiu:
-                    st.balloons()
-                    st.success(f"✨ Parabens! Voce subiu para o nivel {novo_nivel}!")
-            else:
-                st.success("🎉 Acertou! Como o limite de tentativas com XP acabou, nenhum XP foi adicionado.")
+            if subiu:
+                st.balloons()
+                st.success(f"✨ Parabens! Voce subiu para o nivel {novo_nivel}!")
 
             marcar_exercicio_concluido(mundo, exercicio_id)
             return "acertou"
 
-        st.error("❌ Errou! Tente novamente.")
+        erros = registrar_erro_exercicio(mundo, exercicio_id)
+        proximo_xp = calcular_xp_disponivel(exercicio, erros)
+        st.error(f"❌ Errou! Tente novamente. {frase_xp_disponivel(proximo_xp)}")
         return "errou"
 
     return None

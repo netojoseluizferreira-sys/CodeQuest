@@ -4,7 +4,7 @@
 
 ## 📋 Sobre o Projeto
 
-O projeto organiza o aprendizado em mundos temáticos. No estado atual, o usuário cria um perfil, entra no Mundo 1, lê uma aula e responde exercícios em sequência. Cada exercício pode conceder XP quando acertado dentro do limite de tentativas com recompensa.
+O projeto organiza o aprendizado em mundos temáticos. No estado atual, o usuário cria um perfil, entra no Mundo 1, lê uma aula e responde exercícios em sequência. Cada exercício começa valendo 10 XP, perde 2 XP a cada erro e mantém um mínimo de 2 XP como recompensa.
 
 O foco do MVP é validar o ciclo principal:
 
@@ -42,8 +42,8 @@ Arquivos locais ignorados pelo Git:
 - 📚 Aula teórica dividida em páginas curtas.
 - 📝 Exercícios em sequência, um por tela, intercalados com os textos da aula.
 - ⭐ Sistema de XP e níveis.
-- 🎯 Limite de 3 tentativas com XP por exercício.
-- ⚠️ Tentativas extras continuam liberadas, mas sem conceder XP.
+- 🎯 XP dinâmico por exercício: 10, 8, 6, 4 e mínimo de 2 XP.
+- ⚠️ Cada erro reduz a recompensa disponível em 2 XP.
 - 💾 Persistência local do usuário em JSON.
 
 ## 📊 Progresso do MVP
@@ -57,7 +57,7 @@ Arquivos locais ignorados pelo Git:
 | Aula teórica | ✅ Feito | Aula 1 dividida em 3 textos de estudo. |
 | Exercícios | ✅ Feito | Aula 1 possui 15 exercícios intercalados em blocos de 5. |
 | Fluxo aula → exercícios | ✅ Feito | Trilha no padrão texto → 5 exercícios → texto → 5 exercícios. |
-| Sistema de XP | ✅ Feito | XP por acerto dentro do limite de tentativas. |
+| Sistema de XP | ✅ Feito | XP por acerto com penalidade de 2 XP por erro, até o mínimo de 2 XP. |
 | Sistema de níveis | ✅ Feito | Nível calculado por faixas de XP. |
 | Feedback acerto/erro | ✅ Feito | Feedback imediato no Streamlit. |
 | Cutscenes/API de mídia | 🔜 Pendente | Planejado no documento atualizado. |
