@@ -1,44 +1,112 @@
 import streamlit as st
+
 from backend.xp_system import adicionar_xp
 from utils.json_utils import salvar_usuario
 
-def mostrar_exercicio(mundo, exercicio_id, exercicio):
-    if st.session_state.get(f'exercicio_{exercicio_id}_concluido', False):
-        st.info("✅ Você já completou este exercício!")
-        return
-    
-    st.subheader(f"📝 {exercicio.get('titulo', f'Exercício {exercicio_id}')}")
-    st.write(exercicio['pergunta'])
-    
+
+MAX_TENTATIVAS_COM_XP = 3
+
+
+def chave_exercicio(mundo, exercicio_id, sufixo):
+    """Monta uma chave unica para controles de estado do exercicio."""
+    return f"{mundo}_exercicio_{exercicio_id}_{sufixo}"
+
+
+def obter_tentativas_exercicio(mundo, exercicio_id):
+    """Retorna quantas respostas ja foram enviadas neste exercicio."""
+    return st.session_state.get(chave_exercicio(mundo, exercicio_id, "tentativas"), 0)
+
+
+def registrar_tentativa_exercicio(mundo, exercicio_id):
+    """Incrementa e retorna o total de tentativas do exercicio."""
+    chave = chave_exercicio(mundo, exercicio_id, "tentativas")
+    st.session_state[chave] = st.session_state.get(chave, 0) + 1
+    return st.session_state[chave]
+
+
+def exercicio_concluido(mundo, exercicio_id):
+    """Verifica se o exercicio ja foi acertado."""
+    return st.session_state.get(chave_exercicio(mundo, exercicio_id, "concluido"), False)
+
+
+def marcar_exercicio_concluido(mundo, exercicio_id):
+    """Marca um exercicio como concluido no estado da sessao."""
+    st.session_state[chave_exercicio(mundo, exercicio_id, "concluido")] = True
+
+
+def tentativa_vale_xp(tentativa, limite_tentativas=MAX_TENTATIVAS_COM_XP):
+    """Define se a tentativa ainda permite ganhar XP."""
+    return tentativa <= limite_tentativas
+
+
+def premiar_usuario_com_xp(exercicio):
+    """Adiciona o XP do exercicio ao usuario e persiste os dados."""
+    usuario = st.session_state.usuario
+    subiu, novo_nivel = adicionar_xp(usuario, exercicio["xp"])
+
+    salvar_usuario(usuario)
+    st.session_state.usuario = usuario
+
+    return subiu, novo_nivel
+
+
+def mostrar_status_tentativas(mundo, exercicio_id, limite_tentativas=MAX_TENTATIVAS_COM_XP):
+    """Mostra o status de tentativas e se o XP ainda esta disponivel."""
+    tentativas = obter_tentativas_exercicio(mundo, exercicio_id)
+    restantes = max(limite_tentativas - tentativas, 0)
+
+    if restantes > 0:
+        st.caption(f"⭐ Tentativas com XP restantes: {restantes}/{limite_tentativas}")
+    else:
+        st.warning("⚠️ Voce ainda pode continuar tentando, mas este exercicio nao dara mais XP.")
+
+
+def mostrar_exercicio(mundo, exercicio_id, exercicio, limite_tentativas=MAX_TENTATIVAS_COM_XP):
+    """Renderiza um exercicio e retorna 'acertou', 'errou', 'concluido' ou None."""
+    if exercicio_concluido(mundo, exercicio_id):
+        st.info("✅ Voce ja completou este exercicio!")
+        return "concluido"
+
+    mostrar_status_tentativas(mundo, exercicio_id, limite_tentativas)
+
+    st.subheader(f"📝 {exercicio.get('titulo', f'Exercicio {exercicio_id}')}")
+    st.write(exercicio["pergunta"])
+
     resposta = st.radio(
-        "Escolha uma opção:",
-        exercicio['opcoes'],
+        "Escolha uma opcao:",
+        exercicio["opcoes"],
         index=None,
-        key=f"resp_{exercicio_id}"
+        key=f"resp_{mundo}_{exercicio_id}",
     )
-    
-    if st.button("✅ Responder", key=f"btn_{exercicio_id}"):
+
+    if st.button("✅ Responder", key=f"btn_{mundo}_{exercicio_id}"):
         if st.session_state.usuario is None:
             st.error("❌ Crie um perfil primeiro!")
-            return
-        
-        if resposta == exercicio['opcoes'][exercicio['resposta']]:
-            st.success(f"🎉 Acertou! +{exercicio['xp']} XP")
-            
-            # Adicionar XP ao usuário
-            usuario = st.session_state.usuario
-            subiu, novo_nivel = adicionar_xp(usuario, exercicio['xp'])
-            
-            if subiu:
-                st.balloons()
-                st.success(f"✨ PARABÉNS! Você subiu para o nível {novo_nivel}!")
-            
-            # Salvar progresso
-            salvar_usuario(usuario)
-            st.session_state.usuario = usuario
-            
-            # Marcar como concluído
-            st.session_state[f'exercicio_{exercicio_id}_concluido'] = True
-            st.rerun()
-        else:
-            st.error("❌ Errou! Tente novamente.")
+            return None
+
+        if resposta is None:
+            st.warning("⚠️ Escolha uma opcao antes de responder.")
+            return None
+
+        tentativa_atual = registrar_tentativa_exercicio(mundo, exercicio_id)
+        pode_ganhar_xp = tentativa_vale_xp(tentativa_atual, limite_tentativas)
+
+        if resposta == exercicio["opcoes"][exercicio["resposta"]]:
+            if pode_ganhar_xp:
+                st.success(f"🎉 Acertou! +{exercicio['xp']} XP")
+
+                subiu, novo_nivel = premiar_usuario_com_xp(exercicio)
+
+                if subiu:
+                    st.balloons()
+                    st.success(f"✨ Parabens! Voce subiu para o nivel {novo_nivel}!")
+            else:
+                st.success("🎉 Acertou! Como o limite de tentativas com XP acabou, nenhum XP foi adicionado.")
+
+            marcar_exercicio_concluido(mundo, exercicio_id)
+            return "acertou"
+
+        st.error("❌ Errou! Tente novamente.")
+        return "errou"
+
+    return None
