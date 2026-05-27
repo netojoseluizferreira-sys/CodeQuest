@@ -3,7 +3,7 @@ def criar_usuario(nome, idade):
         "nome": nome,
         "idade": idade,
         "xp": 0,
-        "nivel": 0,
+        "nivel": 1,
         "conquistas": []
     }
 

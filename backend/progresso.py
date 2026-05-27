@@ -2,7 +2,8 @@
 import json
 import os
 
-PROGRESSO_FILE = os.path.join("data", "progresso.json")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROGRESSO_FILE = os.path.join(BASE_DIR, "data", "progresso.json")
 
 def salvar_progresso(usuario_nome, modulo, exercicio_id):
     """Salva qual exercício o usuário concluiu"""
