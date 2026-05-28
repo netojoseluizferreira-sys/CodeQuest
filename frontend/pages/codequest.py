@@ -7,7 +7,14 @@ from utils.database import carregar_usuario, criar_usuario, resetar_banco_de_dad
 
 
 def inicializar_estado_global():
-    """Inicializa dados usados em todas as telas."""
+    """Prepara os dados globais da sessao do Streamlit.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     if "usuario" not in st.session_state:
         st.session_state.usuario = carregar_usuario()
     if "pagina" not in st.session_state:
@@ -17,13 +24,27 @@ def inicializar_estado_global():
 
 
 def ir_para_pagina(pagina):
-    """Troca a tela atual e recarrega o app."""
+    """Altera a pagina ativa e recarrega a interface.
+
+    Recebe:
+        pagina: Nome interno da pagina que deve ser exibida.
+
+    Retorna:
+        None.
+    """
     st.session_state.pagina = pagina
     st.rerun()
 
 
 def resetar_estado_app():
-    """Limpa dados persistidos e estado em memoria para testes."""
+    """Apaga dados persistidos e limpa a sessao para testes.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     resetar_banco_de_dados()
     st.session_state.clear()
     st.session_state.db_resetado = True
@@ -31,54 +52,137 @@ def resetar_estado_app():
 
 
 def chave_fluxo(mundo, aula_id, sufixo):
-    """Monta chaves reaproveitaveis para fluxos de aula e exercicios."""
+    """Monta uma chave unica para estado de fluxo no Streamlit.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        sufixo: Parte final que identifica o dado guardado.
+
+    Retorna:
+        String usada como chave em st.session_state.
+    """
     return f"fluxo_{mundo}_{aula_id}_{sufixo}"
 
 
 def inicializar_fluxo_aula_exercicios(mundo, aula_id):
-    """Cria o estado inicial de uma trilha de aula e exercicios intercalados."""
+    """Inicializa o estado de uma trilha de aula e exercicios.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+
+    Retorna:
+        None.
+    """
     st.session_state.setdefault(chave_fluxo(mundo, aula_id, "indice_etapa"), 0)
     st.session_state.setdefault(chave_fluxo(mundo, aula_id, "indice_exercicio"), 0)
     st.session_state.setdefault(chave_fluxo(mundo, aula_id, "concluido"), False)
 
 
 def obter_indice_etapa_atual(mundo, aula_id):
-    """Retorna o indice da etapa atual da trilha."""
+    """Busca o indice da etapa atual da trilha.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+
+    Retorna:
+        Indice inteiro da etapa atual.
+    """
     return st.session_state[chave_fluxo(mundo, aula_id, "indice_etapa")]
 
 
 def definir_indice_etapa_atual(mundo, aula_id, indice):
-    """Atualiza o indice da etapa atual da trilha."""
+    """Atualiza o indice da etapa atual da trilha.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        indice: Novo indice da etapa.
+
+    Retorna:
+        None.
+    """
     st.session_state[chave_fluxo(mundo, aula_id, "indice_etapa")] = indice
 
 
 def obter_indice_exercicio_atual(mundo, aula_id):
-    """Retorna o indice do exercicio atual dentro de um bloco."""
+    """Busca o indice do exercicio atual dentro da etapa.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+
+    Retorna:
+        Indice inteiro do exercicio atual.
+    """
     return st.session_state[chave_fluxo(mundo, aula_id, "indice_exercicio")]
 
 
 def definir_indice_exercicio_atual(mundo, aula_id, indice):
-    """Atualiza o indice do exercicio atual dentro de um bloco."""
+    """Atualiza o indice do exercicio atual dentro da etapa.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        indice: Novo indice do exercicio.
+
+    Retorna:
+        None.
+    """
     st.session_state[chave_fluxo(mundo, aula_id, "indice_exercicio")] = indice
 
 
 def fluxo_concluido(mundo, aula_id):
-    """Verifica se a trilha foi concluida."""
+    """Verifica se a trilha de aula foi concluida.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+
+    Retorna:
+        True quando a trilha foi concluida; caso contrario, False.
+    """
     return st.session_state[chave_fluxo(mundo, aula_id, "concluido")]
 
 
 def definir_fluxo_concluido(mundo, aula_id, concluido):
-    """Atualiza o status de conclusao da trilha."""
+    """Atualiza o status de conclusao da trilha.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        concluido: Booleano com o novo status da trilha.
+
+    Retorna:
+        None.
+    """
     st.session_state[chave_fluxo(mundo, aula_id, "concluido")] = concluido
 
 
 def ordenar_ids_exercicios(exercicios):
-    """Ordena os IDs de exercicios, preservando IDs numericos em ordem natural."""
+    """Ordena os IDs de exercicios em ordem natural.
+
+    Recebe:
+        exercicios: Dicionario de exercicios indexado por ID.
+
+    Retorna:
+        Lista de IDs ordenados numericamente quando possivel.
+    """
     return sorted(exercicios.keys(), key=lambda item: int(item) if str(item).isdigit() else str(item))
 
 
 def obter_trilha_aula(aula, exercicios):
-    """Retorna a trilha configurada ou monta uma trilha legada para aulas antigas."""
+    """Monta a sequencia de telas de aula e exercicios.
+
+    Recebe:
+        aula: Dicionario com dados da aula carregada.
+        exercicios: Dicionario de exercicios disponiveis no mundo.
+
+    Retorna:
+        Lista de etapas da trilha, usando configuracao explicita ou fallback legado.
+    """
     if aula and aula.get("trilha"):
         return aula["trilha"]
 
@@ -99,7 +203,15 @@ def obter_trilha_aula(aula, exercicios):
 
 
 def reiniciar_fluxo_aula_exercicios(mundo, aula_id):
-    """Volta a trilha para a primeira etapa."""
+    """Reinicia a trilha na primeira etapa.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+
+    Retorna:
+        None.
+    """
     definir_indice_etapa_atual(mundo, aula_id, 0)
     definir_indice_exercicio_atual(mundo, aula_id, 0)
     definir_fluxo_concluido(mundo, aula_id, False)
@@ -107,7 +219,16 @@ def reiniciar_fluxo_aula_exercicios(mundo, aula_id):
 
 
 def avancar_etapa_do_fluxo(mundo, aula_id, total_etapas):
-    """Avanca para a proxima etapa ou conclui a trilha."""
+    """Avanca a trilha para a proxima etapa ou marca conclusao.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        total_etapas: Quantidade total de etapas da trilha.
+
+    Retorna:
+        None.
+    """
     proxima_etapa = obter_indice_etapa_atual(mundo, aula_id) + 1
     definir_indice_exercicio_atual(mundo, aula_id, 0)
 
@@ -120,7 +241,17 @@ def avancar_etapa_do_fluxo(mundo, aula_id, total_etapas):
 
 
 def avancar_exercicio_ou_etapa(mundo, aula_id, etapa, total_etapas):
-    """Avanca dentro do bloco de exercicios ou passa para a proxima etapa."""
+    """Avanca para o proximo exercicio ou para a proxima etapa.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        etapa: Dicionario da etapa atual de exercicios.
+        total_etapas: Quantidade total de etapas da trilha.
+
+    Retorna:
+        None.
+    """
     indice_exercicio = obter_indice_exercicio_atual(mundo, aula_id)
     proximo_exercicio = indice_exercicio + 1
 
@@ -132,7 +263,17 @@ def avancar_exercicio_ou_etapa(mundo, aula_id, etapa, total_etapas):
 
 
 def mostrar_tela_aula(etapa, mundo, aula_id, total_etapas):
-    """Renderiza uma pagina de texto da aula."""
+    """Renderiza uma tela de conteudo da aula.
+
+    Recebe:
+        etapa: Dicionario com titulo e linhas de conteudo.
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        total_etapas: Quantidade total de etapas da trilha.
+
+    Retorna:
+        None.
+    """
     st.caption(f"📚 Aula • etapa {obter_indice_etapa_atual(mundo, aula_id) + 1} de {total_etapas}")
     st.markdown(f"## 📚 {etapa['titulo']}")
     st.divider()
@@ -145,7 +286,18 @@ def mostrar_tela_aula(etapa, mundo, aula_id, total_etapas):
 
 
 def mostrar_tela_exercicio_atual(mundo, aula_id, etapa, exercicios, total_etapas):
-    """Renderiza um exercicio por tela dentro do bloco atual."""
+    """Renderiza o exercicio atual de uma etapa pratica.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        etapa: Dicionario da etapa atual de exercicios.
+        exercicios: Dicionario com todos os exercicios do mundo.
+        total_etapas: Quantidade total de etapas da trilha.
+
+    Retorna:
+        None.
+    """
     ids_exercicios = etapa.get("exercicios", [])
 
     if not ids_exercicios:
@@ -175,7 +327,15 @@ def mostrar_tela_exercicio_atual(mundo, aula_id, etapa, exercicios, total_etapas
 
 
 def mostrar_tela_fluxo_concluido(mundo, aula_id):
-    """Renderiza a tela final da trilha."""
+    """Renderiza a tela de conclusao da trilha.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+
+    Retorna:
+        None.
+    """
     st.success("✅ Aula e exercicios concluidos!")
 
     col1, col2 = st.columns(2)
@@ -188,7 +348,16 @@ def mostrar_tela_fluxo_concluido(mundo, aula_id):
 
 
 def mostrar_fluxo_aula_exercicios(mundo, aula_id, titulo):
-    """Controla uma trilha reutilizavel de textos e exercicios intercalados."""
+    """Controla a trilha reutilizavel de aula e exercicios.
+
+    Recebe:
+        mundo: Identificador do mundo da aula.
+        aula_id: Identificador da aula.
+        titulo: Titulo exibido no topo do fluxo.
+
+    Retorna:
+        None.
+    """
     inicializar_fluxo_aula_exercicios(mundo, aula_id)
 
     st.subheader(titulo)
@@ -218,7 +387,14 @@ def mostrar_fluxo_aula_exercicios(mundo, aula_id, titulo):
 
 
 def mostrar_menu_principal():
-    """Renderiza o menu principal."""
+    """Renderiza o menu principal da aplicacao.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -239,7 +415,14 @@ def mostrar_menu_principal():
 
 
 def mostrar_perfil():
-    """Renderiza criacao e dados do perfil."""
+    """Renderiza a tela de criacao e visualizacao do perfil.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     st.subheader("👤 Meu Perfil")
 
     if st.session_state.usuario is None:
@@ -275,7 +458,14 @@ def mostrar_perfil():
 
 
 def mostrar_mundos():
-    """Renderiza a lista de mundos disponiveis."""
+    """Renderiza a lista de mundos disponiveis.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     st.subheader("🌍 Mundos do CodeQuest")
     st.info("📖 Por enquanto, apenas o Mundo 1 esta disponivel!")
 
@@ -287,7 +477,14 @@ def mostrar_mundos():
 
 
 def renderizar_pagina_atual():
-    """Roteia a pagina ativa para sua tela."""
+    """Renderiza a tela correspondente ao estado de navegacao atual.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     if st.session_state.pagina == "menu":
         mostrar_menu_principal()
     elif st.session_state.pagina == "perfil":

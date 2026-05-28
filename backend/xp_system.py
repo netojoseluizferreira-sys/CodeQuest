@@ -2,7 +2,14 @@ from utils.database import salvar_usuario
 
 
 def calcular_nivel(xp):
-    """Calcula o nivel baseado no XP."""
+    """Calcula o nivel do usuario a partir do XP acumulado.
+
+    Recebe:
+        xp: Quantidade total de XP do usuario.
+
+    Retorna:
+        Numero inteiro do nivel correspondente ao XP informado.
+    """
     if xp < 100:
         return 1
     if xp < 250:
@@ -15,7 +22,15 @@ def calcular_nivel(xp):
 
 
 def adicionar_xp(usuario, quantidade):
-    """Adiciona XP ao usuario e atualiza nivel."""
+    """Adiciona XP ao usuario, atualiza seu nivel e persiste a alteracao.
+
+    Recebe:
+        usuario: Instancia de Usuario que recebera o XP.
+        quantidade: Total de XP a ser somado.
+
+    Retorna:
+        Uma tupla com um booleano indicando subida de nivel e o novo nivel.
+    """
     subiu, novo_nivel = usuario.adicionar_xp(quantidade, calcular_nivel)
     salvar_usuario(usuario)
 
@@ -23,7 +38,14 @@ def adicionar_xp(usuario, quantidade):
 
 
 def xp_para_proximo_nivel(xp_atual):
-    """Retorna quanto XP falta para o proximo nivel."""
+    """Calcula quanto XP falta para o proximo nivel.
+
+    Recebe:
+        xp_atual: Quantidade total de XP atual do usuario.
+
+    Retorna:
+        Quantidade de XP restante ate o proximo nivel, ou 0 no nivel maximo.
+    """
     if xp_atual < 100:
         return 100 - xp_atual
     if xp_atual < 250:
@@ -36,7 +58,14 @@ def xp_para_proximo_nivel(xp_atual):
 
 
 def progresso_para_proximo_nivel(xp_atual):
-    """Retorna porcentagem de progresso para o proximo nivel (0 a 1)."""
+    """Calcula a porcentagem de progresso dentro do nivel atual.
+
+    Recebe:
+        xp_atual: Quantidade total de XP atual do usuario.
+
+    Retorna:
+        Valor entre 0.0 e 1.0 usado pelo componente de progresso.
+    """
     if xp_atual >= 700:
         return 1.0
     if xp_atual < 100:

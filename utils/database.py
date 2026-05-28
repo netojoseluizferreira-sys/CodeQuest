@@ -16,7 +16,14 @@ USUARIO_ATIVO_ID = 1
 
 
 def conectar():
-    """Abre uma conexao SQLite com rows acessiveis por nome."""
+    """Abre uma conexao com o banco SQLite local.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        Conexao SQLite configurada para acessar colunas pelo nome.
+    """
     os.makedirs(DATA_DIR, exist_ok=True)
     conexao = sqlite3.connect(DB_PATH)
     conexao.row_factory = sqlite3.Row
@@ -24,7 +31,14 @@ def conectar():
 
 
 def inicializar_banco():
-    """Cria as tabelas da persistencia local, se ainda nao existirem."""
+    """Garante que as tabelas usadas pela persistencia existam.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     with closing(conectar()) as conexao, conexao:
         conexao.execute(
             """
@@ -67,7 +81,14 @@ def inicializar_banco():
 
 
 def migrar_usuario_json_legado():
-    """Migra o usuario antigo salvo em JSON para SQLite, se existir."""
+    """Migra o usuario salvo no JSON legado para SQLite quando existir.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        Usuario migrado ou None quando nao houver arquivo legado.
+    """
     if not os.path.exists(LEGACY_USUARIO_JSON_PATH):
         return None
 
@@ -79,7 +100,14 @@ def migrar_usuario_json_legado():
 
 
 def garantir_usuario(usuario):
-    """Aceita Usuario ou dicionario legado e retorna Usuario."""
+    """Normaliza entradas de usuario para a dataclass Usuario.
+
+    Recebe:
+        usuario: Instancia de Usuario, dicionario legado ou None.
+
+    Retorna:
+        Instancia de Usuario equivalente ou None quando a entrada for None.
+    """
     if usuario is None:
         return None
     if isinstance(usuario, Usuario):
@@ -88,7 +116,14 @@ def garantir_usuario(usuario):
 
 
 def usuario_from_linha(linha):
-    """Converte uma linha SQLite em Usuario."""
+    """Converte uma linha da tabela usuarios em objeto de dominio.
+
+    Recebe:
+        linha: sqlite3.Row com colunas de usuario.
+
+    Retorna:
+        Instancia de Usuario preenchida com os dados da linha.
+    """
     return Usuario(
         id=linha["id"],
         nome=linha["nome"],
@@ -101,19 +136,34 @@ def usuario_from_linha(linha):
 
 @dataclass
 class UsuarioCRUD:
-    """Repositorio SQLite para operacoes de CRUD do Usuario."""
+    """Repositorio SQLite responsavel pelo CRUD de Usuario."""
 
     usuario_ativo_id: int = USUARIO_ATIVO_ID
 
     def criar(self, nome, idade):
-        """Cria e persiste um novo usuario ativo."""
+        """Cria e persiste o usuario ativo.
+
+        Recebe:
+            nome: Nome informado pelo jogador.
+            idade: Idade informada pelo jogador.
+
+        Retorna:
+            Usuario criado e salvo no banco.
+        """
         usuario = Usuario.criar(nome, idade)
         usuario.id = self.usuario_ativo_id
         self.salvar(usuario)
         return usuario
 
     def salvar(self, usuario):
-        """Cria ou atualiza o usuario no SQLite."""
+        """Cria ou atualiza um usuario no banco.
+
+        Recebe:
+            usuario: Instancia de Usuario ou dicionario legado com dados do usuario.
+
+        Retorna:
+            Usuario normalizado que foi persistido.
+        """
         inicializar_banco()
         usuario = garantir_usuario(usuario)
 
@@ -142,7 +192,14 @@ class UsuarioCRUD:
         return usuario
 
     def carregar(self, usuario_id=None):
-        """Busca um usuario por ID e migra o JSON legado quando necessario."""
+        """Busca um usuario pelo ID informado.
+
+        Recebe:
+            usuario_id: ID do usuario desejado; quando omitido, usa o usuario ativo.
+
+        Retorna:
+            Usuario encontrado, usuario migrado do JSON legado ou None.
+        """
         inicializar_banco()
         usuario_id = usuario_id or self.usuario_ativo_id
 
@@ -162,7 +219,14 @@ class UsuarioCRUD:
         return None if linha is None else usuario_from_linha(linha)
 
     def listar(self):
-        """Lista todos os usuarios salvos."""
+        """Lista todos os usuarios persistidos.
+
+        Recebe:
+            Nenhum parametro.
+
+        Retorna:
+            Lista de instancias de Usuario ordenada por ID.
+        """
         inicializar_banco()
 
         with closing(conectar()) as conexao, conexao:
@@ -177,7 +241,14 @@ class UsuarioCRUD:
         return [usuario_from_linha(linha) for linha in linhas]
 
     def deletar(self, usuario_id=None):
-        """Remove um usuario e seus registros relacionados."""
+        """Remove um usuario e seus dados relacionados.
+
+        Recebe:
+            usuario_id: ID do usuario removido; quando omitido, usa o usuario ativo.
+
+        Retorna:
+            None.
+        """
         inicializar_banco()
         usuario_id = usuario_id or self.usuario_ativo_id
 
@@ -188,37 +259,87 @@ class UsuarioCRUD:
 
 
 def usuario_crud():
-    """Cria um repositorio de usuario usando a configuracao atual do banco."""
+    """Instancia o repositorio de usuarios.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        Instancia de UsuarioCRUD usando a configuracao atual do banco.
+    """
     return UsuarioCRUD()
 
 
 def criar_usuario(nome, idade):
-    """Cria e salva o usuario ativo."""
+    """Cria e salva o usuario ativo.
+
+    Recebe:
+        nome: Nome informado pelo jogador.
+        idade: Idade informada pelo jogador.
+
+    Retorna:
+        Usuario criado e persistido.
+    """
     return usuario_crud().criar(nome, idade)
 
 
 def salvar_usuario(usuario):
-    """Salva o usuario ativo no SQLite."""
+    """Persiste dados do usuario ativo no SQLite.
+
+    Recebe:
+        usuario: Instancia de Usuario ou dicionario legado com dados do usuario.
+
+    Retorna:
+        Usuario normalizado que foi salvo.
+    """
     return usuario_crud().salvar(usuario)
 
 
 def carregar_usuario(usuario_id=None):
-    """Carrega um usuario salvo no SQLite."""
+    """Carrega um usuario salvo no SQLite.
+
+    Recebe:
+        usuario_id: ID do usuario desejado; quando omitido, usa o usuario ativo.
+
+    Retorna:
+        Usuario encontrado ou None.
+    """
     return usuario_crud().carregar(usuario_id)
 
 
 def listar_usuarios():
-    """Lista usuarios salvos no SQLite."""
+    """Lista os usuarios salvos no SQLite.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        Lista de instancias de Usuario.
+    """
     return usuario_crud().listar()
 
 
 def deletar_usuario(usuario_id=None):
-    """Remove um usuario salvo no SQLite."""
+    """Remove um usuario salvo no SQLite.
+
+    Recebe:
+        usuario_id: ID do usuario removido; quando omitido, usa o usuario ativo.
+
+    Retorna:
+        None.
+    """
     return usuario_crud().deletar(usuario_id)
 
 
 def obter_usuario_id(usuario=None):
-    """Retorna o ID usado nas tabelas relacionadas ao usuario ativo."""
+    """Resolve o ID usado nas tabelas relacionadas ao usuario.
+
+    Recebe:
+        usuario: Usuario, dicionario legado ou None.
+
+    Retorna:
+        ID do usuario informado ou ID padrao do usuario ativo.
+    """
     usuario = garantir_usuario(usuario)
     if usuario and usuario.id:
         return usuario.id
@@ -226,7 +347,16 @@ def obter_usuario_id(usuario=None):
 
 
 def exercicio_foi_concluido(mundo, exercicio_id, usuario=None):
-    """Verifica se um exercicio ja foi concluido pelo usuario."""
+    """Verifica se um exercicio ja foi concluido por um usuario.
+
+    Recebe:
+        mundo: Identificador do mundo do exercicio.
+        exercicio_id: Identificador do exercicio.
+        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+
+    Retorna:
+        True quando o exercicio ja foi concluido; caso contrario, False.
+    """
     inicializar_banco()
 
     with closing(conectar()) as conexao, conexao:
@@ -243,7 +373,17 @@ def exercicio_foi_concluido(mundo, exercicio_id, usuario=None):
 
 
 def marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho=0, usuario=None):
-    """Marca um exercicio como concluido para impedir nova recompensa apos restart."""
+    """Marca um exercicio como concluido para bloquear nova recompensa.
+
+    Recebe:
+        mundo: Identificador do mundo do exercicio.
+        exercicio_id: Identificador do exercicio.
+        xp_ganho: XP recebido na primeira conclusao.
+        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+
+    Retorna:
+        None.
+    """
     inicializar_banco()
 
     with closing(conectar()) as conexao, conexao:
@@ -258,7 +398,16 @@ def marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho=0, usuario=None):
 
 
 def obter_erros_exercicio(mundo, exercicio_id, usuario=None):
-    """Carrega a quantidade de erros persistida para um exercicio."""
+    """Busca a quantidade de erros persistida para um exercicio.
+
+    Recebe:
+        mundo: Identificador do mundo do exercicio.
+        exercicio_id: Identificador do exercicio.
+        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+
+    Retorna:
+        Quantidade de erros registrados para o exercicio.
+    """
     inicializar_banco()
 
     with closing(conectar()) as conexao, conexao:
@@ -275,7 +424,16 @@ def obter_erros_exercicio(mundo, exercicio_id, usuario=None):
 
 
 def registrar_erro_exercicio(mundo, exercicio_id, usuario=None):
-    """Incrementa e persiste a quantidade de erros de um exercicio."""
+    """Incrementa a quantidade de erros de um exercicio.
+
+    Recebe:
+        mundo: Identificador do mundo do exercicio.
+        exercicio_id: Identificador do exercicio.
+        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+
+    Retorna:
+        Nova quantidade total de erros do exercicio.
+    """
     inicializar_banco()
 
     with closing(conectar()) as conexao, conexao:
@@ -302,7 +460,14 @@ def registrar_erro_exercicio(mundo, exercicio_id, usuario=None):
 
 
 def resetar_banco_de_dados():
-    """Remove todos os dados locais salvos no SQLite."""
+    """Remove todos os dados locais salvos para testes.
+
+    Recebe:
+        Nenhum parametro.
+
+    Retorna:
+        None.
+    """
     inicializar_banco()
 
     with closing(conectar()) as conexao, conexao:

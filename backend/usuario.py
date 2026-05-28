@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Usuario:
-    """Modelo de dominio do jogador."""
+    """Representa o jogador ativo do CodeQuest."""
 
     nome: str
     idade: int
@@ -14,12 +14,27 @@ class Usuario:
 
     @classmethod
     def criar(cls, nome, idade):
-        """Cria um novo usuario com os valores padrao do jogo."""
+        """Cria um usuario novo com os valores iniciais do jogo.
+
+        Recebe:
+            nome: Nome informado no cadastro do perfil.
+            idade: Idade informada no cadastro do perfil.
+
+        Retorna:
+            Uma instancia de Usuario pronta para ser persistida.
+        """
         return cls(nome=nome.strip(), idade=int(idade))
 
     @classmethod
     def from_dict(cls, dados):
-        """Converte registros legados em dicionario para Usuario."""
+        """Converte dados legados em dicionario para Usuario.
+
+        Recebe:
+            dados: Dicionario com campos de usuario vindo de JSON ou compatibilidade.
+
+        Retorna:
+            Uma instancia de Usuario com valores padrao quando campos opcionais faltarem.
+        """
         return cls(
             id=dados.get("id", 1),
             nome=dados["nome"],
@@ -29,19 +44,16 @@ class Usuario:
             conquistas=dados.get("conquistas", []),
         )
 
-    def to_dict(self):
-        """Converte o usuario para formato simples."""
-        return {
-            "id": self.id,
-            "nome": self.nome,
-            "idade": self.idade,
-            "xp": self.xp,
-            "nivel": self.nivel,
-            "conquistas": list(self.conquistas),
-        }
-
     def adicionar_xp(self, quantidade, calcular_nivel):
-        """Adiciona XP e retorna se o usuario subiu de nivel."""
+        """Aplica XP ao usuario e recalcula seu nivel.
+
+        Recebe:
+            quantidade: Total de XP que deve ser somado ao usuario.
+            calcular_nivel: Funcao que recebe o XP total e retorna o nivel correspondente.
+
+        Retorna:
+            Uma tupla com um booleano indicando subida de nivel e o novo nivel.
+        """
         self.xp += quantidade
         novo_nivel = calcular_nivel(self.xp)
         subiu = novo_nivel > self.nivel
