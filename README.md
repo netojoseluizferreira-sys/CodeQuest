@@ -13,6 +13,10 @@ Cada exercício começa valendo 10 XP. A cada erro, a recompensa disponível cai
 ```text
 CodeQuest/
 ├── app_streamlit.py                         # Ponto de entrada do Streamlit
+├── api/                                     # API REST inicial com FastAPI
+│   ├── main.py                              # Fábrica e instância da aplicação
+│   ├── schemas.py                           # Schemas Pydantic de entrada e saída
+│   └── routes/                              # Rotas de health, usuários e progresso
 ├── backend/                                 # Regras de domínio e carregamento de conteúdo
 │   ├── exercicio.py                         # Leitura dos JSONs de aulas e exercícios
 │   ├── usuario.py                           # Dataclass de usuário
@@ -54,6 +58,7 @@ CodeQuest/
 ## 🕹️ Funcionalidades Atuais
 
 - 👤 Criação e carregamento de perfil local.
+- ⚡ API REST inicial para usuário, novo jogo, continuar e progresso.
 - 🌍 Menu de mundos com Mundo 1 disponível.
 - 📚 Aula teórica dividida em páginas curtas.
 - 📝 Exercícios em sequência, um por tela, intercalados com textos de aula.
@@ -134,6 +139,20 @@ O menu Pygame inicial roda isolado e ainda não conversa com FastAPI. Nesta etap
 python -m pygame_client.menu_app
 ```
 
+## ⚡ API REST
+
+A API inicial roda separada do Streamlit e do Pygame. Ela expõe rotas para saúde do serviço, usuário ativo, novo jogo, continuar jogo e progresso de exercícios.
+
+```bash
+uvicorn api.main:app --reload
+```
+
+Documentação automática:
+
+```text
+http://localhost:8000/docs
+```
+
 ## 🧪 Testes e Validação
 
 Validações usadas durante a refatoração:
@@ -165,6 +184,7 @@ Conteúdos versionados:
 - persistência de exercícios concluídos e erros por exercício;
 - separação de monolitos do frontend em navegação, páginas, fluxo de aula, estado de exercício, validação e XP;
 - separação da persistência em configuração, conexão, repositório de usuário e repositório de progresso de exercícios;
+- criação da API REST inicial com FastAPI;
 - remoção de funções sem uso atual;
 - padronização de docstrings nas funções rastreadas;
 - validação de sintaxe com `compileall`;
