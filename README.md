@@ -1,29 +1,45 @@
 # 🚀 CodeQuest
 
-**CodeQuest** é uma plataforma educacional gamificada para ensinar lógica de programação e Python por meio de aulas, exercícios, XP e progressão por mundos.
+**CodeQuest** é uma plataforma educacional gamificada para ensinar lógica de programação e Python por meio de aulas curtas, exercícios, XP e progressão por mundos.
 
 ## 📋 Sobre o Projeto
 
-O projeto organiza o aprendizado em mundos temáticos. No estado atual, o usuário cria um perfil, entra no Mundo 1, lê uma aula e responde exercícios em sequência. Cada exercício começa valendo 10 XP, perde 2 XP a cada erro e mantém um mínimo de 2 XP como recompensa.
+O projeto organiza o aprendizado em mundos temáticos. No estado atual, o usuário cria um perfil, entra no Mundo 1, lê uma aula dividida em telas e responde exercícios intercalados no estilo Duolingo.
 
-O foco do MVP é validar o ciclo principal:
-
-1. criar ou carregar perfil;
-2. acessar um mundo;
-3. estudar uma aula;
-4. responder exercícios em telas separadas;
-5. ganhar XP e acompanhar nível.
+Cada exercício começa valendo 10 XP. A cada erro, a recompensa disponível cai em 2 XP, até o mínimo de 2 XP. Exercícios já concluídos ficam salvos no SQLite para evitar ganho duplicado de XP após reiniciar o app.
 
 ## 🧱 Estrutura Atual
 
 ```text
 CodeQuest/
-├── app_streamlit.py              # Ponto de entrada do Streamlit
-├── backend/                      # Regras de usuário, XP, progresso e carregamento de conteúdo
-├── frontend/pages/               # Telas e componentes de fluxo do Streamlit
-├── data/                         # Aulas/exercícios em JSON e banco SQLite local
-├── utils/                        # Wrappers de persistência usados pelo app
-├── requirements.txt              # Dependências do projeto
+├── app_streamlit.py                         # Ponto de entrada do Streamlit
+├── backend/                                 # Regras de domínio e carregamento de conteúdo
+│   ├── exercicio.py                         # Leitura dos JSONs de aulas e exercícios
+│   ├── usuario.py                           # Dataclass de usuário
+│   └── xp_system.py                         # Regras de XP e nível
+├── frontend/                                # Estado e renderização do Streamlit
+│   ├── exercise_state.py                    # Estado e persistência de tentativas
+│   ├── exercise_validation.py               # Validação de respostas
+│   ├── exercise_xp.py                       # Cálculo e mensagens de XP por exercício
+│   ├── lesson_flow.py                       # Renderização do fluxo aula/exercícios
+│   ├── lesson_flow_state.py                 # Estado do fluxo de aula
+│   ├── lesson_track.py                      # Montagem da trilha de aula
+│   ├── navigation.py                        # Navegação e estado global
+│   └── pages/                               # Telas do app
+│       ├── codequest.py                     # Roteador das telas
+│       ├── exercicio.py                     # Renderização de um exercício
+│       ├── menu.py                          # Menu principal
+│       ├── mundos.py                        # Lista de mundos
+│       └── perfil.py                        # Perfil do usuário
+├── utils/                                   # Persistência e infraestrutura
+│   ├── database.py                          # Fachada de compatibilidade da persistência
+│   ├── database_config.py                   # Caminhos e constantes do banco
+│   ├── database_connection.py               # Conexão e schema SQLite
+│   ├── exercise_progress_repository.py      # Persistência de erros e conclusões
+│   ├── user_mapper.py                       # Conversão de dados para Usuario
+│   └── user_repository.py                   # CRUD de usuário com SQLite
+├── data/                                    # Aulas/exercícios versionados e banco local ignorado
+├── requirements.txt                         # Dependências do projeto
 └── README.md
 ```
 
@@ -34,6 +50,7 @@ Arquivos locais ignorados pelo Git:
 - `data/codequest.db`
 - `data/usuarios.json`
 - `data/progresso.json`
+- `tests/`
 - ambientes virtuais e caches Python
 
 ## 🕹️ Funcionalidades Atuais
@@ -41,27 +58,29 @@ Arquivos locais ignorados pelo Git:
 - 👤 Criação e carregamento de perfil local.
 - 🌍 Menu de mundos com Mundo 1 disponível.
 - 📚 Aula teórica dividida em páginas curtas.
-- 📝 Exercícios em sequência, um por tela, intercalados com os textos da aula.
+- 📝 Exercícios em sequência, um por tela, intercalados com textos de aula.
 - ⭐ Sistema de XP e níveis.
 - 🎯 XP dinâmico por exercício: 10, 8, 6, 4 e mínimo de 2 XP.
-- ⚠️ Cada erro reduz a recompensa disponível em 2 XP.
+- ⚠️ Persistência de erros por exercício.
 - 💾 Persistência local em SQLite para usuário, erros e exercícios concluídos.
 - 🧪 Botão de teste para zerar o banco local.
+- 🧩 Código refatorado em módulos menores para facilitar manutenção.
 
 ## 📊 Progresso do MVP
 
 | Item | Status | Observação |
 | --- | --- | --- |
 | Interface Streamlit | ✅ Feito | Entrada em `app_streamlit.py`. |
-| Perfil do usuário | ✅ Feito | Nome, idade, XP, nível e conquistas. |
+| Perfil do usuário | ✅ Feito | Modelo com `dataclass` e CRUD em SQLite. |
 | Salvamento local | ✅ Feito | Persistência via SQLite em `data/codequest.db`. |
 | Mundo 1 | ✅ Parcial | Cabana do Oráculo disponível. |
-| Aula teórica | ✅ Feito | Aula 1 dividida em 3 textos de estudo. |
+| Aula teórica | ✅ Feito | Aula 1 dividida em textos de estudo. |
 | Exercícios | ✅ Feito | Aula 1 possui 15 exercícios intercalados em blocos de 5. |
 | Fluxo aula → exercícios | ✅ Feito | Trilha no padrão texto → 5 exercícios → texto → 5 exercícios. |
 | Sistema de XP | ✅ Feito | XP por acerto com penalidade de 2 XP por erro, até o mínimo de 2 XP. |
 | Sistema de níveis | ✅ Feito | Nível calculado por faixas de XP. |
 | Feedback acerto/erro | ✅ Feito | Feedback imediato no Streamlit. |
+| Refatoração de monolitos | ✅ Feito | Frontend e persistência separados por responsabilidade. |
 | Cutscenes/API de mídia | 🔜 Pendente | Planejado no documento atualizado. |
 | Tela de créditos | 🔜 Pendente | Planejada para fechamento do MVP. |
 
@@ -108,14 +127,29 @@ streamlit run app_streamlit.py
 http://localhost:8501
 ```
 
+## 🧪 Testes e Validação
+
+Validações usadas durante a refatoração:
+
+```bash
+python -m compileall app_streamlit.py backend frontend utils
+python -c "import json; from pathlib import Path; [json.load(open(path, encoding='utf-8')) for path in Path('data').glob('*.json')]"
+```
+
+Testes locais podem ser criados em `tests/`, mas essa pasta fica ignorada pelo Git. Se `pytest` estiver instalado e a pasta local existir:
+
+```bash
+python -m pytest tests
+```
+
 ## 🗂️ Dados
 
-Os conteúdos versionados ficam em:
+Conteúdos versionados:
 
 - `data/aulas.json`
 - `data/exercicios.json`
 
-Os dados gerados localmente são ignorados pelo Git para evitar misturar progresso pessoal com código do projeto:
+Dados gerados localmente e ignorados pelo Git:
 
 - `data/codequest.db`
 - `data/usuarios.json`
@@ -125,12 +159,13 @@ Os dados gerados localmente são ignorados pelo Git para evitar misturar progres
 
 Última revisão feita no repositório:
 
-- remoção de `.vscode/` do índice do Git;
-- atualização do README para refletir o app Streamlit atual;
-- correção do nível inicial do usuário para `1`;
 - migração da persistência local para SQLite;
+- CRUD de usuário organizado com `dataclass`;
 - persistência de exercícios concluídos e erros por exercício;
-- botão de teste para zerar o banco local;
-- remoção de `sqlite3` de `requirements.txt`, pois é biblioteca nativa do Python;
+- separação de monolitos do frontend em navegação, páginas, fluxo de aula, estado de exercício, validação e XP;
+- separação da persistência em configuração, conexão, repositório de usuário e repositório de progresso de exercícios;
+- remoção de funções sem uso atual;
+- padronização de docstrings nas funções rastreadas;
 - validação de sintaxe com `compileall`;
-- validação de JSON em `data/aulas.json` e `data/exercicios.json`.
+- validação de JSON em `data/aulas.json` e `data/exercicios.json`;
+- verificação manual de inicialização do Streamlit.
