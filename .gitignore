@@ -18,3 +18,4 @@ ENV/
 .vscode/
 app.py
 tests/
+pygame_menu_local.py

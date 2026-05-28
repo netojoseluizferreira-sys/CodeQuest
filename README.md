@@ -31,6 +31,14 @@ CodeQuest/
 │       ├── menu.py                          # Menu principal
 │       ├── mundos.py                        # Lista de mundos
 │       └── perfil.py                        # Perfil do usuário
+├── pygame_client/                           # Cliente Pygame inicial para menu e créditos
+│   ├── audio.py                             # Trilha e efeitos sonoros gerados em memória
+│   ├── credits.py                           # Conteúdo da tela de créditos
+│   ├── menu_actions.py                      # Ações futuras para integração com API
+│   ├── menu_app.py                          # Loop principal do menu Pygame
+│   ├── palette.py                           # Paleta visual alinhada ao Streamlit
+│   ├── settings.py                          # Configurações de janela
+│   └── ui.py                                # Componentes visuais reutilizáveis
 ├── utils/                                   # Persistência e infraestrutura
 │   ├── database.py                          # Fachada de compatibilidade da persistência
 │   ├── database_config.py                   # Caminhos e constantes do banco
@@ -55,6 +63,7 @@ CodeQuest/
 - 💾 Persistência local em SQLite para usuário, erros e exercícios concluídos.
 - 🧪 Botão de teste para zerar o banco local.
 - 🧩 Código refatorado em módulos menores para facilitar manutenção.
+- 🎮 Menu inicial em Pygame preparado para futura integração com API.
 
 ## 📊 Progresso do MVP
 
@@ -115,6 +124,14 @@ streamlit run app_streamlit.py
 
 ```text
 http://localhost:8501
+```
+
+## 🎮 Menu Pygame
+
+O menu Pygame inicial roda isolado e ainda não conversa com FastAPI. Nesta etapa ele prepara os botões de `Novo jogo`, `Continuar` e `Créditos`, deixando apenas a tela de créditos totalmente funcional.
+
+```bash
+python -m pygame_client.menu_app
 ```
 
 ## 🧪 Testes e Validação
