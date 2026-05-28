@@ -1,1 +1,1 @@
-from .json_utils import salvar_usuario, carregar_usuario
+from .database import carregar_usuario, salvar_usuario

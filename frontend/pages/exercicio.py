@@ -3,14 +3,14 @@ import unicodedata
 
 import streamlit as st
 
-from backend.database import (
+from utils.database import (
     exercicio_foi_concluido,
     marcar_exercicio_concluido as salvar_exercicio_concluido,
     obter_erros_exercicio as carregar_erros_exercicio,
     registrar_erro_exercicio as salvar_erro_exercicio,
+    salvar_usuario,
 )
 from backend.xp_system import adicionar_xp
-from utils.json_utils import salvar_usuario
 
 
 XP_BASE_PADRAO = 10

@@ -1,11 +1,10 @@
 import streamlit as st
 
-from backend.database import resetar_banco_de_dados
 from backend.exercicio import carregar_aula, carregar_exercicios
 from backend.usuario import criar_usuario
 from backend.xp_system import xp_para_proximo_nivel, progresso_para_proximo_nivel
 from frontend.pages.exercicio import mostrar_exercicio
-from utils.json_utils import carregar_usuario, salvar_usuario
+from utils.database import carregar_usuario, resetar_banco_de_dados, salvar_usuario
 
 
 def inicializar_estado_global():

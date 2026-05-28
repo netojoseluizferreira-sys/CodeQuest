@@ -6,9 +6,3 @@ def criar_usuario(nome, idade):
         "nivel": 1,
         "conquistas": []
     }
-
-def padronizar_idade(texto):
-    try:
-        return int(texto.lower().replace(' anos', '').strip())
-    except ValueError:
-        return None
