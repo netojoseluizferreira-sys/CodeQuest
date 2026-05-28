@@ -38,20 +38,10 @@ CodeQuest/
 │   ├── exercise_progress_repository.py      # Persistência de erros e conclusões
 │   ├── user_mapper.py                       # Conversão de dados para Usuario
 │   └── user_repository.py                   # CRUD de usuário com SQLite
-├── data/                                    # Aulas/exercícios versionados e banco local ignorado
+├── data/                                    # Aulas e exercícios versionados
 ├── requirements.txt                         # Dependências do projeto
 └── README.md
 ```
-
-Arquivos locais ignorados pelo Git:
-
-- `app.py`
-- `.vscode/`
-- `data/codequest.db`
-- `data/usuarios.json`
-- `data/progresso.json`
-- `tests/`
-- ambientes virtuais e caches Python
 
 ## 🕹️ Funcionalidades Atuais
 
@@ -136,7 +126,7 @@ python -m compileall app_streamlit.py backend frontend utils
 python -c "import json; from pathlib import Path; [json.load(open(path, encoding='utf-8')) for path in Path('data').glob('*.json')]"
 ```
 
-Testes locais podem ser criados em `tests/`, mas essa pasta fica ignorada pelo Git. Se `pytest` estiver instalado e a pasta local existir:
+Se `pytest` estiver instalado e houver testes locais disponíveis:
 
 ```bash
 python -m pytest tests
@@ -148,12 +138,6 @@ Conteúdos versionados:
 
 - `data/aulas.json`
 - `data/exercicios.json`
-
-Dados gerados localmente e ignorados pelo Git:
-
-- `data/codequest.db`
-- `data/usuarios.json`
-- `data/progresso.json`
 
 ## ✅ Revisão Técnica Atual
 
