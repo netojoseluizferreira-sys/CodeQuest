@@ -1,5 +1,6 @@
 import streamlit as st
 
+from backend.database import resetar_banco_de_dados
 from backend.exercicio import carregar_aula, carregar_exercicios
 from backend.usuario import criar_usuario
 from backend.xp_system import xp_para_proximo_nivel, progresso_para_proximo_nivel
@@ -13,11 +14,21 @@ def inicializar_estado_global():
         st.session_state.usuario = carregar_usuario()
     if "pagina" not in st.session_state:
         st.session_state.pagina = "menu"
+    if st.session_state.pop("db_resetado", False):
+        st.success("🧪 Banco de dados zerado para testes!")
 
 
 def ir_para_pagina(pagina):
     """Troca a tela atual e recarrega o app."""
     st.session_state.pagina = pagina
+    st.rerun()
+
+
+def resetar_estado_app():
+    """Limpa dados persistidos e estado em memoria para testes."""
+    resetar_banco_de_dados()
+    st.session_state.clear()
+    st.session_state.db_resetado = True
     st.rerun()
 
 
@@ -223,6 +234,10 @@ def mostrar_menu_principal():
     with col3:
         if st.button("🏆 RANKEAMENTO", use_container_width=True):
             st.info("🏆 Ranking em breve - Pos-MVP")
+
+    st.divider()
+    if st.button("🧪 Zerar banco de dados de teste", use_container_width=True):
+        resetar_estado_app()
 
 
 def mostrar_perfil():

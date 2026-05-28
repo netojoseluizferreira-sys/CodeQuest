@@ -21,8 +21,8 @@ CodeQuest/
 ├── app_streamlit.py              # Ponto de entrada do Streamlit
 ├── backend/                      # Regras de usuário, XP, progresso e carregamento de conteúdo
 ├── frontend/pages/               # Telas e componentes de fluxo do Streamlit
-├── data/                         # Aulas e exercícios versionados em JSON
-├── utils/                        # Persistência JSON do usuário local
+├── data/                         # Aulas/exercícios em JSON e banco SQLite local
+├── utils/                        # Wrappers de persistência usados pelo app
 ├── requirements.txt              # Dependências do projeto
 └── README.md
 ```
@@ -31,6 +31,7 @@ Arquivos locais ignorados pelo Git:
 
 - `app.py`
 - `.vscode/`
+- `data/codequest.db`
 - `data/usuarios.json`
 - `data/progresso.json`
 - ambientes virtuais e caches Python
@@ -44,7 +45,8 @@ Arquivos locais ignorados pelo Git:
 - ⭐ Sistema de XP e níveis.
 - 🎯 XP dinâmico por exercício: 10, 8, 6, 4 e mínimo de 2 XP.
 - ⚠️ Cada erro reduz a recompensa disponível em 2 XP.
-- 💾 Persistência local do usuário em JSON.
+- 💾 Persistência local em SQLite para usuário, erros e exercícios concluídos.
+- 🧪 Botão de teste para zerar o banco local.
 
 ## 📊 Progresso do MVP
 
@@ -52,7 +54,7 @@ Arquivos locais ignorados pelo Git:
 | --- | --- | --- |
 | Interface Streamlit | ✅ Feito | Entrada em `app_streamlit.py`. |
 | Perfil do usuário | ✅ Feito | Nome, idade, XP, nível e conquistas. |
-| Salvamento local | ✅ Feito | Persistência via JSON. |
+| Salvamento local | ✅ Feito | Persistência via SQLite em `data/codequest.db`. |
 | Mundo 1 | ✅ Parcial | Cabana do Oráculo disponível. |
 | Aula teórica | ✅ Feito | Aula 1 dividida em 3 textos de estudo. |
 | Exercícios | ✅ Feito | Aula 1 possui 15 exercícios intercalados em blocos de 5. |
@@ -115,6 +117,7 @@ Os conteúdos versionados ficam em:
 
 Os dados gerados localmente são ignorados pelo Git para evitar misturar progresso pessoal com código do projeto:
 
+- `data/codequest.db`
 - `data/usuarios.json`
 - `data/progresso.json`
 
@@ -125,7 +128,9 @@ Os dados gerados localmente são ignorados pelo Git para evitar misturar progres
 - remoção de `.vscode/` do índice do Git;
 - atualização do README para refletir o app Streamlit atual;
 - correção do nível inicial do usuário para `1`;
-- ajuste do caminho de `data/progresso.json` para ser independente do diretório de execução;
+- migração da persistência local para SQLite;
+- persistência de exercícios concluídos e erros por exercício;
+- botão de teste para zerar o banco local;
 - remoção de `sqlite3` de `requirements.txt`, pois é biblioteca nativa do Python;
 - validação de sintaxe com `compileall`;
 - validação de JSON em `data/aulas.json` e `data/exercicios.json`.

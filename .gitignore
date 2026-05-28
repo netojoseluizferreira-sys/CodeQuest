@@ -1,5 +1,6 @@
 **/__pycache__/
 data/*.json
+data/*.db
 
 !data/.gitkeep
 !data/aulas.json

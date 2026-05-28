@@ -3,6 +3,12 @@ import unicodedata
 
 import streamlit as st
 
+from backend.database import (
+    exercicio_foi_concluido,
+    marcar_exercicio_concluido as salvar_exercicio_concluido,
+    obter_erros_exercicio as carregar_erros_exercicio,
+    registrar_erro_exercicio as salvar_erro_exercicio,
+)
 from backend.xp_system import adicionar_xp
 from utils.json_utils import salvar_usuario
 
@@ -19,23 +25,47 @@ def chave_exercicio(mundo, exercicio_id, sufixo):
 
 def obter_erros_exercicio(mundo, exercicio_id):
     """Retorna quantas respostas erradas ja foram enviadas neste exercicio."""
-    return st.session_state.get(chave_exercicio(mundo, exercicio_id, "erros"), 0)
+    chave = chave_exercicio(mundo, exercicio_id, "erros")
+    if chave not in st.session_state:
+        st.session_state[chave] = carregar_erros_exercicio(
+            mundo,
+            exercicio_id,
+            st.session_state.get("usuario"),
+        )
+    return st.session_state[chave]
 
 
 def registrar_erro_exercicio(mundo, exercicio_id):
     """Incrementa e retorna o total de erros do exercicio."""
     chave = chave_exercicio(mundo, exercicio_id, "erros")
-    st.session_state[chave] = st.session_state.get(chave, 0) + 1
+    st.session_state[chave] = salvar_erro_exercicio(
+        mundo,
+        exercicio_id,
+        st.session_state.get("usuario"),
+    )
     return st.session_state[chave]
 
 
 def exercicio_concluido(mundo, exercicio_id):
     """Verifica se o exercicio ja foi acertado."""
-    return st.session_state.get(chave_exercicio(mundo, exercicio_id, "concluido"), False)
+    chave = chave_exercicio(mundo, exercicio_id, "concluido")
+    if chave not in st.session_state:
+        st.session_state[chave] = exercicio_foi_concluido(
+            mundo,
+            exercicio_id,
+            st.session_state.get("usuario"),
+        )
+    return st.session_state[chave]
 
 
-def marcar_exercicio_concluido(mundo, exercicio_id):
+def marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho):
     """Marca um exercicio como concluido no estado da sessao."""
+    salvar_exercicio_concluido(
+        mundo,
+        exercicio_id,
+        xp_ganho,
+        st.session_state.get("usuario"),
+    )
     st.session_state[chave_exercicio(mundo, exercicio_id, "concluido")] = True
 
 
@@ -158,7 +188,7 @@ def mostrar_exercicio(mundo, exercicio_id, exercicio):
                 st.balloons()
                 st.success(f"✨ Parabens! Voce subiu para o nivel {novo_nivel}!")
 
-            marcar_exercicio_concluido(mundo, exercicio_id)
+            marcar_exercicio_concluido(mundo, exercicio_id, xp_disponivel)
             return "acertou"
 
         erros = registrar_erro_exercicio(mundo, exercicio_id)
