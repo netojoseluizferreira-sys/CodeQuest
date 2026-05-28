@@ -16,11 +16,7 @@ def calcular_nivel(xp):
 
 def adicionar_xp(usuario, quantidade):
     """Adiciona XP ao usuario e atualiza nivel."""
-    usuario["xp"] += quantidade
-    novo_nivel = calcular_nivel(usuario["xp"])
-    subiu = novo_nivel > usuario.get("nivel", 1)
-
-    usuario["nivel"] = novo_nivel
+    subiu, novo_nivel = usuario.adicionar_xp(quantidade, calcular_nivel)
     salvar_usuario(usuario)
 
     return subiu, novo_nivel

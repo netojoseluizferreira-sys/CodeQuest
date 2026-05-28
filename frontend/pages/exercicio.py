@@ -8,7 +8,6 @@ from utils.database import (
     marcar_exercicio_concluido as salvar_exercicio_concluido,
     obter_erros_exercicio as carregar_erros_exercicio,
     registrar_erro_exercicio as salvar_erro_exercicio,
-    salvar_usuario,
 )
 from backend.xp_system import adicionar_xp
 
@@ -93,7 +92,6 @@ def premiar_usuario_com_xp(quantidade_xp):
     usuario = st.session_state.usuario
     subiu, novo_nivel = adicionar_xp(usuario, quantidade_xp)
 
-    salvar_usuario(usuario)
     st.session_state.usuario = usuario
 
     return subiu, novo_nivel

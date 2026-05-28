@@ -1,10 +1,9 @@
 import streamlit as st
 
 from backend.exercicio import carregar_aula, carregar_exercicios
-from backend.usuario import criar_usuario
 from backend.xp_system import xp_para_proximo_nivel, progresso_para_proximo_nivel
 from frontend.pages.exercicio import mostrar_exercicio
-from utils.database import carregar_usuario, resetar_banco_de_dados, salvar_usuario
+from utils.database import carregar_usuario, criar_usuario, resetar_banco_de_dados
 
 
 def inicializar_estado_global():
@@ -250,7 +249,6 @@ def mostrar_perfil():
         if st.button("✨ Criar Perfil"):
             if nome:
                 usuario = criar_usuario(nome, idade)
-                salvar_usuario(usuario)
                 st.session_state.usuario = usuario
                 st.success("✅ Perfil criado com sucesso!")
                 st.rerun()
@@ -259,18 +257,18 @@ def mostrar_perfil():
 
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("🏅 Nivel", usuario["nivel"])
+            st.metric("🏅 Nivel", usuario.nivel)
         with col2:
-            st.metric("⭐ XP Total", usuario["xp"])
+            st.metric("⭐ XP Total", usuario.xp)
 
-        falta_xp = xp_para_proximo_nivel(usuario["xp"])
-        progresso = progresso_para_proximo_nivel(usuario["xp"])
+        falta_xp = xp_para_proximo_nivel(usuario.xp)
+        progresso = progresso_para_proximo_nivel(usuario.xp)
 
         st.progress(progresso)
         st.caption(f"📈 Faltam {falta_xp} XP para o proximo nivel!")
 
-        st.write(f"**Nome:** {usuario['nome']}")
-        st.write(f"**Idade:** {usuario['idade']}")
+        st.write(f"**Nome:** {usuario.nome}")
+        st.write(f"**Idade:** {usuario.idade}")
 
         if st.button("🔙 Voltar ao Menu"):
             ir_para_pagina("menu")

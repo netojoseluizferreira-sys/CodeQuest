@@ -2,6 +2,9 @@ import json
 import os
 import sqlite3
 from contextlib import closing
+from dataclasses import dataclass
+
+from backend.usuario import Usuario
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -63,80 +66,162 @@ def inicializar_banco():
         )
 
 
-def salvar_usuario(usuario):
-    """Salva o usuario ativo no SQLite."""
-    inicializar_banco()
-    conquistas = usuario.get("conquistas", [])
-
-    with closing(conectar()) as conexao, conexao:
-        conexao.execute(
-            """
-            INSERT INTO usuarios (id, nome, idade, xp, nivel, conquistas)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON CONFLICT(id) DO UPDATE SET
-                nome = excluded.nome,
-                idade = excluded.idade,
-                xp = excluded.xp,
-                nivel = excluded.nivel,
-                conquistas = excluded.conquistas
-            """,
-            (
-                usuario.get("id", USUARIO_ATIVO_ID),
-                usuario["nome"],
-                usuario["idade"],
-                usuario.get("xp", 0),
-                usuario.get("nivel", 1),
-                json.dumps(conquistas, ensure_ascii=False),
-            ),
-        )
-
-
-def carregar_usuario():
-    """Carrega o usuario ativo salvo no SQLite."""
-    inicializar_banco()
-
-    with closing(conectar()) as conexao, conexao:
-        linha = conexao.execute(
-            """
-            SELECT id, nome, idade, xp, nivel, conquistas
-            FROM usuarios
-            WHERE id = ?
-            """,
-            (USUARIO_ATIVO_ID,),
-        ).fetchone()
-
-    if linha is None:
-        return migrar_usuario_json_legado()
-
-    return {
-        "id": linha["id"],
-        "nome": linha["nome"],
-        "idade": linha["idade"],
-        "xp": linha["xp"],
-        "nivel": linha["nivel"],
-        "conquistas": json.loads(linha["conquistas"] or "[]"),
-    }
-
-
 def migrar_usuario_json_legado():
     """Migra o usuario antigo salvo em JSON para SQLite, se existir."""
     if not os.path.exists(LEGACY_USUARIO_JSON_PATH):
         return None
 
     with open(LEGACY_USUARIO_JSON_PATH, "r", encoding="utf-8") as arquivo:
-        usuario = json.load(arquivo)
+        usuario = Usuario.from_dict(json.load(arquivo))
 
-    usuario["id"] = usuario.get("id", USUARIO_ATIVO_ID)
-    usuario["nivel"] = usuario.get("nivel", 1)
-    usuario["conquistas"] = usuario.get("conquistas", [])
     salvar_usuario(usuario)
     return usuario
 
 
+def garantir_usuario(usuario):
+    """Aceita Usuario ou dicionario legado e retorna Usuario."""
+    if usuario is None:
+        return None
+    if isinstance(usuario, Usuario):
+        return usuario
+    return Usuario.from_dict(usuario)
+
+
+def usuario_from_linha(linha):
+    """Converte uma linha SQLite em Usuario."""
+    return Usuario(
+        id=linha["id"],
+        nome=linha["nome"],
+        idade=linha["idade"],
+        xp=linha["xp"],
+        nivel=linha["nivel"],
+        conquistas=json.loads(linha["conquistas"] or "[]"),
+    )
+
+
+@dataclass
+class UsuarioCRUD:
+    """Repositorio SQLite para operacoes de CRUD do Usuario."""
+
+    usuario_ativo_id: int = USUARIO_ATIVO_ID
+
+    def criar(self, nome, idade):
+        """Cria e persiste um novo usuario ativo."""
+        usuario = Usuario.criar(nome, idade)
+        usuario.id = self.usuario_ativo_id
+        self.salvar(usuario)
+        return usuario
+
+    def salvar(self, usuario):
+        """Cria ou atualiza o usuario no SQLite."""
+        inicializar_banco()
+        usuario = garantir_usuario(usuario)
+
+        with closing(conectar()) as conexao, conexao:
+            conexao.execute(
+                """
+                INSERT INTO usuarios (id, nome, idade, xp, nivel, conquistas)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    nome = excluded.nome,
+                    idade = excluded.idade,
+                    xp = excluded.xp,
+                    nivel = excluded.nivel,
+                    conquistas = excluded.conquistas
+                """,
+                (
+                    usuario.id,
+                    usuario.nome,
+                    usuario.idade,
+                    usuario.xp,
+                    usuario.nivel,
+                    json.dumps(usuario.conquistas, ensure_ascii=False),
+                ),
+            )
+
+        return usuario
+
+    def carregar(self, usuario_id=None):
+        """Busca um usuario por ID e migra o JSON legado quando necessario."""
+        inicializar_banco()
+        usuario_id = usuario_id or self.usuario_ativo_id
+
+        with closing(conectar()) as conexao, conexao:
+            linha = conexao.execute(
+                """
+                SELECT id, nome, idade, xp, nivel, conquistas
+                FROM usuarios
+                WHERE id = ?
+                """,
+                (usuario_id,),
+            ).fetchone()
+
+        if linha is None and usuario_id == self.usuario_ativo_id:
+            return migrar_usuario_json_legado()
+
+        return None if linha is None else usuario_from_linha(linha)
+
+    def listar(self):
+        """Lista todos os usuarios salvos."""
+        inicializar_banco()
+
+        with closing(conectar()) as conexao, conexao:
+            linhas = conexao.execute(
+                """
+                SELECT id, nome, idade, xp, nivel, conquistas
+                FROM usuarios
+                ORDER BY id
+                """
+            ).fetchall()
+
+        return [usuario_from_linha(linha) for linha in linhas]
+
+    def deletar(self, usuario_id=None):
+        """Remove um usuario e seus registros relacionados."""
+        inicializar_banco()
+        usuario_id = usuario_id or self.usuario_ativo_id
+
+        with closing(conectar()) as conexao, conexao:
+            conexao.execute("DELETE FROM exercicios_concluidos WHERE usuario_id = ?", (usuario_id,))
+            conexao.execute("DELETE FROM exercicio_erros WHERE usuario_id = ?", (usuario_id,))
+            conexao.execute("DELETE FROM usuarios WHERE id = ?", (usuario_id,))
+
+
+def usuario_crud():
+    """Cria um repositorio de usuario usando a configuracao atual do banco."""
+    return UsuarioCRUD()
+
+
+def criar_usuario(nome, idade):
+    """Cria e salva o usuario ativo."""
+    return usuario_crud().criar(nome, idade)
+
+
+def salvar_usuario(usuario):
+    """Salva o usuario ativo no SQLite."""
+    return usuario_crud().salvar(usuario)
+
+
+def carregar_usuario(usuario_id=None):
+    """Carrega um usuario salvo no SQLite."""
+    return usuario_crud().carregar(usuario_id)
+
+
+def listar_usuarios():
+    """Lista usuarios salvos no SQLite."""
+    return usuario_crud().listar()
+
+
+def deletar_usuario(usuario_id=None):
+    """Remove um usuario salvo no SQLite."""
+    return usuario_crud().deletar(usuario_id)
+
+
 def obter_usuario_id(usuario=None):
     """Retorna o ID usado nas tabelas relacionadas ao usuario ativo."""
-    if usuario and usuario.get("id"):
-        return usuario["id"]
+    usuario = garantir_usuario(usuario)
+    if usuario and usuario.id:
+        return usuario.id
     return USUARIO_ATIVO_ID
 
 
@@ -214,34 +299,6 @@ def registrar_erro_exercicio(mundo, exercicio_id, usuario=None):
         ).fetchone()
 
     return linha["erros"]
-
-
-def salvar_progresso(usuario_nome, modulo, exercicio_id):
-    """Compatibilidade para chamadas antigas de progresso."""
-    inicializar_banco()
-    mundo = str(modulo)
-    marcar_exercicio_concluido(mundo, exercicio_id)
-
-
-def carregar_progresso(usuario_nome=None):
-    """Carrega progresso concluido em formato simples para compatibilidade."""
-    inicializar_banco()
-
-    with closing(conectar()) as conexao, conexao:
-        linhas = conexao.execute(
-            """
-            SELECT mundo, exercicio_id
-            FROM exercicios_concluidos
-            WHERE usuario_id = ?
-            ORDER BY mundo, exercicio_id
-            """,
-            (USUARIO_ATIVO_ID,),
-        ).fetchall()
-
-    concluidos = [linha["exercicio_id"] for linha in linhas]
-    return {"modulo_atual": None, "concluidos": concluidos} if usuario_nome else {
-        "usuario_ativo": {"modulo_atual": None, "concluidos": concluidos}
-    }
 
 
 def resetar_banco_de_dados():
