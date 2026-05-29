@@ -37,7 +37,7 @@ def frase_xp(xp):
     """
     frases = {
         10: "Perfeito! Voce garantiu 10 XP.",
-        8: "Muito bom! Um tropeço pequeno, 8 XP.",
+        8: "Muito bom! Um tropeco pequeno, 8 XP.",
         6: "Boa recuperacao! Voce levou 6 XP.",
         4: "Persistencia conta: 4 XP.",
         2: "Conseguiu no limite minimo: 2 XP.",
