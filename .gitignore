@@ -1,6 +1,7 @@
 **/__pycache__/
 data/*.json
 data/*.db
+data/*.log
 
 !data/.gitkeep
 !data/aulas.json
@@ -17,5 +18,8 @@ ENV/
 .env
 .vscode/
 app.py
+app_streamlit.py
+frontend/
 tests/
+.pytest_cache/
 pygame_menu_local.py
