@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from api.routes import health, progress, users
+from api.routes import health, menu, progress, users
 
 
 def criar_app():
@@ -18,6 +18,7 @@ def criar_app():
         version="0.1.0",
     )
     app.include_router(health.router)
+    app.include_router(menu.router)
     app.include_router(users.router)
     app.include_router(progress.router)
     return app

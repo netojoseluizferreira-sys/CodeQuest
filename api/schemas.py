@@ -33,6 +33,13 @@ class NovoJogoRequest(BaseModel):
     idade: int = Field(default=18, ge=1, le=120)
 
 
+class MenuStateResponse(BaseModel):
+    """Resposta com a proxima acao solicitada pelo menu."""
+
+    next_page: str | None = None
+    message: str
+
+
 class ConcluirExercicioRequest(BaseModel):
     """Payload para marcar um exercicio como concluido."""
 
