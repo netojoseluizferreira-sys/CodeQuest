@@ -1,111 +1,50 @@
-# 🚀 CodeQuest
+# CodeQuest
 
 **CodeQuest** é uma plataforma educacional gamificada para ensinar lógica de programação e Python por meio de aulas curtas, exercícios, XP e progressão por mundos.
 
-## 📋 Sobre o Projeto
+**Status atual:** projeto concluído na versão **Beta 0.9**.
 
-O projeto organiza o aprendizado em mundos temáticos. No estado atual, o usuário cria um perfil, entra no Mundo 1, lê uma aula dividida em telas e responde exercícios intercalados no estilo Duolingo.
+## Sobre o Projeto
+
+O CodeQuest organiza o aprendizado em mundos temáticos. A versão Beta 0.9 entrega o ciclo principal completo: menu inicial em Pygame, navegação web em Streamlit, API REST local em FastAPI, persistência em SQLite, criação/continuação de save, aula teórica e exercícios intercalados.
 
 Cada exercício começa valendo 10 XP. A cada erro, a recompensa disponível cai em 2 XP, até o mínimo de 2 XP. Exercícios já concluídos ficam salvos no SQLite para evitar ganho duplicado de XP após reiniciar o app.
 
-## 🧱 Estrutura Atual
+## Estrutura Atual
 
 ```text
 CodeQuest/
 ├── app_streamlit.py                         # Ponto de entrada do Streamlit
-├── api/                                     # API REST inicial com FastAPI
+├── api/                                     # API REST local com FastAPI
 │   ├── main.py                              # Fábrica e instância da aplicação
-│   ├── schemas.py                           # Schemas Pydantic de entrada e saída
-│   └── routes/                              # Rotas de health, usuários e progresso
+│   ├── menu_state.py                        # Estado da última ação do menu Pygame
+│   ├── schemas.py                           # Schemas Pydantic
+│   └── routes/                              # Rotas de health, menu, usuários e progresso
 ├── backend/                                 # Regras de domínio e carregamento de conteúdo
-│   ├── exercicio.py                         # Leitura dos JSONs de aulas e exercícios
-│   ├── usuario.py                           # Dataclass de usuário
-│   └── xp_system.py                         # Regras de XP e nível
 ├── frontend/                                # Estado e renderização do Streamlit
-│   ├── exercise_state.py                    # Estado e persistência de tentativas
-│   ├── exercise_validation.py               # Validação de respostas
-│   ├── exercise_xp.py                       # Cálculo e mensagens de XP por exercício
-│   ├── lesson_flow.py                       # Renderização do fluxo aula/exercícios
-│   ├── lesson_flow_state.py                 # Estado do fluxo de aula
-│   ├── lesson_track.py                      # Montagem da trilha de aula
-│   ├── navigation.py                        # Navegação e estado global
-│   └── pages/                               # Telas do app
-│       ├── codequest.py                     # Roteador das telas
-│       ├── exercicio.py                     # Renderização de um exercício
-│       ├── menu.py                          # Menu principal
-│       ├── mundos.py                        # Lista de mundos
-│       └── perfil.py                        # Perfil do usuário
-├── pygame_client/                           # Cliente Pygame inicial para menu e créditos
-│   ├── audio.py                             # Trilha e efeitos sonoros gerados em memória
-│   ├── credits.py                           # Conteúdo da tela de créditos
-│   ├── menu_actions.py                      # Ações futuras para integração com API
-│   ├── menu_app.py                          # Loop principal do menu Pygame
-│   ├── palette.py                           # Paleta visual alinhada ao Streamlit
-│   ├── settings.py                          # Configurações de janela
-│   └── ui.py                                # Componentes visuais reutilizáveis
-├── utils/                                   # Persistência e infraestrutura
-│   ├── database.py                          # Fachada de compatibilidade da persistência
-│   ├── database_config.py                   # Caminhos e constantes do banco
-│   ├── database_connection.py               # Conexão e schema SQLite
-│   ├── exercise_progress_repository.py      # Persistência de erros e conclusões
-│   ├── user_mapper.py                       # Conversão de dados para Usuario
-│   └── user_repository.py                   # CRUD de usuário com SQLite
+├── pygame_client/                           # Menu Pygame, créditos, áudio e botões
+├── utils/                                   # Persistência SQLite e repositórios
 ├── data/                                    # Aulas e exercícios versionados
-├── requirements.txt                         # Dependências do projeto
+├── requirements.txt
 └── README.md
 ```
 
-## 🕹️ Funcionalidades Atuais
+## Funcionalidades da Beta 0.9
 
-- 👤 Criação e carregamento de perfil local.
-- ⚡ API REST inicial para usuário, novo jogo, continuar e progresso.
-- 🌍 Menu de mundos com Mundo 1 disponível.
-- 📚 Aula teórica dividida em páginas curtas.
-- 📝 Exercícios em sequência, um por tela, intercalados com textos de aula.
-- ⭐ Sistema de XP e níveis.
-- 🎯 XP dinâmico por exercício: 10, 8, 6, 4 e mínimo de 2 XP.
-- ⚠️ Persistência de erros por exercício.
-- 💾 Persistência local em SQLite para usuário, erros e exercícios concluídos.
-- 🧪 Botão de teste para zerar o banco local.
-- 🧩 Código refatorado em módulos menores para facilitar manutenção.
-- 🎮 Menu inicial em Pygame preparado para futura integração com API.
+- Menu inicial em Pygame chamado a partir do fluxo web.
+- Botão **Novo jogo** no Pygame resetando o banco e abrindo criação de perfil no Streamlit.
+- Botão **Continuar** no Pygame carregando o save existente ou criando um save inicial.
+- Botão **Créditos** funcional no Pygame.
+- Botões de voltar no Streamlit retornando para a tela de espera do menu Pygame.
+- API REST local em FastAPI para menu, usuário e progresso.
+- Interface web em Streamlit para perfil, mundos, aulas e exercícios.
+- Persistência local em SQLite.
+- Aula 1 com textos e 15 exercícios intercalados.
+- Sistema de XP com penalidade por erro: 10, 8, 6, 4 e mínimo de 2 XP.
+- Controle de exercícios concluídos para impedir XP duplicado.
+- Código modularizado por responsabilidade.
 
-## 📊 Progresso do MVP
-
-| Item | Status | Observação |
-| --- | --- | --- |
-| Interface Streamlit | ✅ Feito | Entrada em `app_streamlit.py`. |
-| Perfil do usuário | ✅ Feito | Modelo com `dataclass` e CRUD em SQLite. |
-| Salvamento local | ✅ Feito | Persistência via SQLite em `data/codequest.db`. |
-| Mundo 1 | ✅ Parcial | Cabana do Oráculo disponível. |
-| Aula teórica | ✅ Feito | Aula 1 dividida em textos de estudo. |
-| Exercícios | ✅ Feito | Aula 1 possui 15 exercícios intercalados em blocos de 5. |
-| Fluxo aula → exercícios | ✅ Feito | Trilha no padrão texto → 5 exercícios → texto → 5 exercícios. |
-| Sistema de XP | ✅ Feito | XP por acerto com penalidade de 2 XP por erro, até o mínimo de 2 XP. |
-| Sistema de níveis | ✅ Feito | Nível calculado por faixas de XP. |
-| Feedback acerto/erro | ✅ Feito | Feedback imediato no Streamlit. |
-| Refatoração de monolitos | ✅ Feito | Frontend e persistência separados por responsabilidade. |
-| Cutscenes/API de mídia | 🔜 Pendente | Planejado no documento atualizado. |
-| Tela de créditos | 🔜 Pendente | Planejada para fechamento do MVP. |
-
-## 🧭 Pós-MVP
-
-Funcionalidades planejadas após estabilizar o MVP:
-
-- 🧩 Módulo 2: Operadores, a Forja das Runas.
-- 🏛️ Módulo 3: Estruturas de decisão, a Torre dos Julgamentos.
-- 🔁 Módulos futuros de repetição, funções e listas.
-- 🗺️ Mapa interativo do mundo.
-- 🎬 Cutscenes intermediárias por módulo.
-- 🏆 Ranking online.
-- 🔐 Autenticação real com login/senha.
-- 🎨 Skins simples para personalização.
-- 🏅 Conquistas por módulo.
-- 🔊 Música e efeitos sonoros.
-- 🤖 Feedback com IA como recurso opcional.
-- ☁️ Hospedagem online.
-
-## 🔧 Como Rodar
+## Como Rodar
 
 1. Crie e ative um ambiente virtual.
 
@@ -131,17 +70,11 @@ streamlit run app_streamlit.py
 http://localhost:8501
 ```
 
-## 🎮 Menu Pygame
+Ao iniciar o Streamlit, o projeto sobe a API local e abre o menu Pygame. O fluxo esperado é escolher **Novo jogo** ou **Continuar** na janela Pygame e seguir a jornada pelo navegador.
 
-O menu Pygame inicial roda isolado e ainda não conversa com FastAPI. Nesta etapa ele prepara os botões de `Novo jogo`, `Continuar` e `Créditos`, deixando apenas a tela de créditos totalmente funcional.
+## API REST
 
-```bash
-python -m pygame_client.menu_app
-```
-
-## ⚡ API REST
-
-A API inicial roda separada do Streamlit e do Pygame. Ela expõe rotas para saúde do serviço, usuário ativo, novo jogo, continuar jogo e progresso de exercícios.
+A API local expõe rotas para saúde do serviço, menu, usuário e progresso:
 
 ```bash
 uvicorn api.main:app --reload
@@ -153,40 +86,51 @@ Documentação automática:
 http://localhost:8000/docs
 ```
 
-## 🧪 Testes e Validação
+## Menu Pygame
 
-Validações usadas durante a refatoração:
+O menu Pygame também pode ser executado isoladamente para desenvolvimento:
 
 ```bash
-python -m compileall app_streamlit.py backend frontend utils
-python -c "import json; from pathlib import Path; [json.load(open(path, encoding='utf-8')) for path in Path('data').glob('*.json')]"
+python -m pygame_client.menu_app
 ```
 
-Se `pytest` estiver instalado e houver testes locais disponíveis:
+## Testes e Validação
+
+Validações usadas durante o desenvolvimento:
 
 ```bash
+python -m compileall api app_streamlit.py backend frontend utils pygame_client
 python -m pytest tests
 ```
 
-## 🗂️ Dados
+## Dados
 
 Conteúdos versionados:
 
 - `data/aulas.json`
 - `data/exercicios.json`
 
-## ✅ Revisão Técnica Atual
+## Revisão Técnica da Beta 0.9
 
-Última revisão feita no repositório:
+- Persistência migrada para SQLite.
+- CRUD de usuário organizado com `dataclass`.
+- API REST local criada com FastAPI.
+- Menu Pygame integrado à API.
+- Streamlit consumindo a API para aplicar ações do menu.
+- Fluxo Novo jogo/Continuar funcionando entre Pygame, API e Streamlit.
+- Tela de créditos disponível no Pygame.
+- Frontend e persistência separados em módulos menores.
+- Testes locais cobrindo API, banco, XP, usuário, conteúdo e lógica de frontend.
 
-- migração da persistência local para SQLite;
-- CRUD de usuário organizado com `dataclass`;
-- persistência de exercícios concluídos e erros por exercício;
-- separação de monolitos do frontend em navegação, páginas, fluxo de aula, estado de exercício, validação e XP;
-- separação da persistência em configuração, conexão, repositório de usuário e repositório de progresso de exercícios;
-- criação da API REST inicial com FastAPI;
-- remoção de funções sem uso atual;
-- padronização de docstrings nas funções rastreadas;
-- validação de sintaxe com `compileall`;
-- validação de JSON em `data/aulas.json` e `data/exercicios.json`;
-- verificação manual de inicialização do Streamlit.
+## Roadmap
+
+- Integrar cadastro de usuário diretamente via API em todas as telas do Streamlit.
+- Criar autenticação real com login/senha.
+- Adicionar novos mundos e módulos: operadores, condicionais, repetições, funções e listas.
+- Expandir cutscenes em Pygame antes e depois de cada módulo.
+- Criar mapa interativo do Arquipélago de Bythos.
+- Adicionar conquistas persistidas por módulo.
+- Implementar ranking online.
+- Evoluir trilha sonora e efeitos sonoros.
+- Criar empacotamento local para execução simplificada.
+- Preparar hospedagem online para a API e o app web.
