@@ -8,35 +8,54 @@ class MenuAction:
     name: str
     description: str
     payload: dict
+    success: bool = True
 
 
-def solicitar_novo_jogo(nome_padrao="Aventureiro"):
-    """Cria o payload futuro para iniciar um novo jogo.
-
-    Recebe:
-        nome_padrao: Nome temporario usado ate existir tela de cadastro no Pygame.
-
-    Retorna:
-        MenuAction sem efeito colateral local, pronta para futura chamada FastAPI.
-    """
-    return MenuAction(
-        name="novo_jogo",
-        description="Futuramente apagara o banco e criara um usuario via API.",
-        payload={"resetar_banco": True, "nome": nome_padrao},
-    )
-
-
-def solicitar_continuar_jogo():
-    """Cria o payload futuro para continuar um save.
+def solicitar_novo_jogo(api_client):
+    """Solicita novo jogo para a API.
 
     Recebe:
-        Nenhum parametro.
+        api_client: Cliente HTTP configurado para chamar a API.
 
     Retorna:
-        MenuAction sem efeito colateral local, pronta para futura chamada FastAPI.
+        MenuAction com resultado da chamada.
     """
-    return MenuAction(
-        name="continuar",
-        description="Futuramente carregara o save existente ou criara um novo via API.",
-        payload={"criar_se_nao_existir": True},
-    )
+    try:
+        payload = api_client.novo_jogo()
+        return MenuAction(
+            name="novo_jogo",
+            description=payload.get("message", "Novo jogo preparado."),
+            payload=payload,
+        )
+    except Exception as exc:
+        return MenuAction(
+            name="novo_jogo",
+            description=f"API indisponivel para novo jogo: {exc}",
+            payload={},
+            success=False,
+        )
+
+
+def solicitar_continuar_jogo(api_client):
+    """Solicita continuar jogo para a API.
+
+    Recebe:
+        api_client: Cliente HTTP configurado para chamar a API.
+
+    Retorna:
+        MenuAction com resultado da chamada.
+    """
+    try:
+        payload = api_client.continuar()
+        return MenuAction(
+            name="continuar",
+            description=f"Save carregado para {payload.get('nome', 'usuario')}.",
+            payload=payload,
+        )
+    except Exception as exc:
+        return MenuAction(
+            name="continuar",
+            description=f"API indisponivel para continuar: {exc}",
+            payload={},
+            success=False,
+        )

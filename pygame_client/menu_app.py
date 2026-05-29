@@ -1,6 +1,9 @@
+import argparse
+
 import pygame
 
 from pygame_client.audio import AudioController
+from pygame_client.api_client import CodeQuestApiClient
 from pygame_client.credits import obter_linhas_creditos
 from pygame_client.menu_actions import solicitar_continuar_jogo, solicitar_novo_jogo
 from pygame_client.palette import PALETTE
@@ -11,11 +14,11 @@ from pygame_client.ui import Button, desenhar_texto_centralizado, quebrar_texto
 class CodeQuestPygameMenu:
     """Aplicacao Pygame inicial para o menu do CodeQuest."""
 
-    def __init__(self):
+    def __init__(self, api_url="http://127.0.0.1:8000"):
         """Inicializa o estado visual do menu.
 
         Recebe:
-            Nenhum parametro.
+            api_url: URL base da API REST do CodeQuest.
 
         Retorna:
             None.
@@ -24,6 +27,7 @@ class CodeQuestPygameMenu:
         self.screen = pygame.display.set_mode((WINDOW.width, WINDOW.height))
         pygame.display.set_caption(WINDOW.title)
         self.clock = pygame.time.Clock()
+        self.api_client = CodeQuestApiClient(api_url)
         self.audio = AudioController()
         self.audio.inicializar()
         self.font_title = pygame.font.SysFont("segoeui", 52, bold=True)
@@ -32,7 +36,7 @@ class CodeQuestPygameMenu:
         self.font_small = pygame.font.SysFont("segoeui", 18)
         self.running = True
         self.screen_name = "menu"
-        self.status_message = "Menu Pygame inicial: pronto para futura integracao via FastAPI."
+        self.status_message = f"Menu conectado em {api_url}. Escolha uma opcao."
         self.credit_scroll = 0
         self.buttons = self._criar_botoes_menu()
 
@@ -228,7 +232,7 @@ class CodeQuestPygameMenu:
         return self.font_small, PALETTE.muted, 24
 
     def _novo_jogo(self):
-        """Prepara a acao futura de novo jogo.
+        """Solicita novo jogo pela API e fecha o menu quando der certo.
 
         Recebe:
             Nenhum parametro.
@@ -236,11 +240,13 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        action = solicitar_novo_jogo()
+        action = solicitar_novo_jogo(self.api_client)
         self.status_message = f"Preparado: {action.description}"
+        if action.success:
+            self._sair()
 
     def _continuar(self):
-        """Prepara a acao futura de continuar save.
+        """Solicita continuar jogo pela API e fecha o menu quando der certo.
 
         Recebe:
             Nenhum parametro.
@@ -248,8 +254,10 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        action = solicitar_continuar_jogo()
+        action = solicitar_continuar_jogo(self.api_client)
         self.status_message = f"Preparado: {action.description}"
+        if action.success:
+            self._sair()
 
     def _abrir_creditos(self):
         """Abre a tela de creditos.
@@ -285,7 +293,10 @@ def main():
     Retorna:
         None.
     """
-    CodeQuestPygameMenu().run()
+    parser = argparse.ArgumentParser(description="Menu Pygame inicial do CodeQuest.")
+    parser.add_argument("--api-url", default="http://127.0.0.1:8000", help="URL base da API FastAPI.")
+    args = parser.parse_args()
+    CodeQuestPygameMenu(api_url=args.api_url).run()
 
 
 if __name__ == "__main__":
