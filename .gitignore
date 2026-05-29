@@ -1,6 +1,7 @@
 **/__pycache__/
 data/*.json
 data/*.db
+data/*.log
 
 !data/.gitkeep
 !data/aulas.json
@@ -18,4 +19,5 @@ ENV/
 .vscode/
 app.py
 tests/
+.pytest_cache/
 pygame_menu_local.py
