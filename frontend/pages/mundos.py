@@ -1,6 +1,6 @@
 import streamlit as st
 
-from frontend.navigation import ir_para_pagina
+from frontend.navigation import ir_para_pagina, voltar_para_menu_pygame
 
 
 def mostrar_mundos():
@@ -19,4 +19,4 @@ def mostrar_mundos():
         ir_para_pagina("mundo1")
 
     if st.button("🔙 Voltar"):
-        ir_para_pagina("menu")
+        voltar_para_menu_pygame()

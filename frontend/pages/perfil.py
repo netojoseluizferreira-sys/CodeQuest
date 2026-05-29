@@ -1,7 +1,7 @@
 import streamlit as st
 
 from backend.xp_system import progresso_para_proximo_nivel, xp_para_proximo_nivel
-from frontend.navigation import ir_para_pagina
+from frontend.navigation import ir_para_pagina, voltar_para_menu_pygame
 from utils.database import criar_usuario
 
 
@@ -25,7 +25,7 @@ def mostrar_perfil():
                 usuario = criar_usuario(nome, idade)
                 st.session_state.usuario = usuario
                 st.success("✅ Perfil criado com sucesso!")
-                st.rerun()
+                ir_para_pagina("mundos")
     else:
         usuario = st.session_state.usuario
 
@@ -45,4 +45,4 @@ def mostrar_perfil():
         st.write(f"**Idade:** {usuario.idade}")
 
         if st.button("🔙 Voltar ao Menu"):
-            ir_para_pagina("menu")
+            voltar_para_menu_pygame()
