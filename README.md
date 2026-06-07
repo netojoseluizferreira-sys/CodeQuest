@@ -66,7 +66,7 @@ pip install -r requirements.txt
 Execute o jogo:
 
 ```bash
-python -m pygame_client.menu_app
+python app.py
 ```
 
 ## Dados e Persistencia

@@ -6,6 +6,36 @@ import pygame
 from pygame_client.palette import PALETTE
 
 
+def _quebrar_texto_botao(texto, font, largura_maxima):
+    """Divide o texto do botao em linhas que cabem dentro do retangulo.
+
+    Recebe:
+        texto: Texto exibido no botao.
+        font: Fonte usada para medir cada linha.
+        largura_maxima: Largura maxima disponivel em pixels.
+
+    Retorna:
+        Lista de linhas prontas para renderizacao.
+    """
+    palavras = texto.split()
+    linhas = []
+    linha_atual = ""
+
+    for palavra in palavras:
+        candidata = f"{linha_atual} {palavra}".strip()
+        if font.size(candidata)[0] <= largura_maxima:
+            linha_atual = candidata
+        else:
+            if linha_atual:
+                linhas.append(linha_atual)
+            linha_atual = palavra
+
+    if linha_atual:
+        linhas.append(linha_atual)
+
+    return linhas or [texto]
+
+
 @dataclass
 class Button:
     """Botao retangular usado pelas telas do menu Pygame."""
@@ -13,6 +43,9 @@ class Button:
     rect: pygame.Rect
     text: str
     action: Callable[[], None]
+    background: tuple[int, int, int] | None = None
+    hover_background: tuple[int, int, int] | None = None
+    text_color: tuple[int, int, int] = PALETTE.text
 
     def draw(self, screen, font, mouse_pos):
         """Desenha o botao na tela.
@@ -26,13 +59,21 @@ class Button:
             None.
         """
         hovered = self.rect.collidepoint(mouse_pos)
-        color = PALETTE.primary_hover if hovered else PALETTE.primary
+        background = self.background or PALETTE.primary
+        hover_background = self.hover_background or PALETTE.primary_hover
+        color = hover_background if hovered else background
         pygame.draw.rect(screen, color, self.rect, border_radius=8)
         pygame.draw.rect(screen, PALETTE.border, self.rect, width=2, border_radius=8)
 
-        label = font.render(self.text, True, (255, 255, 255))
-        label_rect = label.get_rect(center=self.rect.center)
-        screen.blit(label, label_rect)
+        linhas = _quebrar_texto_botao(self.text, font, self.rect.width - 24)
+        linha_altura = font.get_linesize()
+        y = self.rect.centery - ((len(linhas) * linha_altura) // 2)
+
+        for linha in linhas:
+            label = font.render(linha, True, self.text_color)
+            label_rect = label.get_rect(center=(self.rect.centerx, y + linha_altura // 2))
+            screen.blit(label, label_rect)
+            y += linha_altura
 
     def handle_event(self, event):
         """Executa a acao do botao quando houver clique.

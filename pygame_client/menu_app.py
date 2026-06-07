@@ -193,13 +193,16 @@ class CodeQuestPygameMenu:
         exercicio = self._exercicio_atual()
         if exercicio and exercicio["tipo"] == "multipla_escolha":
             botoes = []
-            for indice, _opcao in enumerate(exercicio["opcoes"]):
-                y = 285 + (indice * 58)
+            for indice, opcao in enumerate(exercicio["opcoes"]):
+                y = 245 + (indice * 70)
                 botoes.append(
                     Button(
-                        pygame.Rect(130, y, 700, 46),
-                        f"{chr(65 + indice)}",
+                        pygame.Rect(130, y, 700, 58),
+                        f"{chr(65 + indice)}) {opcao}",
                         lambda escolha=indice: self._responder_exercicio(escolha),
+                        background=PALETTE.surface,
+                        hover_background=PALETTE.surface_hover,
+                        text_color=PALETTE.text,
                     )
                 )
             botoes.append(self._botao_voltar_mundos())
@@ -574,7 +577,7 @@ class CodeQuestPygameMenu:
         self._desenhar_status(520)
 
     def _renderizar_opcoes(self, exercicio):
-        """Renderiza alternativas de multipla escolha.
+        """Mantem o espaco das alternativas, renderizadas pelos botoes.
 
         Recebe:
             exercicio: Dicionario do exercicio atual.
@@ -582,9 +585,7 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        for indice, opcao in enumerate(exercicio["opcoes"]):
-            y = 293 + (indice * 58)
-            self._desenhar_paragrafo(f"{chr(65 + indice)}) {opcao}", 190, y, 620, self.font_small, PALETTE.text)
+        return None
 
     def _renderizar_conclusao(self):
         """Renderiza a tela de conclusao da aula.
