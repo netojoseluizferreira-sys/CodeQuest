@@ -43,6 +43,7 @@ class CodeQuestPygameMenu:
         self.running = True
         self.screen_name = "start"
         self.status_message = "Bem-vindo ao CodeQuest."
+        self.status_kind = "normal"
         self.usuario = carregar_usuario()
         self.credit_scroll = 0
         self.nome_input = ""
@@ -685,7 +686,37 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
+        if self.status_kind in {"success", "error"}:
+            color = PALETTE.success if self.status_kind == "success" else PALETTE.error
+            font = self.font_body
+            linhas = quebrar_texto(self.status_message, font, self.content_width - 80)
+            linha_altura = font.get_linesize()
+            altura = max(58, (len(linhas) * linha_altura) + 24)
+            rect = pygame.Rect(self.content_x, y - altura // 2, self.content_width, altura)
+            pygame.draw.rect(self.screen, PALETTE.surface, rect, border_radius=10)
+            pygame.draw.rect(self.screen, color, rect, width=2, border_radius=10)
+            texto_y = rect.y + 12
+            for linha in linhas:
+                surface = font.render(linha, True, color)
+                surface_rect = surface.get_rect(center=(rect.centerx, texto_y + linha_altura // 2))
+                self.screen.blit(surface, surface_rect)
+                texto_y += linha_altura
+            return
+
         desenhar_texto_centralizado(self.screen, self.status_message, self.font_tiny, PALETTE.muted, y)
+
+    def _definir_status(self, mensagem, kind="normal"):
+        """Atualiza a mensagem de status e seu estilo visual.
+
+        Recebe:
+            mensagem: Texto que sera exibido no rodape ou banner.
+            kind: Tipo visual da mensagem: normal, success ou error.
+
+        Retorna:
+            None.
+        """
+        self.status_message = mensagem
+        self.status_kind = kind
 
     def _desenhar_rodape(self, texto):
         """Desenha rodape fixo na base da tela.
@@ -738,7 +769,7 @@ class CodeQuestPygameMenu:
         self.nome_input = ""
         self.idade_input = ""
         self.active_field = "nome"
-        self.status_message = "Crie seu personagem para comecar uma nova jornada."
+        self._definir_status("Crie seu personagem para comecar uma nova jornada.")
         self.screen_name = "create"
 
     def _continuar(self):
@@ -752,7 +783,7 @@ class CodeQuestPygameMenu:
         """
         self.usuario = carregar_usuario()
         if self.usuario is None:
-            self.status_message = "Nenhum save encontrado. Crie seu personagem."
+            self._definir_status("Nenhum save encontrado. Crie seu personagem.", "error")
             self.screen_name = "create"
             return
         self._abrir_hub()
@@ -768,19 +799,19 @@ class CodeQuestPygameMenu:
         """
         nome = self.nome_input.strip()
         if not nome:
-            self.status_message = "Informe um nome para o personagem."
+            self._definir_status("Informe um nome para o personagem.", "error")
             return
         try:
             idade = int(self.idade_input)
         except ValueError:
-            self.status_message = "Informe uma idade numerica."
+            self._definir_status("Informe uma idade numerica.", "error")
             return
         if idade < 1 or idade > 120:
-            self.status_message = "A idade precisa estar entre 1 e 120."
+            self._definir_status("A idade precisa estar entre 1 e 120.", "error")
             return
 
         self.usuario = criar_usuario(nome, idade)
-        self.status_message = "Personagem criado. Escolha seu proximo destino."
+        self._definir_status("Personagem criado. Escolha seu proximo destino.", "success")
         self._abrir_hub()
 
     def _abrir_hub(self):
@@ -809,11 +840,11 @@ class CodeQuestPygameMenu:
             None.
         """
         if carregar_usuario() is None:
-            self.status_message = "Crie um personagem antes de viajar."
+            self._definir_status("Crie um personagem antes de viajar.", "error")
             self.screen_name = "create"
             return
         self.screen_name = "worlds"
-        self.status_message = "Escolha um mundo para estudar."
+        self._definir_status("Escolha um mundo para estudar.")
 
     def _abrir_perfil(self):
         """Abre a tela de perfil.
@@ -850,20 +881,20 @@ class CodeQuestPygameMenu:
         """
         self.usuario = carregar_usuario()
         if self.usuario is None:
-            self.status_message = "Crie um personagem antes de estudar."
+            self._definir_status("Crie um personagem antes de estudar.", "error")
             self.screen_name = "create"
             return
 
         self.aula = carregar_aula_pygame(MUNDO_ATIVO, AULA_ATIVA)
         self.exercicios = carregar_exercicios_pygame(MUNDO_ATIVO)
         if not self.aula:
-            self.status_message = "Nao foi possivel carregar a aula."
+            self._definir_status("Nao foi possivel carregar a aula.", "error")
             return
         self.trilha_indice = 0
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
-        self.status_message = "Leia com calma e avance no seu ritmo."
+        self._definir_status("Leia com calma e avance no seu ritmo.")
         self.screen_name = "lesson"
 
     def _segmento_atual(self):
@@ -910,7 +941,7 @@ class CodeQuestPygameMenu:
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
-        self.status_message = "Continue sua jornada."
+        self._definir_status("Continue sua jornada.")
         if self._segmento_atual() is None:
             self.screen_name = "complete"
 
@@ -933,7 +964,7 @@ class CodeQuestPygameMenu:
         else:
             self.resposta_texto = ""
             self.exercicio_respondido = False
-            self.status_message = "Proximo desafio."
+            self._definir_status("Proximo desafio.")
 
     def _responder_texto_livre(self):
         """Envia resposta textual do exercicio atual.
@@ -945,7 +976,7 @@ class CodeQuestPygameMenu:
             None.
         """
         if not self.resposta_texto.strip():
-            self.status_message = "Digite uma resposta antes de enviar."
+            self._definir_status("Digite uma resposta antes de enviar.", "error")
             return
         self._responder_exercicio(self.resposta_texto)
 
@@ -961,11 +992,11 @@ class CodeQuestPygameMenu:
         exercicio = self._exercicio_atual()
         self.usuario = carregar_usuario()
         if exercicio is None or self.usuario is None:
-            self.status_message = "Nao foi possivel responder agora."
+            self._definir_status("Nao foi possivel responder agora.", "error")
             return
 
         resultado = registrar_resposta(MUNDO_ATIVO, exercicio, resposta, self.usuario)
-        self.status_message = resultado["mensagem"]
+        self._definir_status(resultado["mensagem"], "success" if resultado["acertou"] else "error")
         if resultado["acertou"]:
             self.usuario = carregar_usuario()
             self.exercicio_respondido = True
@@ -1001,7 +1032,7 @@ class CodeQuestPygameMenu:
             None.
         """
         self.screen_name = "start"
-        self.status_message = "Bem-vindo ao CodeQuest."
+        self._definir_status("Bem-vindo ao CodeQuest.")
 
     def _sair(self):
         """Encerra o loop principal.

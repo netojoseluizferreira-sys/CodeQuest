@@ -14,6 +14,7 @@ class CodeQuestPalette:
     primary_hover: tuple[int, int, int] = (71, 116, 181)
     accent: tuple[int, int, int] = (105, 179, 255)
     success: tuple[int, int, int] = (67, 199, 128)
+    error: tuple[int, int, int] = (255, 99, 99)
     gold: tuple[int, int, int] = (245, 190, 92)
     border: tuple[int, int, int] = (67, 82, 107)
 
