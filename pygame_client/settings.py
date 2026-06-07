@@ -5,8 +5,8 @@ from dataclasses import dataclass
 class WindowSettings:
     """Configuracoes visuais da janela Pygame."""
 
-    width: int = 960
-    height: int = 640
+    width: int = 1280
+    height: int = 800
     title: str = "CodeQuest - Menu Pygame"
     fps: int = 60
 

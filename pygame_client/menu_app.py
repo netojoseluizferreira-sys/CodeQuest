@@ -35,9 +35,11 @@ class CodeQuestPygameMenu:
         self.audio.inicializar()
         self.font_title = pygame.font.SysFont("segoeui", 52, bold=True)
         self.font_subtitle = pygame.font.SysFont("segoeui", 28, bold=True)
-        self.font_body = pygame.font.SysFont("segoeui", 22)
-        self.font_small = pygame.font.SysFont("segoeui", 18)
+        self.font_body = pygame.font.SysFont("segoeui", 21)
+        self.font_small = pygame.font.SysFont("segoeui", 17)
         self.font_tiny = pygame.font.SysFont("segoeui", 15)
+        self.content_x = 150
+        self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
         self.screen_name = "start"
         self.status_message = "Bem-vindo ao CodeQuest."
@@ -127,8 +129,8 @@ class CodeQuestPygameMenu:
             Lista de botoes da tela de criacao.
         """
         return [
-            Button(pygame.Rect(260, 455, 200, 52), "Criar", self._criar_personagem),
-            Button(pygame.Rect(500, 455, 200, 52), "Voltar", self._voltar_inicio),
+            Button(pygame.Rect(410, 505, 220, 54), "Criar", self._criar_personagem),
+            Button(pygame.Rect(670, 505, 220, 54), "Voltar", self._voltar_inicio),
         ]
 
     def _botoes_hub(self):
@@ -161,7 +163,7 @@ class CodeQuestPygameMenu:
             Lista de botoes da tela de mundos.
         """
         return [
-            Button(pygame.Rect(260, 255, 440, 58), "Mundo 1 - Cabana do Oraculo", self._iniciar_mundo_1),
+            Button(pygame.Rect(390, 285, 500, 62), "Mundo 1 - Cabana do Oraculo", self._iniciar_mundo_1),
             self._botao_voltar_hub(),
         ]
 
@@ -180,13 +182,13 @@ class CodeQuestPygameMenu:
 
         if segmento["tipo"] == "aula":
             return [
-                Button(pygame.Rect(650, 560, 220, 48), "Continuar", self._avancar_segmento),
+                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Continuar", self._avancar_segmento),
                 self._botao_voltar_mundos(),
             ]
 
         if self.exercicio_respondido:
             return [
-                Button(pygame.Rect(650, 560, 220, 48), "Proximo", self._avancar_exercicio),
+                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Proximo", self._avancar_exercicio),
                 self._botao_voltar_mundos(),
             ]
 
@@ -194,10 +196,10 @@ class CodeQuestPygameMenu:
         if exercicio and exercicio["tipo"] == "multipla_escolha":
             botoes = []
             for indice, opcao in enumerate(exercicio["opcoes"]):
-                y = 245 + (indice * 70)
+                y = 285 + (indice * 86)
                 botoes.append(
                     Button(
-                        pygame.Rect(130, y, 700, 58),
+                        pygame.Rect(self.content_x, y, self.content_width, 72),
                         f"{chr(65 + indice)}) {opcao}",
                         lambda escolha=indice: self._responder_exercicio(escolha),
                         background=PALETTE.surface,
@@ -209,7 +211,7 @@ class CodeQuestPygameMenu:
             return botoes
 
         return [
-            Button(pygame.Rect(650, 560, 220, 48), "Responder", self._responder_texto_livre),
+            Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Responder", self._responder_texto_livre),
             self._botao_voltar_mundos(),
         ]
 
@@ -223,11 +225,11 @@ class CodeQuestPygameMenu:
         Retorna:
             Lista de botoes configurados.
         """
-        largura = 360
-        altura = 54
+        largura = 420
+        altura = 58
         x = (WINDOW.width - largura) // 2
         return [
-            Button(pygame.Rect(x, y_inicial + (indice * 68), largura, altura), texto, acao)
+            Button(pygame.Rect(x, y_inicial + (indice * 72), largura, altura), texto, acao)
             for indice, (texto, acao) in enumerate(itens)
         ]
 
@@ -240,7 +242,7 @@ class CodeQuestPygameMenu:
         Retorna:
             Botao Voltar.
         """
-        return Button(pygame.Rect(40, 560, 180, 48), "Voltar", self._voltar_inicio)
+        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._voltar_inicio)
 
     def _botao_voltar_hub(self):
         """Cria botao de retorno para o hub.
@@ -251,7 +253,7 @@ class CodeQuestPygameMenu:
         Retorna:
             Botao Voltar.
         """
-        return Button(pygame.Rect(40, 560, 180, 48), "Voltar", self._abrir_hub)
+        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._abrir_hub)
 
     def _botao_voltar_mundos(self):
         """Cria botao de retorno para a tela de mundos.
@@ -262,7 +264,7 @@ class CodeQuestPygameMenu:
         Retorna:
             Botao Voltar.
         """
-        return Button(pygame.Rect(40, 560, 180, 48), "Mundos", self._abrir_mundos)
+        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Mundos", self._abrir_mundos)
 
     def _processar_eventos(self):
         """Processa eventos de teclado, mouse e janela.
@@ -291,16 +293,16 @@ class CodeQuestPygameMenu:
             None.
         """
         if self.screen_name == "create":
-            if pygame.Rect(260, 255, 440, 46).collidepoint(event.pos):
+            if pygame.Rect(390, 285, 500, 50).collidepoint(event.pos):
                 self.active_field = "nome"
-            elif pygame.Rect(260, 345, 180, 46).collidepoint(event.pos):
+            elif pygame.Rect(390, 385, 220, 50).collidepoint(event.pos):
                 self.active_field = "idade"
 
         if self.screen_name == "lesson":
             segmento = self._segmento_atual()
             exercicio = self._exercicio_atual() if segmento and segmento["tipo"] == "exercicios" else None
             if exercicio and exercicio["tipo"] == "completar":
-                if pygame.Rect(130, 415, 700, 46).collidepoint(event.pos):
+                if pygame.Rect(self.content_x, 455, self.content_width, 52).collidepoint(event.pos):
                     self.active_field = "resposta"
 
         for button in self._botoes_tela():
@@ -433,11 +435,11 @@ class CodeQuestPygameMenu:
             None.
         """
         self._desenhar_cabecalho("Criar personagem", "Defina quem vai explorar Bythos")
-        self._desenhar_label("Nome do aventureiro", 260, 225)
-        self._desenhar_input(pygame.Rect(260, 255, 440, 46), self.nome_input, "nome", "Digite seu nome")
-        self._desenhar_label("Idade", 260, 315)
-        self._desenhar_input(pygame.Rect(260, 345, 180, 46), self.idade_input, "idade", "18")
-        self._desenhar_status(530)
+        self._desenhar_label("Nome do aventureiro", 390, 252)
+        self._desenhar_input(pygame.Rect(390, 285, 500, 50), self.nome_input, "nome", "Digite seu nome")
+        self._desenhar_label("Idade", 390, 352)
+        self._desenhar_input(pygame.Rect(390, 385, 220, 50), self.idade_input, "idade", "18")
+        self._desenhar_status(610)
 
     def _renderizar_hub(self):
         """Renderiza o menu principal do jogador.
@@ -464,13 +466,13 @@ class CodeQuestPygameMenu:
         self._desenhar_cabecalho("Arquipelago de Bythos", "Escolha o proximo destino")
         self._desenhar_paragrafo(
             "A Cabana do Oraculo guarda a primeira aula: programacao, algoritmos e linguagens.",
-            190,
-            370,
-            580,
+            280,
+            390,
+            720,
             self.font_body,
             PALETTE.text,
         )
-        self._desenhar_status(520)
+        self._desenhar_status(650)
 
     def _renderizar_perfil(self):
         """Renderiza a tela de perfil do usuario.
@@ -484,7 +486,7 @@ class CodeQuestPygameMenu:
         self.usuario = carregar_usuario()
         self._desenhar_cabecalho("Perfil", "Seu progresso em Bythos")
         if self.usuario is None:
-            self._desenhar_paragrafo("Nenhum personagem criado ainda.", 240, 260, 520, self.font_body, PALETTE.text)
+            self._desenhar_paragrafo("Nenhum personagem criado ainda.", 360, 300, 560, self.font_body, PALETTE.text)
             return
 
         dados = [
@@ -494,10 +496,10 @@ class CodeQuestPygameMenu:
             f"XP total: {self.usuario.xp}",
             f"XP para o proximo nivel: {xp_para_proximo_nivel(self.usuario.xp)}",
         ]
-        y = 230
+        y = 250
         for linha in dados:
-            self._desenhar_paragrafo(linha, 300, y, 420, self.font_body, PALETTE.text)
-            y += 46
+            self._desenhar_paragrafo(linha, 430, y, 520, self.font_body, PALETTE.text)
+            y += 48
 
     def _renderizar_creditos(self):
         """Renderiza a tela de creditos com rolagem.
@@ -546,9 +548,9 @@ class CodeQuestPygameMenu:
             None.
         """
         self._desenhar_cabecalho(segmento["titulo"], self.aula["titulo"])
-        y = 200
+        y = 205
         for paragrafo in segmento["conteudo"]:
-            y = self._desenhar_paragrafo(paragrafo, 95, y, 770, self.font_small, PALETTE.text) + 12
+            y = self._desenhar_paragrafo(paragrafo, self.content_x, y, self.content_width, self.font_small, PALETTE.text) + 12
 
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercicio atual dentro de uma lista de pratica.
@@ -564,17 +566,17 @@ class CodeQuestPygameMenu:
         total = len(segmento["exercicios"])
         self._desenhar_cabecalho(segmento["titulo"], f"Exercicio {numero} de {total}")
         if exercicio is None:
-            self._desenhar_paragrafo("Exercicio nao encontrado.", 120, 250, 720, self.font_body, PALETTE.text)
+            self._desenhar_paragrafo("Exercicio nao encontrado.", self.content_x, 250, self.content_width, self.font_body, PALETTE.text)
             return
 
-        self._desenhar_paragrafo(exercicio["pergunta"], 120, 200, 720, self.font_body, PALETTE.text)
+        self._desenhar_paragrafo(exercicio["pergunta"], self.content_x, 205, self.content_width, self.font_body, PALETTE.text)
         if exercicio["tipo"] == "multipla_escolha":
             self._renderizar_opcoes(exercicio)
         else:
             placeholder = exercicio.get("placeholder", "Digite sua resposta")
-            self._desenhar_input(pygame.Rect(130, 415, 700, 46), self.resposta_texto, "resposta", placeholder)
+            self._desenhar_input(pygame.Rect(self.content_x, 455, self.content_width, 52), self.resposta_texto, "resposta", placeholder)
 
-        self._desenhar_status(520)
+        self._desenhar_status(WINDOW.height - 118)
 
     def _renderizar_opcoes(self, exercicio):
         """Mantem o espaco das alternativas, renderizadas pelos botoes.
@@ -599,9 +601,9 @@ class CodeQuestPygameMenu:
         self._desenhar_cabecalho("Aula concluida", "A primeira rota de Bythos foi vencida")
         self._desenhar_paragrafo(
             "Voce completou o fluxo de texto, pratica e revisao. Volte ao menu para ver seu perfil.",
-            190,
-            265,
-            580,
+            300,
+            300,
+            680,
             self.font_body,
             PALETTE.text,
         )
