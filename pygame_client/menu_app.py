@@ -1,5 +1,6 @@
 import pygame
 import webbrowser  # Adicionei a importacao do webbrowser para abrir links no navegador
+import glob  # Para ler a pasta de frames de video
 
 from backend.xp_system import xp_para_proximo_nivel
 from pygame_client.audio import AudioController
@@ -36,14 +37,14 @@ class CodeQuestPygameMenu:
         self.audio.inicializar()
         # Aplicando fonte Silkscreen-Bold para titulos e Silkscreen-Regular para os demais
         try:
-            self.font_title = pygame.font.Font("data/Silkscreen-Bold.ttf", 52)
-            self.font_subtitle = pygame.font.Font("data/Silkscreen-Bold.ttf", 28)
+            self.font_title = pygame.font.Font("data/Silkscreen-Bold.ttf", 96)
+            self.font_subtitle = pygame.font.Font("data/Silkscreen-Regular.ttf", 28)
             self.font_body = pygame.font.Font("data/Silkscreen-Regular.ttf", 21)
             self.font_small = pygame.font.Font("data/Silkscreen-Regular.ttf", 17)
             self.font_tiny = pygame.font.Font("data/Silkscreen-Regular.ttf", 15)
         except Exception:
-            self.font_title = pygame.font.SysFont("segoeui", 52, bold=True)
-            self.font_subtitle = pygame.font.SysFont("segoeui", 28, bold=True)
+            self.font_title = pygame.font.SysFont("segoeui", 96, bold=True)
+            self.font_subtitle = pygame.font.SysFont("segoeui", 28, bold=False)
             self.font_body = pygame.font.SysFont("segoeui", 21)
             self.font_small = pygame.font.SysFont("segoeui", 17)
             self.font_tiny = pygame.font.SysFont("segoeui", 15)
@@ -67,12 +68,25 @@ class CodeQuestPygameMenu:
         self.link_rect = None  # Adicionei a variavel para armazenar o retangulo do link
         self.btn_continuar_y = None  # Adicionei a variavel para armazenar o Y do botao continuar
 
-        # Carregando fundo verde do menu
-        try:
-            raw_bg = pygame.image.load("data/imagem_verde.jpeg")
-            self.bg_image = pygame.transform.scale(raw_bg, (WINDOW.width, WINDOW.height))
-        except Exception:
-            self.bg_image = None
+        # Lógica de troca dos frames do vídeo - Carregamento
+        self.bg_frames = []
+        self.current_bg_frame = 0.0
+
+        frame_files = sorted(glob.glob("data/video_frames/*.jpeg") + glob.glob("data/video_frames/*.png") + glob.glob("data/video_frames/*.jpg"))
+        for frame_file in frame_files:
+            try:
+                raw_bg = pygame.image.load(frame_file)
+                self.bg_frames.append(pygame.transform.scale(raw_bg, (WINDOW.width, WINDOW.height)))
+            except Exception:
+                pass
+
+        # Fallback para fundo verde antigo se n achar frames
+        if not self.bg_frames:
+            try:
+                raw_bg = pygame.image.load("data/imagem_verde.jpeg")
+                self.bg_frames.append(pygame.transform.scale(raw_bg, (WINDOW.width, WINDOW.height)))
+            except Exception:
+                pass
 
     def run(self):
         """Executa o loop principal da aplicacao.
@@ -136,7 +150,7 @@ class CodeQuestPygameMenu:
                 ("Continuar", self._continuar),
                 ("Sair", self._sair),
             ],
-            y_inicial=300,
+            y_inicial=340,
         )
 
         # Botão de Créditos no Canto Inferior Direito
@@ -150,10 +164,10 @@ class CodeQuestPygameMenu:
             pygame.Rect(x_creditos, y_creditos, btn_width, btn_height),
             "Creditos",
             self._abrir_creditos,
-            background=(20, 80, 40),
+            background=(30, 100, 50),
             hover_background=(255, 255, 255),
             text_color=(255, 255, 255),
-            hover_text_color=(20, 80, 40)
+            hover_text_color=(30, 100, 50)
         ))
 
         return botoes
@@ -267,19 +281,19 @@ class CodeQuestPygameMenu:
         Retorna:
             Lista de botoes configurados.
         """
-        largura = 420
-        altura = 58
+        largura = 460
+        altura = 65
         x = (WINDOW.width - largura) // 2
 
         # Logica de inversao de cores hover para a tela inicial
-        cor_fundo_padrao = (20, 80, 40) # Fundo verde escuro/neon
+        cor_fundo_padrao = (30, 100, 50) # Fundo verde harmonioso com o video
         cor_texto_padrao = (255, 255, 255) # Branco
         cor_fundo_hover = (255, 255, 255) # Fundo branco no hover
-        cor_texto_hover = (20, 80, 40) # Texto verde no hover
+        cor_texto_hover = (30, 100, 50) # Texto verde no hover
 
         return [
             Button(
-                pygame.Rect(x, y_inicial + (indice * 90), largura, altura),
+                pygame.Rect(x, y_inicial + (indice * 95), largura, altura),
                 texto,
                 acao,
                 background=cor_fundo_padrao,
@@ -452,8 +466,11 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        if self.screen_name == "start" and self.bg_image:
-            self.screen.blit(self.bg_image, (0, 0))
+        if self.screen_name == "start" and self.bg_frames:
+            # Lógica de troca dos frames do vídeo - Loop de renderização
+            frame_idx = int(self.current_bg_frame) % len(self.bg_frames)
+            self.screen.blit(self.bg_frames[frame_idx], (0, 0))
+            self.current_bg_frame += 0.5  # Velocidade do video (30fps se tick 60)
         else:
             self.screen.fill(PALETTE.background)
 
@@ -489,9 +506,9 @@ class CodeQuestPygameMenu:
             None.
         """
         # Posicionamento do Título e Frase
-        desenhar_texto_centralizado(self.screen, "CodeQuest", self.font_title, PALETTE.text, 68)
-        desenhar_texto_centralizado(self.screen, "Uma Jornada pelo Arquipelago de Bythos", self.font_subtitle, PALETTE.accent, 120)
-        self._desenhar_status(650)
+        desenhar_texto_centralizado(self.screen, "CodeQuest", self.font_title, PALETTE.text, 100)
+        desenhar_texto_centralizado(self.screen, "Uma Jornada pelo Arquipelago de Bythos", self.font_subtitle, PALETTE.accent, 180)
+        self._desenhar_status(680)
 
     def _renderizar_criacao(self):
         """Renderiza a tela de criacao de personagem.
