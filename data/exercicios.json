@@ -1,0 +1,227 @@
+{
+  "mundo_1": {
+    "1": {
+      "id": 1,
+      "tipo": "multipla_escolha",
+      "titulo": "O que é programação?",
+      "pergunta": "O que é programação?",
+      "opcoes": [
+        "O ato de consertar computadores com defeito",
+        "O ato de dar instruções a um computador para que ele execute tarefas",
+        "O ato de instalar programas em um computador",
+        "O ato de ligar e desligar um computador"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "tipo": "multipla_escolha",
+      "titulo": "Definição de algoritmo",
+      "pergunta": "Qual das opções abaixo melhor define um algoritmo?",
+      "opcoes": [
+        "Um tipo de linguagem de programação",
+        "Um erro encontrado em um programa",
+        "Uma sequência de passos lógicos e ordenados para resolver um problema",
+        "Um programa já finalizado e funcionando"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "tipo": "multipla_escolha",
+      "titulo": "Computadores seguem instruções",
+      "pergunta": "O que os computadores fazem com as instruções que recebem?",
+      "opcoes": [
+        "Interpretam livremente, adaptando conforme necessário",
+        "Pensam sobre elas antes de executar",
+        "Seguem as ordens exatamente como foram dadas",
+        "Ignoram instruções que consideram desnecessárias"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "4": {
+      "id": 4,
+      "tipo": "completar",
+      "titulo": "Elementos fundamentais",
+      "pergunta": "Todo programa trabalha com três elementos fundamentais: ____, processamento e ____.",
+      "placeholder": "Digite as duas palavras que completam a frase",
+      "respostas_aceitas": [
+        "dados saída",
+        "dados e saída",
+        "dados, saída",
+        "dados saida",
+        "entrada saída",
+        "entrada e saída",
+        "entrada saida",
+        "código resultado",
+        "codigo resultado",
+        "memória resultado",
+        "memoria resultado",
+        "dados resultado",
+        "dados resposta",
+        "dados retorno"
+      ],
+      "xp": 10
+    },
+    "5": {
+      "id": 5,
+      "tipo": "multipla_escolha",
+      "titulo": "Python para iniciantes",
+      "pergunta": "Python é uma linguagem recomendada para iniciantes pois:",
+      "opcoes": [
+        "É a linguagem mais antiga da computação",
+        "É a única linguagem que os computadores conseguem entender diretamente",
+        "É conhecida pela simplicidade e legibilidade",
+        "É exclusiva para desenvolvimento de jogos"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "6": {
+      "id": 6,
+      "tipo": "multipla_escolha",
+      "titulo": "Início, meio e fim",
+      "pergunta": "Qual das afirmações abaixo sobre algoritmos é correta?",
+      "opcoes": [
+        "Um algoritmo pode continuar executando indefinidamente sem precisar encerrar",
+        "Um algoritmo tem início, meio e fim, encerrando ao completar sua última etapa",
+        "Um algoritmo só existe dentro de um computador",
+        "Um algoritmo é exclusivo de linguagens de programação avançadas"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "7": {
+      "id": 7,
+      "tipo": "completar",
+      "titulo": "Estados elétricos",
+      "pergunta": "Internamente, os computadores processam tudo como sinais elétricos que representam dois estados: ligado (representado pelo número ___) e desligado (representado pelo número ___).",
+      "placeholder": "Digite os dois números na ordem correta",
+      "respostas_aceitas": [
+        "1 0",
+        "1 e 0",
+        "1, 0",
+        "1/0",
+        "1 - 0",
+        "1 ligado 0 desligado"
+      ],
+      "xp": 10
+    },
+    "8": {
+      "id": 8,
+      "tipo": "multipla_escolha",
+      "titulo": "Clareza das instruções",
+      "pergunta": "Por que as instruções de um programa precisam ser claras e bem ordenadas?",
+      "opcoes": [
+        "Porque computadores pensam e podem interpretar instruções confusas",
+        "Porque computadores não pensam, apenas seguem ordens",
+        "Porque linguagens de programação não aceitam textos longos",
+        "Porque algoritmos precisam ser escritos em inglês"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "9": {
+      "id": 9,
+      "tipo": "multipla_escolha",
+      "titulo": "Saída de um programa",
+      "pergunta": "O que é a saída dentro dos três elementos fundamentais de um programa?",
+      "opcoes": [
+        "As informações inseridas pelo usuário",
+        "O processamento realizado pelo programa",
+        "O resultado produzido pelo programa",
+        "O código escrito pelo programador"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "10": {
+      "id": 10,
+      "tipo": "completar",
+      "titulo": "Ponte entre humano e máquina",
+      "pergunta": "As linguagens de programação existem para fazer a ponte entre o ____ humano e o funcionamento interno da máquina.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": [
+        "raciocínio",
+        "raciocinio",
+        "pensamento",
+        "conhecimento",
+        "julgamento"
+      ],
+      "xp": 10
+    },
+    "11": {
+      "id": 11,
+      "tipo": "multipla_escolha",
+      "titulo": "Algoritmo para atravessar a rua",
+      "pergunta": "Qual das sequências abaixo representa corretamente um algoritmo para atravessar a rua?",
+      "opcoes": [
+        "Atravessar, olhar para os lados, chegar à calçada",
+        "Olhar para os lados, aguardar o momento seguro, atravessar, chegar à calçada",
+        "Chegar à calçada, atravessar, olhar para os lados",
+        "Aguardar o momento seguro, chegar à calçada, olhar para os lados, atravessar"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "12": {
+      "id": 12,
+      "tipo": "multipla_escolha",
+      "titulo": "Dados, processamento e saída",
+      "pergunta": "Qual das afirmações abaixo sobre os elementos fundamentais de um programa está correta?",
+      "opcoes": [
+        "Todo programa precisa apenas de dados e saída, sem necessidade de processamento",
+        "O processamento é o resultado final produzido pelo programa",
+        "Os dados são as informações utilizadas, o processamento é o que é feito com elas e a saída é o resultado produzido",
+        "A saída é a informação inserida pelo usuário no início do programa"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "13": {
+      "id": 13,
+      "tipo": "multipla_escolha",
+      "titulo": "Linguagens diferentes, conceitos iguais",
+      "pergunta": "Sobre linguagens de programação, qual afirmação é correta?",
+      "opcoes": [
+        "Cada linguagem tem características próprias, mas os conceitos fundamentais da programação são os mesmos em todas",
+        "Cada linguagem tem regras completamente diferentes, tornando impossível migrar de uma para outra",
+        "Python é a única linguagem adequada para iniciantes",
+        "Linguagens de programação são todas iguais, mudando apenas o nome"
+      ],
+      "resposta": 0,
+      "xp": 10
+    },
+    "14": {
+      "id": 14,
+      "tipo": "multipla_escolha",
+      "titulo": "Programar antes do código",
+      "pergunta": "João afirma que programar é apenas escrever código. Maria afirma que programar começa antes do código, no momento em que o programador analisa o problema e pensa em uma solução lógica. Qual das afirmações está correta?",
+      "opcoes": [
+        "João, pois programação se resume à escrita do código em si",
+        "Maria, pois programar envolve analisar o problema e traduzir a solução em código",
+        "Ambos, pois as duas etapas são independentes e não se relacionam",
+        "Nenhum, pois programar é apenas o ato de instalar programas no computador"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "15": {
+      "id": 15,
+      "tipo": "multipla_escolha",
+      "titulo": "Ordem lógica",
+      "pergunta": "Um estudante criou o seguinte algoritmo para preparar um copo de suco: (1) beber o suco, (2) colocar o suco no copo, (3) pegar o copo, (4) pegar o suco. Qual o problema com esse algoritmo?",
+      "opcoes": [
+        "O algoritmo está correto, pois contém todos os passos necessários",
+        "O algoritmo está incorreto, pois os passos estão fora de ordem lógica",
+        "O algoritmo está incorreto, pois possui passos desnecessários",
+        "O algoritmo está correto, pois qualquer sequência de passos é válida"
+      ],
+      "resposta": 1,
+      "xp": 10
+    }
+  }
+}

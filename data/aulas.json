@@ -1,0 +1,63 @@
+{
+  "mundo_1": {
+    "aula_1": {
+      "titulo": "Aula 1: O que é programação?",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "O que é programação?",
+          "conteudo": [
+            "Programação é o ato de dar instruções a um computador para que ele execute tarefas. Essas instruções são escritas em uma linguagem que o computador consegue interpretar e seguir, passo a passo.",
+            "Assim como uma receita de bolo guia um cozinheiro, um programa guia o computador, dizendo exatamente o que fazer, em qual ordem e em quais condições.",
+            "Programar é, no fundo, resolver problemas. O programador analisa uma situação, pensa em uma solução lógica e a traduz em código para que a máquina a execute.",
+            "Antes de escrever qualquer programa, é importante entender que computadores não pensam. Eles apenas seguem ordens. Por isso, as instruções precisam ser claras, precisas e bem ordenadas.",
+            "Todo programa trabalha com três elementos fundamentais: dados, processamento e saída.",
+            "Compreender esses elementos é o primeiro passo para pensar como um programador, transformando problemas do mundo real em soluções que uma máquina consegue executar."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Programação e conceitos básicos",
+          "exercicios": ["1", "2", "3", "4", "5"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Algoritmos",
+          "conteudo": [
+            "Um algoritmo é uma sequência de passos lógicos e ordenados para resolver um problema. Ele existe antes do código, sendo o raciocínio por trás da solução.",
+            "Por exemplo: para fazer um sanduíche, você pega o pão, coloca o recheio e fecha. Essa sequência é um algoritmo. Em programação, o princípio é o mesmo, só que aplicado a problemas computacionais.",
+            "Todo algoritmo tem início, meio e fim. Ao completar sua última etapa, ele encerra.",
+            "Aprender a pensar algoritmicamente, dividindo um problema em etapas menores, ordenadas e com um objetivo claro, é a habilidade mais importante de um programador."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: Algoritmos e ordem lógica",
+          "exercicios": ["6", "7", "8", "9", "10"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Linguagens de programação",
+          "conteudo": [
+            "Computadores não entendem português nem inglês. Internamente, eles processam tudo como sinais elétricos, que representam apenas dois estados: ligado, representado pelo número 1, ou desligado, representado pelo número 0.",
+            "As linguagens de programação existem para fazer a ponte entre o raciocínio humano e esse funcionamento interno da máquina.",
+            "Existem diversas linguagens, cada uma com características e propósitos diferentes: Python, JavaScript, C, Java, entre outras.",
+            "Neste curso, utilizaremos Python, uma linguagem conhecida pela simplicidade e legibilidade, ideal para quem está começando.",
+            "Independentemente da linguagem, os conceitos fundamentais da programação são os mesmos. Aprender bem uma linguagem facilita muito o aprendizado de qualquer outra no futuro."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Linguagens e raciocínio computacional",
+          "exercicios": ["11", "12", "13", "14", "15"]
+        }
+      ]
+    }
+  }
+}
