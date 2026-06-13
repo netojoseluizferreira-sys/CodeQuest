@@ -1,4 +1,5 @@
 import pygame
+import webbrowser  # Adicionei a importacao do webbrowser para abrir links no navegador
 
 from backend.xp_system import xp_para_proximo_nivel
 from pygame_client.audio import AudioController
@@ -55,6 +56,8 @@ class CodeQuestPygameMenu:
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
+        self.link_rect = None  # Adicionei a variavel para armazenar o retangulo do link
+        self.btn_continuar_y = None  # Adicionei a variavel para armazenar o Y do botao continuar
 
     def run(self):
         """Executa o loop principal da aplicacao.
@@ -67,6 +70,7 @@ class CodeQuestPygameMenu:
         """
         self.audio.tocar_trilha()
         while self.running:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)  # Resetando cursor para seta no inicio do frame
             self._processar_eventos()
             self._renderizar()
             self.clock.tick(WINDOW.fps)
@@ -182,8 +186,11 @@ class CodeQuestPygameMenu:
             return [self._botao_voltar_hub()]
 
         if segmento["tipo"] == "aula":
+            # Mudei a posicao do botao 'Continuar' para acompanhar o y dinamico calculado ao exibir o link, se aplicavel (apenas para modulo 1 aula 1)
+            x_btn = self.content_x if self.btn_continuar_y is not None else WINDOW.width - 340
+            y_btn = self.btn_continuar_y if self.btn_continuar_y is not None else WINDOW.height - 88
             return [
-                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Continuar", self._avancar_segmento),
+                Button(pygame.Rect(x_btn, y_btn, 250, 52), "Continuar", self._avancar_segmento),
                 self._botao_voltar_mundos(),
             ]
 
@@ -301,6 +308,11 @@ class CodeQuestPygameMenu:
 
         if self.screen_name == "lesson":
             segmento = self._segmento_atual()
+
+            # Adicionei a verificacao de clique no link do Youtube
+            if self.link_rect and self.link_rect.collidepoint(event.pos):
+                webbrowser.open("https://www.youtube.com/watch?v=8mei6uVttho")
+
             exercicio = self._exercicio_atual() if segmento and segmento["tipo"] == "exercicios" else None
             if exercicio and exercicio["tipo"] == "completar":
                 if pygame.Rect(self.content_x, 455, self.content_width, 52).collidepoint(event.pos):
@@ -552,6 +564,27 @@ class CodeQuestPygameMenu:
         y = 205
         for paragrafo in segmento["conteudo"]:
             y = self._desenhar_paragrafo(paragrafo, self.content_x, y, self.content_width, self.font_small, PALETTE.text) + 12
+
+        # Adicionei checagem para Módulo 1 (MUNDO_ATIVO) e primeira aula (texto_1)
+        if MUNDO_ATIVO == "mundo_1" and segmento.get("id") == "texto_1":
+            chamada = "Quer se aprofundar um pouco mais no tema? Clica no link abaixo e assista a uma aula completa!"
+            y = self._desenhar_paragrafo(chamada, self.content_x, y + 10, self.content_width, self.font_body, PALETTE.accent) + 10
+
+            link_texto = "Assistir Aula Completa (YouTube)"
+            link_surface = self.font_body.render(link_texto, True, (0, 150, 255))
+            self.link_rect = link_surface.get_rect(topleft=(self.content_x, y))
+            self.screen.blit(link_surface, self.link_rect)
+
+            if self.link_rect.collidepoint(pygame.mouse.get_pos()):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Mudando cursor para mãozinha
+                if pygame.mouse.get_pressed()[0]:
+                    pygame.draw.line(self.screen, (0, 150, 255), self.link_rect.bottomleft, self.link_rect.bottomright, 2)  # Desenhando sublinhado do link
+
+            y = self.link_rect.bottom + 20
+            self.btn_continuar_y = y  # Salva para posicionar o botão continuar
+        else:
+            self.link_rect = None
+            self.btn_continuar_y = None
 
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercicio atual dentro de uma lista de pratica.
