@@ -1,3 +1,7 @@
+import glob
+import math
+import os
+
 import pygame
 import webbrowser  # Adicionei a importacao do webbrowser para abrir links no navegador
 
@@ -14,6 +18,11 @@ from utils.database import carregar_usuario, criar_usuario, resetar_banco_de_dad
 
 MUNDO_ATIVO = "mundo_1"
 AULA_ATIVA = "aula_1"
+
+_VERDE = (30, 100, 50)
+_BRANCO = (255, 255, 255)
+_VERDE_CLARO = (100, 200, 120)
+_KW_VERDE = dict(background=_VERDE, hover_background=_BRANCO, text_color=_BRANCO, hover_text_color=_VERDE, border_color=_VERDE_CLARO)
 
 
 class CodeQuestPygameMenu:
@@ -34,11 +43,23 @@ class CodeQuestPygameMenu:
         self.clock = pygame.time.Clock()
         self.audio = AudioController()
         self.audio.inicializar()
-        self.font_title = pygame.font.SysFont("segoeui", 52, bold=True)
-        self.font_subtitle = pygame.font.SysFont("segoeui", 28, bold=True)
-        self.font_body = pygame.font.SysFont("segoeui", 21)
-        self.font_small = pygame.font.SysFont("segoeui", 17)
-        self.font_tiny = pygame.font.SysFont("segoeui", 15)
+        _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+        self.font_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 52)
+        self.font_title_large = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 64)
+        self.font_subtitle = pygame.font.Font(os.path.join(_data_dir, "Silkscreen-Regular.ttf"), 28)
+        _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
+        _sub_size = 22
+        _sub_path = os.path.join(_data_dir, "Silkscreen-Regular.ttf")
+        _sub_texto = "Uma Jornada pelo Arquipélago de Bythos"
+        _font_sub = pygame.font.Font(_sub_path, _sub_size)
+        while _font_sub.size(_sub_texto)[0] > _titulo_w and _sub_size > 8:
+            _sub_size -= 1
+            _font_sub = pygame.font.Font(_sub_path, _sub_size)
+        self.font_subtitle_small = _font_sub
+        self.font_welcome = pygame.font.Font(os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf"), 20)
+        self.font_body = pygame.font.Font(os.path.join(_data_dir, "Silkscreen-Regular.ttf"), 21)
+        self.font_small = pygame.font.Font(os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf"), 17)
+        self.font_tiny = pygame.font.Font(os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf"), 15)
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -58,6 +79,17 @@ class CodeQuestPygameMenu:
         self.exercicio_respondido = False
         self.link_rect = None  # Adicionei a variavel para armazenar o retangulo do link
         self.btn_continuar_y = None  # Adicionei a variavel para armazenar o Y do botao continuar
+        _frames_dir = os.path.join(_data_dir, "video_frames")
+        _frames_paths = sorted(glob.glob(os.path.join(_frames_dir, "*.jpg")))
+        self.video_frames = [
+            pygame.transform.scale(pygame.image.load(p).convert(), (WINDOW.width, WINDOW.height))
+            for p in _frames_paths
+        ]
+        self.video_frame_index = 0
+        self.video_frame_timer = 0
+        self.glow_timer = 0
+        self.start_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        self.start_overlay.fill((0, 0, 0, 140))
 
     def run(self):
         """Executa o loop principal da aplicacao.
@@ -95,7 +127,7 @@ class CodeQuestPygameMenu:
         if self.screen_name == "worlds":
             return self._botoes_mundos()
         if self.screen_name == "profile":
-            return [self._botao_voltar_hub()]
+            return [self._botao_voltar_hub(**_KW_VERDE)]
         if self.screen_name == "credits":
             return [self._botao_voltar_hub() if self.usuario else self._botao_voltar_inicio()]
         if self.screen_name == "lesson":
@@ -113,15 +145,17 @@ class CodeQuestPygameMenu:
         Retorna:
             Lista de botoes de inicio.
         """
-        return self._botoes_centralizados(
-            [
-                ("Novo jogo", self._novo_jogo),
-                ("Continuar", self._continuar),
-                ("Creditos", self._abrir_creditos),
-                ("Sair", self._sair),
-            ],
-            y_inicial=245,
-        )
+        largura = 420
+        altura = 58
+        x = (WINDOW.width - largura) // 2
+        y_inicial = 380
+        _esp = 65
+        return [
+            Button(pygame.Rect(x, y_inicial, largura, altura), "Novo jogo", self._novo_jogo, **_KW_VERDE),
+            Button(pygame.Rect(x, y_inicial + _esp, largura, altura), "Continuar", self._continuar, **_KW_VERDE),
+            Button(pygame.Rect(x, y_inicial + _esp * 2, largura, altura), "Sair", self._sair, **_KW_VERDE),
+            Button(pygame.Rect(WINDOW.width - 190, WINDOW.height - 75, 160, 45), "Creditos", self._abrir_creditos, **_KW_VERDE),
+        ]
 
     def _botoes_criacao(self):
         """Monta botoes da criacao de personagem.
@@ -133,8 +167,8 @@ class CodeQuestPygameMenu:
             Lista de botoes da tela de criacao.
         """
         return [
-            Button(pygame.Rect(410, 505, 220, 54), "Criar", self._criar_personagem),
-            Button(pygame.Rect(670, 505, 220, 54), "Voltar", self._voltar_inicio),
+            Button(pygame.Rect(410, 505, 220, 54), "Criar", self._criar_personagem, **_KW_VERDE),
+            Button(pygame.Rect(670, 505, 220, 54), "Voltar", self._voltar_inicio, **_KW_VERDE),
         ]
 
     def _botoes_hub(self):
@@ -155,6 +189,7 @@ class CodeQuestPygameMenu:
                 ("Sair", self._sair),
             ],
             y_inicial=225,
+            **_KW_VERDE,
         )
 
     def _botoes_mundos(self):
@@ -167,8 +202,8 @@ class CodeQuestPygameMenu:
             Lista de botoes da tela de mundos.
         """
         return [
-            Button(pygame.Rect(390, 285, 500, 62), "Mundo 1 - Cabana do Oraculo", self._iniciar_mundo_1),
-            self._botao_voltar_hub(),
+            Button(pygame.Rect(390, 285, 500, 62), "Mundo 1 - Cabana do Oraculo", self._iniciar_mundo_1, **_KW_VERDE),
+            self._botao_voltar_hub(**_KW_VERDE),
         ]
 
     def _botoes_fluxo_aprendizado(self):
@@ -222,12 +257,13 @@ class CodeQuestPygameMenu:
             self._botao_voltar_mundos(),
         ]
 
-    def _botoes_centralizados(self, itens, y_inicial):
+    def _botoes_centralizados(self, itens, y_inicial, **kwargs):
         """Cria botoes centralizados com espacamento uniforme.
 
         Recebe:
             itens: Lista de tuplas com texto e acao.
             y_inicial: Coordenada vertical inicial.
+            **kwargs: Argumentos extras repassados a cada Button.
 
         Retorna:
             Lista de botoes configurados.
@@ -236,42 +272,42 @@ class CodeQuestPygameMenu:
         altura = 58
         x = (WINDOW.width - largura) // 2
         return [
-            Button(pygame.Rect(x, y_inicial + (indice * 72), largura, altura), texto, acao)
+            Button(pygame.Rect(x, y_inicial + (indice * 72), largura, altura), texto, acao, **kwargs)
             for indice, (texto, acao) in enumerate(itens)
         ]
 
-    def _botao_voltar_inicio(self):
+    def _botao_voltar_inicio(self, **kw):
         """Cria botao de retorno para a tela inicial.
 
         Recebe:
-            Nenhum parametro.
+            **kw: Kwargs opcionais repassados ao Button.
 
         Retorna:
             Botao Voltar.
         """
-        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._voltar_inicio)
+        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._voltar_inicio, **kw)
 
-    def _botao_voltar_hub(self):
+    def _botao_voltar_hub(self, **kw):
         """Cria botao de retorno para o hub.
 
         Recebe:
-            Nenhum parametro.
+            **kw: Kwargs opcionais repassados ao Button.
 
         Retorna:
             Botao Voltar.
         """
-        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._abrir_hub)
+        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._abrir_hub, **kw)
 
-    def _botao_voltar_mundos(self):
+    def _botao_voltar_mundos(self, **kw):
         """Cria botao de retorno para a tela de mundos.
 
         Recebe:
-            Nenhum parametro.
+            **kw: Kwargs opcionais repassados ao Button.
 
         Retorna:
             Botao Voltar.
         """
-        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Mundos", self._abrir_mundos)
+        return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Mundos", self._abrir_mundos, **kw)
 
     def _processar_eventos(self):
         """Processa eventos de teclado, mouse e janela.
@@ -402,28 +438,52 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        self.screen.fill(PALETTE.background)
+        _FUNDO_VERDE = (20, 40, 20)
         if self.screen_name == "start":
+            self._renderizar_fundo_video()
             self._renderizar_inicio()
-        elif self.screen_name == "create":
-            self._renderizar_criacao()
-        elif self.screen_name == "hub":
-            self._renderizar_hub()
-        elif self.screen_name == "worlds":
-            self._renderizar_mundos()
-        elif self.screen_name == "profile":
-            self._renderizar_perfil()
-        elif self.screen_name == "credits":
-            self._renderizar_creditos()
-        elif self.screen_name == "lesson":
-            self._renderizar_fluxo_aprendizado()
-        elif self.screen_name == "complete":
-            self._renderizar_conclusao()
+        else:
+            if self.screen_name in {"create", "hub", "worlds", "profile"}:
+                self.screen.fill(_FUNDO_VERDE)
+            else:
+                self.screen.fill(PALETTE.background)
+            if self.screen_name == "create":
+                self._renderizar_criacao()
+            elif self.screen_name == "hub":
+                self._renderizar_hub()
+            elif self.screen_name == "worlds":
+                self._renderizar_mundos()
+            elif self.screen_name == "profile":
+                self._renderizar_perfil()
+            elif self.screen_name == "credits":
+                self._renderizar_creditos()
+            elif self.screen_name == "lesson":
+                self._renderizar_fluxo_aprendizado()
+            elif self.screen_name == "complete":
+                self._renderizar_conclusao()
 
         mouse_pos = pygame.mouse.get_pos()
         for button in self._botoes_tela():
             button.draw(self.screen, self.font_body, mouse_pos)
         pygame.display.flip()
+
+    def _renderizar_fundo_video(self):
+        """Renderiza o frame atual do video de fundo e avanca a animacao.
+
+        Recebe:
+            Nenhum parametro.
+
+        Retorna:
+            None.
+        """
+        if not self.video_frames:
+            self.screen.fill(PALETTE.background)
+            return
+        self.video_frame_timer += 1
+        if self.video_frame_timer >= 2:
+            self.video_frame_timer = 0
+            self.video_frame_index = (self.video_frame_index + 1) % len(self.video_frames)
+        self.screen.blit(self.video_frames[self.video_frame_index], (0, 0))
 
     def _renderizar_inicio(self):
         """Renderiza a tela inicial.
@@ -434,8 +494,56 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        self._desenhar_cabecalho("CodeQuest", "Uma Jornada pelo Arquipelago de Bythos")
-        self._desenhar_status(570)
+        self.screen.blit(self.start_overlay, (0, 0))
+
+        # Titulo renderizado letra por letra com espaçamento manual uniforme
+        _TITULO = "CodeQuest"
+        _GAP = 2  # pixels extras entre caracteres alem da largura individual
+        _char_w = [self.font_title_large.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title_large.get_height()
+        _tcy = 270  # centro vertical do titulo
+
+        # Glow verde pulsante por tras do titulo
+        self.glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.glow_timer * 0.04)))
+        _glow_surfs = [self.font_title_large.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _glow_surfs:
+            _s.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_glow_surfs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+
+        # Sombra do titulo (offset +3px)
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title_large.render(_c, True, (0, 0, 0))
+            self.screen.blit(_s, (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+
+        # Titulo principal branco
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title_large.render(_c, True, _BRANCO)
+            self.screen.blit(_s, (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        # Subtitulo com sombra nas letras deslocada 2px
+        _subtitulo = "Uma Jornada pelo Arquipélago de Bythos"
+        _sub_som = self.font_subtitle_small.render(_subtitulo, True, (0, 0, 0))
+        self.screen.blit(_sub_som, _sub_som.get_rect(center=(WINDOW.width // 2 + 2, 327)))
+        _sub_surf = self.font_subtitle_small.render(_subtitulo, True, _BRANCO)
+        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 325)))
+
+        if self.status_kind in {"success", "error"}:
+            self._desenhar_status(600)
 
     def _renderizar_criacao(self):
         """Renderiza a tela de criacao de personagem.
