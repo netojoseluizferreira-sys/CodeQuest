@@ -34,11 +34,19 @@ class CodeQuestPygameMenu:
         self.clock = pygame.time.Clock()
         self.audio = AudioController()
         self.audio.inicializar()
-        self.font_title = pygame.font.SysFont("segoeui", 52, bold=True)
-        self.font_subtitle = pygame.font.SysFont("segoeui", 28, bold=True)
-        self.font_body = pygame.font.SysFont("segoeui", 21)
-        self.font_small = pygame.font.SysFont("segoeui", 17)
-        self.font_tiny = pygame.font.SysFont("segoeui", 15)
+        # Aplicando fonte Silkscreen-Bold para titulos e Silkscreen-Regular para os demais
+        try:
+            self.font_title = pygame.font.Font("data/Silkscreen-Bold.ttf", 52)
+            self.font_subtitle = pygame.font.Font("data/Silkscreen-Bold.ttf", 28)
+            self.font_body = pygame.font.Font("data/Silkscreen-Regular.ttf", 21)
+            self.font_small = pygame.font.Font("data/Silkscreen-Regular.ttf", 17)
+            self.font_tiny = pygame.font.Font("data/Silkscreen-Regular.ttf", 15)
+        except Exception:
+            self.font_title = pygame.font.SysFont("segoeui", 52, bold=True)
+            self.font_subtitle = pygame.font.SysFont("segoeui", 28, bold=True)
+            self.font_body = pygame.font.SysFont("segoeui", 21)
+            self.font_small = pygame.font.SysFont("segoeui", 17)
+            self.font_tiny = pygame.font.SysFont("segoeui", 15)
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -137,7 +145,7 @@ class CodeQuestPygameMenu:
         x_creditos = WINDOW.width - btn_width - 30
         y_creditos = WINDOW.height - btn_height - 30
 
-        # Inversão de cores hover para o botão de créditos também
+        # Logica de inversao de cores hover para o botão de créditos também
         botoes.append(Button(
             pygame.Rect(x_creditos, y_creditos, btn_width, btn_height),
             "Creditos",
@@ -263,7 +271,7 @@ class CodeQuestPygameMenu:
         altura = 58
         x = (WINDOW.width - largura) // 2
 
-        # Inversão de cores hover para a tela inicial
+        # Logica de inversao de cores hover para a tela inicial
         cor_fundo_padrao = (20, 80, 40) # Fundo verde escuro/neon
         cor_texto_padrao = (255, 255, 255) # Branco
         cor_fundo_hover = (255, 255, 255) # Fundo branco no hover
@@ -271,7 +279,7 @@ class CodeQuestPygameMenu:
 
         return [
             Button(
-                pygame.Rect(x, y_inicial + (indice * 72), largura, altura),
+                pygame.Rect(x, y_inicial + (indice * 90), largura, altura),
                 texto,
                 acao,
                 background=cor_fundo_padrao,
