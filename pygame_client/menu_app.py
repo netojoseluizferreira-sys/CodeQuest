@@ -70,6 +70,7 @@ class CodeQuestPygameMenu:
         """
         self.audio.tocar_trilha()
         while self.running:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)  # Resetando cursor para seta no inicio do frame
             self._processar_eventos()
             self._renderizar()
             self.clock.tick(WINDOW.fps)
@@ -573,6 +574,11 @@ class CodeQuestPygameMenu:
             link_surface = self.font_body.render(link_texto, True, (0, 150, 255))
             self.link_rect = link_surface.get_rect(topleft=(self.content_x, y))
             self.screen.blit(link_surface, self.link_rect)
+
+            if self.link_rect.collidepoint(pygame.mouse.get_pos()):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Mudando cursor para mãozinha
+                if pygame.mouse.get_pressed()[0]:
+                    pygame.draw.line(self.screen, (0, 150, 255), self.link_rect.bottomleft, self.link_rect.bottomright, 2)  # Desenhando sublinhado do link
 
             y = self.link_rect.bottom + 20
             self.btn_continuar_y = y  # Salva para posicionar o botão continuar
