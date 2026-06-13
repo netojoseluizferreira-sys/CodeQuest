@@ -46,20 +46,24 @@ class CodeQuestPygameMenu:
         _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
         self.font_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 52)
         self.font_title_large = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 64)
-        self.font_subtitle = pygame.font.Font(os.path.join(_data_dir, "Silkscreen-Regular.ttf"), 28)
+        _mont = os.path.join(_data_dir, "Montserrat-VariableFont_wght.ttf")
+        self.font_subtitle = pygame.font.Font(_mont, 28)
+        self.font_subtitle.bold = True
+        _silkscreen = os.path.join(_data_dir, "Silkscreen-Regular.ttf")
         _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
         _sub_size = 22
-        _sub_path = os.path.join(_data_dir, "Silkscreen-Regular.ttf")
         _sub_texto = "Uma Jornada pelo Arquipélago de Bythos"
-        _font_sub = pygame.font.Font(_sub_path, _sub_size)
+        _font_sub = pygame.font.Font(_silkscreen, _sub_size)
         while _font_sub.size(_sub_texto)[0] > _titulo_w and _sub_size > 8:
             _sub_size -= 1
-            _font_sub = pygame.font.Font(_sub_path, _sub_size)
+            _font_sub = pygame.font.Font(_silkscreen, _sub_size)
         self.font_subtitle_small = _font_sub
-        self.font_welcome = pygame.font.Font(os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf"), 20)
-        self.font_body = pygame.font.Font(os.path.join(_data_dir, "Silkscreen-Regular.ttf"), 21)
-        self.font_small = pygame.font.Font(os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf"), 17)
-        self.font_tiny = pygame.font.Font(os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf"), 15)
+        self.font_start_btn = pygame.font.Font(_silkscreen, 21)
+        self.font_welcome = pygame.font.Font(_mont, 20)
+        self.font_welcome.bold = True
+        self.font_body = pygame.font.Font(_mont, 21)
+        self.font_small = pygame.font.Font(_mont, 17)
+        self.font_tiny = pygame.font.Font(_mont, 15)
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -129,7 +133,7 @@ class CodeQuestPygameMenu:
         if self.screen_name == "profile":
             return [self._botao_voltar_hub(**_KW_VERDE)]
         if self.screen_name == "credits":
-            return [self._botao_voltar_hub() if self.usuario else self._botao_voltar_inicio()]
+            return [self._botao_voltar_hub(**_KW_VERDE) if self.usuario else self._botao_voltar_inicio(**_KW_VERDE)]
         if self.screen_name == "lesson":
             return self._botoes_fluxo_aprendizado()
         if self.screen_name == "complete":
@@ -445,6 +449,8 @@ class CodeQuestPygameMenu:
         else:
             if self.screen_name in {"create", "hub", "worlds", "profile"}:
                 self.screen.fill(_FUNDO_VERDE)
+            elif self.screen_name == "credits":
+                self.screen.fill((11, 25, 11))
             else:
                 self.screen.fill(PALETTE.background)
             if self.screen_name == "create":
@@ -463,8 +469,9 @@ class CodeQuestPygameMenu:
                 self._renderizar_conclusao()
 
         mouse_pos = pygame.mouse.get_pos()
+        _btn_font = self.font_start_btn if self.screen_name == "start" else self.font_body
         for button in self._botoes_tela():
-            button.draw(self.screen, self.font_body, mouse_pos)
+            button.draw(self.screen, _btn_font, mouse_pos)
         pygame.display.flip()
 
     def _renderizar_fundo_video(self):
@@ -630,7 +637,9 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        y = 58 - self.credit_scroll
+        _box_h = 48
+        _area_h = WINDOW.height - _box_h - 16
+        y = 30 - self.credit_scroll
         largura_texto = WINDOW.width - 160
         for style, text in obter_linhas_creditos():
             font, color, spacing = self._estilo_credito(style)
@@ -638,7 +647,20 @@ class CodeQuestPygameMenu:
                 desenhar_texto_centralizado(self.screen, line, font, color, y)
                 y += spacing
             y += 8
-        self._desenhar_rodape("Use W/S ou setas para rolar. ESC volta.")
+
+        # Caixa de instrucoes no estilo dos botoes da tela inicial
+        _msg = "W/S ou setas para rolar   |   ESC para voltar"
+        _msg_surf = self.font_small.render(_msg, True, _BRANCO)
+        _box_w = _msg_surf.get_width() + 48
+        _box_rect = pygame.Rect(
+            WINDOW.width // 2 - _box_w // 2,
+            WINDOW.height - _box_h - 8,
+            _box_w,
+            _box_h,
+        )
+        pygame.draw.rect(self.screen, _VERDE, _box_rect, border_radius=8)
+        pygame.draw.rect(self.screen, _VERDE_CLARO, _box_rect, width=2, border_radius=8)
+        self.screen.blit(_msg_surf, _msg_surf.get_rect(center=_box_rect.center))
 
     def _renderizar_fluxo_aprendizado(self):
         """Renderiza aula ou exercicio atual.
@@ -877,18 +899,18 @@ class CodeQuestPygameMenu:
             Tupla com fonte, cor RGB e espacamento vertical.
         """
         if style == "title":
-            return self.font_title, PALETTE.primary, 58
+            return self.font_title, _VERDE_CLARO, 62
         if style == "subtitle":
-            return self.font_subtitle, PALETTE.accent, 36
+            return self.font_welcome, _BRANCO, 32
         if style == "section":
-            return self.font_subtitle, PALETTE.text, 38
+            return self.font_welcome, _VERDE_CLARO, 34
         if style == "body":
-            return self.font_body, PALETTE.text, 30
+            return self.font_small, _BRANCO, 26
         if style == "quote":
-            return self.font_small, PALETTE.accent, 26
+            return self.font_small, (160, 220, 160), 24
         if style == "footer":
-            return self.font_small, PALETTE.gold, 30
-        return self.font_small, PALETTE.muted, 24
+            return self.font_small, PALETTE.gold, 26
+        return self.font_small, (160, 200, 160), 22
 
     def _novo_jogo(self):
         """Inicia novo jogo e abre criacao de personagem.
