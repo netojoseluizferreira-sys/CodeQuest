@@ -59,6 +59,13 @@ class CodeQuestPygameMenu:
         self.link_rect = None  # Adicionei a variavel para armazenar o retangulo do link
         self.btn_continuar_y = None  # Adicionei a variavel para armazenar o Y do botao continuar
 
+        # Carregando fundo verde do menu
+        try:
+            raw_bg = pygame.image.load("data/imagem_verde.jpeg")
+            self.bg_image = pygame.transform.scale(raw_bg, (WINDOW.width, WINDOW.height))
+        except Exception:
+            self.bg_image = None
+
     def run(self):
         """Executa o loop principal da aplicacao.
 
@@ -114,15 +121,34 @@ class CodeQuestPygameMenu:
         Retorna:
             Lista de botoes de inicio.
         """
-        return self._botoes_centralizados(
+        # Alinhando botões no centro
+        botoes = self._botoes_centralizados(
             [
                 ("Novo jogo", self._novo_jogo),
                 ("Continuar", self._continuar),
-                ("Creditos", self._abrir_creditos),
                 ("Sair", self._sair),
             ],
-            y_inicial=245,
+            y_inicial=300,
         )
+
+        # Botão de Créditos no Canto Inferior Direito
+        btn_width = 180
+        btn_height = 50
+        x_creditos = WINDOW.width - btn_width - 30
+        y_creditos = WINDOW.height - btn_height - 30
+
+        # Inversão de cores hover para o botão de créditos também
+        botoes.append(Button(
+            pygame.Rect(x_creditos, y_creditos, btn_width, btn_height),
+            "Creditos",
+            self._abrir_creditos,
+            background=(20, 80, 40),
+            hover_background=(255, 255, 255),
+            text_color=(255, 255, 255),
+            hover_text_color=(20, 80, 40)
+        ))
+
+        return botoes
 
     def _botoes_criacao(self):
         """Monta botoes da criacao de personagem.
@@ -236,8 +262,23 @@ class CodeQuestPygameMenu:
         largura = 420
         altura = 58
         x = (WINDOW.width - largura) // 2
+
+        # Inversão de cores hover para a tela inicial
+        cor_fundo_padrao = (20, 80, 40) # Fundo verde escuro/neon
+        cor_texto_padrao = (255, 255, 255) # Branco
+        cor_fundo_hover = (255, 255, 255) # Fundo branco no hover
+        cor_texto_hover = (20, 80, 40) # Texto verde no hover
+
         return [
-            Button(pygame.Rect(x, y_inicial + (indice * 72), largura, altura), texto, acao)
+            Button(
+                pygame.Rect(x, y_inicial + (indice * 72), largura, altura),
+                texto,
+                acao,
+                background=cor_fundo_padrao,
+                hover_background=cor_fundo_hover,
+                text_color=cor_texto_padrao,
+                hover_text_color=cor_texto_hover
+            )
             for indice, (texto, acao) in enumerate(itens)
         ]
 
@@ -403,7 +444,11 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        self.screen.fill(PALETTE.background)
+        if self.screen_name == "start" and self.bg_image:
+            self.screen.blit(self.bg_image, (0, 0))
+        else:
+            self.screen.fill(PALETTE.background)
+
         if self.screen_name == "start":
             self._renderizar_inicio()
         elif self.screen_name == "create":
@@ -435,8 +480,10 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
-        self._desenhar_cabecalho("CodeQuest", "Uma Jornada pelo Arquipelago de Bythos")
-        self._desenhar_status(570)
+        # Posicionamento do Título e Frase
+        desenhar_texto_centralizado(self.screen, "CodeQuest", self.font_title, PALETTE.text, 68)
+        desenhar_texto_centralizado(self.screen, "Uma Jornada pelo Arquipelago de Bythos", self.font_subtitle, PALETTE.accent, 120)
+        self._desenhar_status(650)
 
     def _renderizar_criacao(self):
         """Renderiza a tela de criacao de personagem.
@@ -595,6 +642,7 @@ class CodeQuestPygameMenu:
         Retorna:
             None.
         """
+        self.link_rect = None  # Evita clique fantasma em botoes de link que sumiram
         exercicio = self._exercicio_atual()
         numero = self.exercicio_indice + 1
         total = len(segmento["exercicios"])

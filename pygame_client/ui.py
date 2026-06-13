@@ -46,6 +46,7 @@ class Button:
     background: tuple[int, int, int] | None = None
     hover_background: tuple[int, int, int] | None = None
     text_color: tuple[int, int, int] = PALETTE.text
+    hover_text_color: tuple[int, int, int] | None = None
 
     def draw(self, screen, font, mouse_pos):
         """Desenha o botao na tela.
@@ -60,11 +61,15 @@ class Button:
         """
         hovered = self.rect.collidepoint(mouse_pos)
         if hovered:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Mudando cursor para mãozinha
+            # Lógica do cursor de mãozinha
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
         background = self.background or PALETTE.primary
         hover_background = self.hover_background or PALETTE.primary_hover
         color = hover_background if hovered else background
+
+        texto_color_final = (self.hover_text_color if self.hover_text_color else self.text_color) if hovered else self.text_color
+
         pygame.draw.rect(screen, color, self.rect, border_radius=8)
         pygame.draw.rect(screen, PALETTE.border, self.rect, width=2, border_radius=8)
 
@@ -73,7 +78,7 @@ class Button:
         y = self.rect.centery - ((len(linhas) * linha_altura) // 2)
 
         for linha in linhas:
-            label = font.render(linha, True, self.text_color)
+            label = font.render(linha, True, texto_color_final)
             label_rect = label.get_rect(center=(self.rect.centerx, y + linha_altura // 2))
             screen.blit(label, label_rect)
             y += linha_altura
