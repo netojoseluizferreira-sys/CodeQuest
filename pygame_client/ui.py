@@ -46,6 +46,8 @@ class Button:
     background: tuple[int, int, int] | None = None
     hover_background: tuple[int, int, int] | None = None
     text_color: tuple[int, int, int] = PALETTE.text
+    hover_text_color: tuple[int, int, int] | None = None
+    border_color: tuple[int, int, int] | None = None
 
     def draw(self, screen, font, mouse_pos):
         """Desenha o botao na tela.
@@ -63,14 +65,15 @@ class Button:
         hover_background = self.hover_background or PALETTE.primary_hover
         color = hover_background if hovered else background
         pygame.draw.rect(screen, color, self.rect, border_radius=8)
-        pygame.draw.rect(screen, PALETTE.border, self.rect, width=2, border_radius=8)
+        pygame.draw.rect(screen, self.border_color or PALETTE.border, self.rect, width=2, border_radius=8)
 
         linhas = _quebrar_texto_botao(self.text, font, self.rect.width - 24)
         linha_altura = font.get_linesize()
         y = self.rect.centery - ((len(linhas) * linha_altura) // 2)
 
+        cur_text_color = (self.hover_text_color if hovered and self.hover_text_color is not None else self.text_color)
         for linha in linhas:
-            label = font.render(linha, True, self.text_color)
+            label = font.render(linha, True, cur_text_color)
             label_rect = label.get_rect(center=(self.rect.centerx, y + linha_altura // 2))
             screen.blit(label, label_rect)
             y += linha_altura
