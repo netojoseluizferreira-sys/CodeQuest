@@ -1,53 +1,51 @@
+"""Conteudo estruturado exibido na tela de creditos do jogo."""
+
+
 CREDIT_LINES = [
     ("small", ""),
     ("title", "CodeQuest"),
+    ("subtitle", "Uma Jornada pelo Arquipelago de Bythos"),
     ("section", "Equipe de Desenvolvimento"),
-    ("body", "**Neto** - Backend & API"),
-    ("small", "Sistema de XP e níveis | Banco de dados | API de mídia | Arquitetura"),
-    ("body", "**Anthony** - Frontend & Interface"),
-    ("small", "Interface Streamlit | Navegação | Cutscenes em Pygame | Design visual"),
-    ("body", "**Mayanderson** - Conteúdo & Pedagogia"),
-    ("small", "Aulas e exercícios | Progressão pedagógica | Narrativa | Revisão"),
-    ("section", "Instituição e Disciplina"),
+    ("body", "**Neto** - Backend e Persistencia"),
+    ("small", "Sistema de XP, SQLite, organizacao de dados e arquitetura"),
+    ("body", "**Anthony** - Interface e Experiencia"),
+    ("small", "Telas Pygame, navegacao, estilo visual e polimento de interacao"),
+    ("body", "**Mayanderson** - Conteudo e Pedagogia"),
+    ("small", "Aulas, exercicios, progressao pedagogica, narrativa e revisao"),
+    ("section", "Instituicao e Disciplina"),
     ("body", "Universidade Federal de Alagoas (UFAL)"),
-    ("small", "Curso: Ciência da Computação - 1º Período"),
-    ("small", "Disciplina: Algoritmos e Programação de Computadores"),
+    ("small", "Curso: Ciencia da Computacao - 1o Periodo"),
+    ("small", "Disciplina: Algoritmos e Programacao de Computadores"),
     ("small", "Professor: Alexandre Barbosa"),
     ("section", "Data"),
     ("body", "Maio-Junho de 2025"),
-    ("section", "Agradecimentos Especiais"),
-    ("small", "Agradecemos ao Professor **Alexandre Barbosa** pela orientação e ensinamentos."),
-    ("small", "Agradecemos também aos **colegas** que testaram e deram feedback."),
-    ("small", "E a **comunidade de código aberto** pelas ferramentas utilizadas."),
-    ("section", "Tecnologias Utilizadas"),
-    ("body", "Python | Streamlit | Pygame | FastAPI | Git & GitHub"),
+    ("section", "Agradecimentos"),
+    ("small", "Ao Professor **Alexandre Barbosa** pela orientacao ao longo da disciplina."),
+    ("small", "Aos **colegas** que testaram o jogo e ajudaram com feedback."),
+    ("section", "Tecnologias"),
+    ("body", "Python | Pygame | SQLite | Pytest | Git e GitHub"),
     ("section", "Mensagem Final"),
     (
         "quote",
-        "Este projeto foi desenvolvido por Mayanderson, Neto e Anthony, alunos do primeiro período da UFAL.",
+        "Este projeto foi desenvolvido por Mayanderson, Neto e Anthony, alunos do primeiro periodo da UFAL.",
     ),
-    (
-        "quote",
-        "Ficamos imensamente gratos por você ter embarcado nessa jornada conosco.",
-    ),
-    (
-        "quote",
-        "Esperamos que o CodeQuest tenha acendido uma centelha no seu interesse por programação.",
-    ),
-    ("quote", "Desejamos sorte no seu progresso e uma incrível jornada pela frente."),
+    ("quote", "Obrigado por embarcar nessa jornada pelo Arquipelago de Bythos."),
+    ("quote", "Que o CodeQuest ajude a acender sua curiosidade por programacao."),
     ("section", "Links"),
     ("small", "GitHub: github.com/netojoseluizferreira-sys/CodeQuest"),
-    ("footer", "© 2025 CodeQuest - Todos os direitos reservados"),
+    ("footer", "2025 CodeQuest"),
 ]
 
 
 def obter_linhas_creditos():
-    """Retorna a lista estática de linhas que compõem a tela de créditos.
+    """Retorna as linhas renderizadas na tela de creditos.
+
+    Recebe:
+        Nenhum parametro.
 
     Retorna:
-        list[tuple[str, str]]: Cada tupla contém o estilo da linha
-        ("title", "section", "body", "small", "quote" ou "footer") e o texto
-        correspondente. Textos podem conter marcadores **palavra** para negrito
-        inline renderizado por _desenhar_credito_inline.
+        list[tuple[str, str]]: Tuplas no formato (estilo, texto). O estilo
+        define fonte, cor e espacamento; o texto pode usar marcadores
+        **palavra** para trechos em negrito no renderizador Pygame.
     """
     return CREDIT_LINES

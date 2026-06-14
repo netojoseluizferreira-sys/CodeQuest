@@ -1,3 +1,5 @@
+"""Leitura dos arquivos JSON de aulas e exercicios do CodeQuest."""
+
 import json
 import os
 

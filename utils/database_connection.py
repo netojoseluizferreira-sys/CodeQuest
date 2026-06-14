@@ -1,3 +1,5 @@
+"""Abertura da conexao SQLite e criacao das tabelas necessarias."""
+
 import os
 import sqlite3
 from contextlib import closing

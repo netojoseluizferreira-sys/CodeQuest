@@ -1,3 +1,5 @@
+"""Fachada publica das operacoes de persistencia SQLite do CodeQuest."""
+
 import os
 from contextlib import closing
 

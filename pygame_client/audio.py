@@ -1,3 +1,5 @@
+"""Trilha e efeitos sonoros procedurais usados pela interface Pygame."""
+
 import math
 from array import array
 

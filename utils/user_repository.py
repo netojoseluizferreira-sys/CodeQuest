@@ -1,3 +1,5 @@
+"""Repositorio de usuarios e funcoes de conveniencia para o save ativo."""
+
 import json
 import os
 from contextlib import closing

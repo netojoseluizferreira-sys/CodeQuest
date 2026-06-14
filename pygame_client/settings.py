@@ -1,3 +1,5 @@
+"""Configuracoes imutaveis da janela do jogo."""
+
 from dataclasses import dataclass
 
 
