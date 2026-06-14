@@ -61,19 +61,17 @@ class CodeQuestPygameMenu:
         self.font_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 52)
         self.font_title_large = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 64)
         _wendyone = os.path.join(_data_dir, "WendyOne-Regular.ttf")
-        _elms = os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf")
-        _font_hub_sub = pygame.font.Font(_elms, 28)
-        _font_hub_sub.bold = True
-        self.font_hub_subtitle = _font_hub_sub
-        self.font_subtitle = pygame.font.Font(_elms, 28)
-        self.font_subtitle.bold = True
+        _pressstart = os.path.join(_data_dir, "PressStart2P-Regular.ttf")
+        _rammetto = os.path.join(_data_dir, "RammettoOne-Regular.ttf")
+        self.font_hub_subtitle = pygame.font.Font(_rammetto, 28)
+        self.font_subtitle = pygame.font.Font(_rammetto, 28)
         _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
         _sub_size = 22
         _sub_texto = "Uma Jornada pelo Arquipélago de Bythos"
-        _font_sub = pygame.font.Font(_wendyone, _sub_size)
+        _font_sub = pygame.font.Font(_rammetto, _sub_size)
         while _font_sub.size(_sub_texto)[0] > _titulo_w and _sub_size > 8:
             _sub_size -= 1
-            _font_sub = pygame.font.Font(_wendyone, _sub_size)
+            _font_sub = pygame.font.Font(_rammetto, _sub_size)
         self.font_subtitle_small = _font_sub
         self.font_start_btn = pygame.font.Font(_wendyone, 21)
         self.font_welcome = pygame.font.Font(_wendyone, 20)
