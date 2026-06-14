@@ -20,6 +20,18 @@ from utils.database import carregar_usuario, criar_usuario, resetar_banco_de_dad
 MUNDO_ATIVO = "mundo_1"
 AULA_ATIVA = "aula_1"
 
+MUNDOS_BYTHOS = [
+    ("Mundo 1", "Introdução", "Cabana do Oráculo", True),
+    ("Mundo 2", "Primeiros Passos", "Tenda do Iniciado", False),
+    ("Mundo 3", "Operadores", "Forja das Runas", False),
+    ("Mundo 4", "Estruturas de Decisão", "Torre dos Julgamentos", False),
+    ("Mundo 5", "Estruturas de Repetição", "Moinho Eterno", False),
+    ("Mundo 6", "Funções", "Santuário dos Invocadores", False),
+    ("Mundo 7", "Vetores / Listas", "Biblioteca dos Pergaminhos", False),
+    ("Mundo 8", "Dicionários", "Templo da Grade Sagrada", False),
+    ("Mundo 9", "Recursividade", "Citadela do Espelho Infinito", False),
+]
+
 _VERDE = (30, 100, 50)
 _BRANCO = (255, 255, 255)
 _VERDE_CLARO = (100, 200, 120)
@@ -282,17 +294,28 @@ class CodeQuestPygameMenu:
         ]
 
     def _botoes_mundos(self):
-        """Constrói os botões da tela de seleção de mundos.
+        """Constrói os botões da tela de seleção de mundos em grade.
 
         Retorna:
-            list[Button]: Botão do Mundo 1 centralizado e botão Voltar no canto inferior esquerdo.
+            list[Button]: Botões dos mundos organizados em 3 colunas e botão Voltar.
         """
-        _bw = 500
-        _bx = (WINDOW.width - _bw) // 2
-        return [
-            Button(pygame.Rect(_bx, 295, _bw, 62), "Mundo 1 - Cabana do Oráculo", self._iniciar_mundo_1, **_KW_VERDE),
-            Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE),
-        ]
+        _bw = 330
+        _bh = 58
+        _gap_x = 28
+        _gap_y = 16
+        _grid_w = _bw * 3 + _gap_x * 2
+        _start_x = (WINDOW.width - _grid_w) // 2
+        _start_y = 300
+        botoes = []
+        for indice, (numero, _assunto, nome, disponivel) in enumerate(MUNDOS_BYTHOS):
+            col = indice % 3
+            row = indice // 3
+            x = _start_x + col * (_bw + _gap_x)
+            y = _start_y + row * (_bh + _gap_y)
+            acao = self._iniciar_mundo_1 if disponivel else self._mostrar_mundo_em_breve
+            botoes.append(Button(pygame.Rect(x, y, _bw, _bh), f"{numero} - {nome}", acao, **_KW_VERDE))
+        botoes.append(Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE))
+        return botoes
 
     def _botoes_fluxo_aprendizado(self):
         """Constrói os botões do segmento de aula ou exercício atualmente exibido.
@@ -830,26 +853,16 @@ class CodeQuestPygameMenu:
         _sub_surf = self.font_hub_subtitle.render(_sub, True, _BRANCO)
         self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 240)))
 
-        # Descrição do mundo centralizada abaixo do botão (botão em y=295, h=62 → bottom 357)
-        _desc = "A Cabana do Oraculo guarda a primeira aula: programacao, algoritmos e linguagens."
-        _desc_linhas = quebrar_texto(_desc, self.font_body, WINDOW.width - 300)
-        _dl_h = self.font_body.get_linesize() + 4
-        _dy = 378
-        for _dl in _desc_linhas:
-            _ds = self.font_body.render(_dl, True, (0, 0, 0))
-            self.screen.blit(_ds, _ds.get_rect(center=(WINDOW.width // 2 + 1, _dy + 1)))
-            _ds = self.font_body.render(_dl, True, _BRANCO)
-            self.screen.blit(_ds, _ds.get_rect(center=(WINDOW.width // 2, _dy)))
-            _dy += _dl_h
-
         # Caixa de aviso com a mensagem de status
-        _aviso_font = self.font_hub_subtitle
-        _aviso_linhas = quebrar_texto(self.status_message, _aviso_font, WINDOW.width - 200)
+        _aviso_font = self.font_status_success
+        _aviso_linhas = []
+        for _parte in self.status_message.splitlines():
+            _aviso_linhas.extend(quebrar_texto(_parte, _aviso_font, WINDOW.width - 340))
         _lh = _aviso_font.get_linesize()
-        _pad = 16
+        _pad = 12
         _aviso_h = len(_aviso_linhas) * _lh + _pad * 2
-        _aviso_w = min(max(_aviso_font.size(l)[0] for l in _aviso_linhas) + 80, WINDOW.width - 100)
-        _aviso_rect = pygame.Rect(WINDOW.width // 2 - _aviso_w // 2, 455, _aviso_w, _aviso_h)
+        _aviso_w = min(max(_aviso_font.size(l)[0] for l in _aviso_linhas) + 56, WINDOW.width - 300)
+        _aviso_rect = pygame.Rect(WINDOW.width // 2 - _aviso_w // 2, 548, _aviso_w, _aviso_h)
         _cor_borda_aviso = _VERDE_CLARO
         if self.status_kind == "success":
             _cor_borda_aviso = PALETTE.success
@@ -1586,7 +1599,22 @@ class CodeQuestPygameMenu:
             self.screen_name = "create"
             return
         self.screen_name = "worlds"
-        self._definir_status("Escolha um mundo para estudar.")
+        self._definir_status("Escolha um destino para estudar.")
+
+    def _mostrar_mundo_em_breve(self):
+        """Mostra o aviso de mundo indisponível mantendo o jogador na seleção de mundos.
+
+        Recebe:
+            Nenhum parametro.
+
+        Retorna:
+            None: Atualiza apenas a mensagem de status exibida na tela de mundos.
+        """
+        self._definir_status(
+            "EM BREVE!\nOs segredos deste lugar ainda não estão prontos para ser revelados. "
+            "Continue sua jornada pelo Módulo 1 enquanto isso.",
+            "normal",
+        )
 
     def _abrir_perfil(self):
         """Navega para a tela de perfil do jogador."""
