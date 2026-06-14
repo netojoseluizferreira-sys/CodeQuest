@@ -760,17 +760,28 @@ class CodeQuestPygameMenu:
             self._desenhar_status_hub(665)
 
     def _desenhar_status_hub(self, y):
-        """Desenha um banner de status centralizado com largura proporcional ao texto.
+        """Desenha feedback centralizado para telas de hub e criacao.
 
-        Usa font_hub_subtitle, bordas coloridas conforme status_kind e sombra de texto.
+        Usa banner verde para sucesso e texto vermelho com sombra para erro,
+        mantendo o aviso de erro visualmente separado dos botoes.
 
         Recebe:
-            y (int): Coordenada vertical do centro da caixa de status.
+            y (int): Coordenada vertical do centro do feedback.
         """
         color = PALETTE.success if self.status_kind == "success" else PALETTE.error
         font = self.font_hub_subtitle
         linhas = quebrar_texto(self.status_message, font, WINDOW.width - 200)
         linha_altura = font.get_linesize()
+        if self.status_kind == "error":
+            texto_y = y - (len(linhas) * linha_altura) // 2
+            for linha in linhas:
+                sombra = font.render(linha, True, (0, 0, 0))
+                self.screen.blit(sombra, sombra.get_rect(center=(WINDOW.width // 2 + 2, texto_y + linha_altura // 2 + 2)))
+                surface = font.render(linha, True, color)
+                self.screen.blit(surface, surface.get_rect(center=(WINDOW.width // 2, texto_y + linha_altura // 2)))
+                texto_y += linha_altura
+            return
+
         max_w = max(font.size(l)[0] for l in linhas)
         box_w = min(max_w + 80, WINDOW.width - 100)
         altura = max(58, len(linhas) * linha_altura + 24)
@@ -1346,17 +1357,28 @@ class CodeQuestPygameMenu:
     def _desenhar_status(self, y):
         """Renderiza o banner de status quando status_kind for "success" ou "error".
 
-        Para "normal", exibe apenas o texto em cor muted. Para "success"/"error",
-        desenha um retângulo com borda colorida e texto centralizado.
+        Para "normal", exibe apenas o texto em cor muted. Para "success", desenha
+        um retangulo com borda verde. Para "error", usa apenas texto vermelho com
+        sombra, evitando que o aviso pareca um botao clicavel.
 
         Recebe:
             y (int): Coordenada vertical central do banner.
         """
         if self.status_kind in {"success", "error"}:
             color = PALETTE.success if self.status_kind == "success" else PALETTE.error
-            font = self.font_body
+            font = self.font_hub_subtitle if self.status_kind == "error" else self.font_body
             linhas = quebrar_texto(self.status_message, font, self.content_width - 80)
             linha_altura = font.get_linesize()
+            if self.status_kind == "error":
+                texto_y = y - (len(linhas) * linha_altura) // 2
+                for linha in linhas:
+                    sombra = font.render(linha, True, (0, 0, 0))
+                    self.screen.blit(sombra, sombra.get_rect(center=(WINDOW.width // 2 + 2, texto_y + linha_altura // 2 + 2)))
+                    surface = font.render(linha, True, color)
+                    self.screen.blit(surface, surface.get_rect(center=(WINDOW.width // 2, texto_y + linha_altura // 2)))
+                    texto_y += linha_altura
+                return
+
             altura = max(58, (len(linhas) * linha_altura) + 24)
             rect = pygame.Rect(self.content_x, y - altura // 2, self.content_width, altura)
             pygame.draw.rect(self.screen, PALETTE.surface, rect, border_radius=10)
