@@ -1476,14 +1476,20 @@ class CodeQuestPygameMenu:
         self.screen_name = "create"
 
     def _continuar(self):
-        """Carrega o save existente e navega para o hub; exibe erro se não houver save."""
+        """Carrega o save existente ou cria um usuario padrao antes de navegar para o hub.
+
+        Recebe:
+            Nenhum parametro.
+
+        Retorna:
+            None: Atualiza self.usuario, status_message e screen_name como efeito colateral.
+        """
         self.usuario = carregar_usuario()
         if self.usuario is None:
-            self._definir_status(
-                "Você ainda não tem um progresso salvo. Inicie um novo jogo primeiro.",
-                "error",
-            )
-            return
+            self.usuario = criar_usuario("Aventureiro", 18)
+            self._definir_status("Save criado automaticamente. Escolha seu destino.", "success")
+        else:
+            self._definir_status("Save carregado. Continue sua jornada.", "success")
         self._abrir_hub()
 
     def _criar_personagem(self):
