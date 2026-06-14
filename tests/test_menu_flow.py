@@ -4,30 +4,32 @@ from backend.usuario import Usuario
 from pygame_client import menu_app
 
 
-def test_continuar_cria_usuario_padrao_quando_nao_existe_save(monkeypatch):
-    criado = Usuario(nome="Aventureiro", idade=18)
+def test_continuar_sem_save_abre_tela_de_criacao_sem_criar_usuario(monkeypatch):
     chamadas_criar = []
-    carregamentos = iter([None, criado])
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: next(carregamentos))
+    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: None)
 
-    def criar_usuario_padrao(nome, idade):
+    def criar_usuario_indevido(nome, idade):
         chamadas_criar.append((nome, idade))
-        return criado
 
-    monkeypatch.setattr(menu_app, "criar_usuario", criar_usuario_padrao)
+    monkeypatch.setattr(menu_app, "criar_usuario", criar_usuario_indevido)
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.status_message = ""
     app.status_kind = "normal"
     app.screen_name = "start"
     app.active_field = ""
+    app.nome_input = "Nome antigo"
+    app.idade_input = "99"
 
     app._continuar()
 
-    assert chamadas_criar == [("Aventureiro", 18)]
-    assert app.usuario == criado
-    assert app.status_kind == "success"
-    assert app.screen_name == "hub"
+    assert chamadas_criar == []
+    assert app.usuario is None
+    assert app.nome_input == ""
+    assert app.idade_input == ""
+    assert app.active_field == "nome"
+    assert app.status_kind == "normal"
+    assert app.screen_name == "create"
 
 
 def test_continuar_carrega_save_existente_sem_criar_usuario(monkeypatch):
