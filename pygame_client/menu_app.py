@@ -82,6 +82,9 @@ class CodeQuestPygameMenu:
         _font_hub_sub = pygame.font.Font(_elms, 28)
         _font_hub_sub.bold = True
         self.font_hub_subtitle = _font_hub_sub
+        _silkscreen_bold = os.path.join(_data_dir, "Silkscreen-Bold.ttf")
+        self.font_block_title = pygame.font.Font(_silkscreen_bold, 18)
+        self.font_block_body = pygame.font.Font(_elms, 20)
         _mont_bold_c = pygame.font.Font(_mont, 24)
         _mont_bold_c.bold = True
         self.font_credit_section = _mont_bold_c
@@ -1088,45 +1091,162 @@ class CodeQuestPygameMenu:
             self.screen.blit(_ov, (0, 0))
 
     def _renderizar_creditos(self):
-        """Renderiza os créditos com animação de fundo, suporte a rolagem e texto inline-bold."""
+        """Renderiza os créditos com blocos visuais, título CodeQuest com glow e fundo animado."""
         if self.creditos_frame_paths:
             self.creditos_frame_timer += 1
             if self.creditos_frame_timer >= 6:
                 self.creditos_frame_timer = 0
                 self.creditos_frame_index = (self.creditos_frame_index + 1) % len(self.creditos_frame_paths)
             self.screen.blit(self._obter_frame_animado(self.creditos_frame_paths, self.creditos_frame_index), (0, 0))
-            _overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
-            _overlay.fill((0, 0, 0, 120))
-            self.screen.blit(_overlay, (0, 0))
+            _cred_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+            _cred_ov.fill((0, 0, 0, 120))
+            self.screen.blit(_cred_ov, (0, 0))
 
-        _box_h = 48
-        y = 30 - self.credit_scroll
-        largura_texto = WINDOW.width - 160
-        for style, text in obter_linhas_creditos():
-            font, color, spacing = self._estilo_credito(style)
-            display_text = text.upper() if style == "section" else text
-            if "**" in display_text:
-                bold_font = self._bold_font_para_estilo(style)
-                self._desenhar_credito_inline(display_text, font, bold_font, color, y)
-                y += spacing
-            else:
-                for line in quebrar_texto(display_text, font, largura_texto):
-                    desenhar_texto_centralizado(self.screen, line, font, color, y)
-                    y += spacing
-            y += 8
+        _COR_B_FUNDO = (30, 80, 50)
+        _COR_B_BORDA = (100, 200, 120)
+        _BX = 60
+        _BW = WINDOW.width - 120
+        _PAD_V = 16
+        _PAD_H = 20
+        _ESPACO = 18
+        _GAP_SMALL = 16
+        _FT = self.font_block_title
+        _FB = self.font_block_body
+        _LINE_H = _FB.get_linesize() + 3
+        _EMPTY_H = _LINE_H // 2
+        _BADGE_PAD_H = 10
+        _BADGE_PAD_V = 5
+        _TITLE_BODY_GAP = 12
+        _FT_H = _FT.get_height()
+        _BADGE_H = _FT_H + _BADGE_PAD_V * 2
+        _FULL_CW = _BW - _PAD_H * 2
+        _SMALL_W = (_BW - _GAP_SMALL * 2) // 3
+        _SMALL_CW = _SMALL_W - _PAD_H * 2
 
-        _msg = "W/S ou setas para rolar   |   ESC para voltar"
-        _msg_surf = self.font_small.render(_msg, True, _BRANCO)
-        _box_w = _msg_surf.get_width() + 48
-        _box_rect = pygame.Rect(
-            WINDOW.width // 2 - _box_w // 2,
-            WINDOW.height - _box_h - 8,
-            _box_w,
-            _box_h,
-        )
-        pygame.draw.rect(self.screen, _VERDE, _box_rect, border_radius=8)
-        pygame.draw.rect(self.screen, _VERDE_CLARO, _box_rect, width=2, border_radius=8)
-        self.screen.blit(_msg_surf, _msg_surf.get_rect(center=_box_rect.center))
+        def _calc_h(linhas, cw):
+            h = _PAD_V + _BADGE_H + _TITLE_BODY_GAP
+            for _l in linhas:
+                h += _EMPTY_H if not _l else len(quebrar_texto(_l, _FB, cw)) * _LINE_H
+            return h + _PAD_V
+
+        def _desenhar_bloco(bx, by, bw, titulo, linhas, cw):
+            _bh = _calc_h(linhas, cw)
+            pygame.draw.rect(self.screen, _COR_B_FUNDO, pygame.Rect(bx, by, bw, _bh), border_radius=12)
+            pygame.draw.rect(self.screen, _COR_B_BORDA, pygame.Rect(bx, by, bw, _bh), width=2, border_radius=12)
+            # Badge do título: fundo preto semitransparente + borda verde claro + texto branco
+            _ts = _FT.render(titulo, True, _BRANCO)
+            _bdg_w = _ts.get_width() + _BADGE_PAD_H * 2
+            _bdg_rect = pygame.Rect(bx + _PAD_H, by + _PAD_V, _bdg_w, _BADGE_H)
+            _bdg_surf = pygame.Surface((_bdg_w, _BADGE_H), pygame.SRCALPHA)
+            _bdg_surf.fill((0, 0, 0, 160))
+            self.screen.blit(_bdg_surf, _bdg_rect.topleft)
+            pygame.draw.rect(self.screen, _COR_B_BORDA, _bdg_rect, width=2, border_radius=5)
+            self.screen.blit(_ts, (bx + _PAD_H + _BADGE_PAD_H, by + _PAD_V + _BADGE_PAD_V))
+            # Corpo de texto em ElmsSans branco
+            _ty = by + _PAD_V + _BADGE_H + _TITLE_BODY_GAP
+            for _l in linhas:
+                if not _l:
+                    _ty += _EMPTY_H
+                else:
+                    for _sub in quebrar_texto(_l, _FB, cw):
+                        self.screen.blit(_FB.render(_sub, True, _BRANCO), (bx + _PAD_H, _ty))
+                        _ty += _LINE_H
+
+        _blocos_full = [
+            ("Equipe de Desenvolvimento", [
+                "Neto  —  Backend e Persistência",
+                "Sistema de XP, SQLite, organização de dados e arquitetura.",
+                "",
+                "Anthony  —  Interface e Experiência",
+                "Telas Pygame, navegação, estilo visual e polimento de interação.",
+                "",
+                "Mayanderson  —  Conteúdo e Pedagogia",
+                "Aulas, exercícios, progressão pedagógica, narrativa e revisão.",
+            ]),
+            ("Instituição e Disciplina", [
+                "Universidade Federal de Alagoas (UFAL)",
+                "Curso: Ciência da Computação — 1° Período",
+                "Disciplina: Algoritmos e Programação de Computadores",
+                "Professor: Alexandre Barbosa",
+            ]),
+            ("Agradecimentos", [
+                "Ao Professor Alexandre Barbosa pela orientação ao longo da disciplina.",
+                "Aos colegas que testaram o jogo e ajudaram com feedback.",
+            ]),
+            ("Mensagem Final", [
+                "Este projeto foi desenvolvido por Mayanderson, Neto e Anthony,",
+                "alunos do primeiro período da UFAL.",
+                "",
+                "Obrigado por embarcar nessa jornada pelo Arquipélago de Bythos.",
+                "",
+                "Que o CodeQuest ajude a acender sua curiosidade por programação.",
+            ]),
+        ]
+
+        _blocos_small = [
+            ("Tecnologias Utilizadas", [
+                "Python | Pygame | SQLite | Pytest | Git e GitHub",
+            ]),
+            ("Data", [
+                "Maio — Junho de 2025",
+            ]),
+            ("Links", [
+                "github.com/netojoseluizferreira-sys/CodeQuest",
+            ]),
+        ]
+
+        _AREA_TOP = 155
+        _AREA_BOTTOM = WINDOW.height - 90
+        self.screen.set_clip(pygame.Rect(0, _AREA_TOP, WINDOW.width, _AREA_BOTTOM - _AREA_TOP))
+
+        y = _AREA_TOP + 10 - self.credit_scroll
+
+        for _titulo_b, _linhas in _blocos_full:
+            _bh = _calc_h(_linhas, _FULL_CW)
+            if y + _bh >= _AREA_TOP and y <= _AREA_BOTTOM:
+                _desenhar_bloco(_BX, y, _BW, _titulo_b, _linhas, _FULL_CW)
+            y += _bh + _ESPACO
+
+        _trio_h = max(_calc_h(linhas, _SMALL_CW) for _, linhas in _blocos_small)
+        if y + _trio_h >= _AREA_TOP and y <= _AREA_BOTTOM:
+            for _k, (_titulo_b, _linhas) in enumerate(_blocos_small):
+                _sx = _BX + _k * (_SMALL_W + _GAP_SMALL)
+                _desenhar_bloco(_sx, y, _SMALL_W, _titulo_b, _linhas, _SMALL_CW)
+        y += _trio_h + _ESPACO  # noqa: F841
+
+        self.screen.set_clip(None)
+
+        # Título "CodeQuest" com glow verde pulsante — desenhado por cima dos blocos
+        _TITULO = "CodeQuest"
+        _GAP = 2
+        _char_w = [self.font_title_large.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title_large.get_height()
+        _tcy = 80
+
+        self.glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.glow_timer * 0.04)))
+        _glow_surfs = [self.font_title_large.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _glow_surfs:
+            _s.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_glow_surfs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(self.font_title_large.render(_c, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(self.font_title_large.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
 
     def _renderizar_fluxo_aprendizado(self):
         """Despacha para _renderizar_segmento_aula ou _renderizar_segmento_exercicio conforme o segmento atual."""
