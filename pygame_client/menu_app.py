@@ -10,7 +10,6 @@ import webbrowser
 from backend.xp_system import xp_para_proximo_nivel
 from pygame_client.audio import AudioController
 from pygame_client.content import carregar_aula_pygame, carregar_exercicios_pygame, obter_exercicio
-from pygame_client.credits import obter_linhas_creditos
 from pygame_client.learning_progress import registrar_resposta
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
@@ -46,8 +45,8 @@ class CodeQuestPygameMenu:
     def __init__(self):
         """Inicializa Pygame, carrega fontes/imagens/vídeos e restaura o save do usuário.
 
-        Configura a janela 1280×800, o AudioController, todas as fontes Montserrat e
-        PressStart2P, os frames de vídeo de fundo (start, hub, créditos, perfil),
+        Configura a janela 1280×800, o AudioController, as fontes PressStart2P,
+        RammettoOne e WendyOne, os frames de vídeo de fundo (start, hub, créditos, perfil),
         as imagens da cutscene (data/cutscenes/1-10.jpeg) e os atributos de estado
         de tela, campo ativo, cutscene fade e fluxo de aprendizagem.
         """
@@ -58,11 +57,11 @@ class CodeQuestPygameMenu:
         self.audio = AudioController()
         self.audio.inicializar()
         _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-        self.font_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 52)
-        self.font_title_large = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 64)
         _wendyone = os.path.join(_data_dir, "WendyOne-Regular.ttf")
         _pressstart = os.path.join(_data_dir, "PressStart2P-Regular.ttf")
         _rammetto = os.path.join(_data_dir, "RammettoOne-Regular.ttf")
+        self.font_title = pygame.font.Font(_pressstart, 52)
+        self.font_title_large = pygame.font.Font(_pressstart, 64)
         self.font_hub_subtitle = pygame.font.Font(_rammetto, 28)
         self.font_subtitle = pygame.font.Font(_rammetto, 28)
         _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
@@ -78,16 +77,19 @@ class CodeQuestPygameMenu:
         self.font_body = pygame.font.Font(_wendyone, 21)
         self.font_small = pygame.font.Font(_wendyone, 17)
         self.font_tiny = pygame.font.Font(_wendyone, 15)
-        self.font_block_title = pygame.font.Font(_wendyone, 18)
+        self.font_block_title = pygame.font.Font(_rammetto, 16)
         self.font_block_body = pygame.font.Font(_wendyone, 20)
-        self.font_credit_section = pygame.font.Font(_wendyone, 24)
+        self.font_credit_section = pygame.font.Font(_rammetto, 23)
         self.font_credit_body_bold = pygame.font.Font(_wendyone, 22)
         self.font_cutscene_text = pygame.font.Font(_wendyone, 26)
         self.font_credit_body = pygame.font.Font(_wendyone, 22)
-        self.font_credit_small_bold = pygame.font.Font(_wendyone, 20)
+        self.font_credit_small_bold = pygame.font.Font(_rammetto, 16)
         self.font_credit_small_reg = pygame.font.Font(_wendyone, 20)
         self.font_credit_quote = pygame.font.Font(_wendyone, 18)
         self.font_credit_footer_bold = pygame.font.Font(_wendyone, 16)
+        self.font_status_success = pygame.font.Font(_wendyone, 24)
+        self.font_profile_label = pygame.font.Font(_rammetto, 19)
+        self.font_profile_value = pygame.font.Font(_wendyone, 38)
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -165,7 +167,7 @@ class CodeQuestPygameMenu:
         self.mundos_overlay.fill((0, 0, 0, 150))
         self.mundos_glow_timer = 0
         self.lesson_glow_timer = 0
-        self.font_lesson_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 28)
+        self.font_lesson_title = pygame.font.Font(_pressstart, 28)
         self.font_lesson_content = pygame.font.Font(_wendyone, 20)
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
@@ -756,7 +758,7 @@ class CodeQuestPygameMenu:
             y (int): Coordenada vertical do centro do feedback.
         """
         color = PALETTE.success if self.status_kind == "success" else PALETTE.error
-        font = self.font_hub_subtitle
+        font = self.font_hub_subtitle if self.status_kind == "error" else self.font_status_success
         linhas = quebrar_texto(self.status_message, font, WINDOW.width - 200)
         linha_altura = font.get_linesize()
         if self.status_kind == "error":
@@ -770,12 +772,12 @@ class CodeQuestPygameMenu:
             return
 
         max_w = max(font.size(l)[0] for l in linhas)
-        box_w = min(max_w + 80, WINDOW.width - 100)
-        altura = max(58, len(linhas) * linha_altura + 24)
+        box_w = min(max_w + 56, WINDOW.width - 170)
+        altura = max(48, len(linhas) * linha_altura + 16)
         rect = pygame.Rect(WINDOW.width // 2 - box_w // 2, y - altura // 2, box_w, altura)
         pygame.draw.rect(self.screen, PALETTE.surface, rect, border_radius=10)
         pygame.draw.rect(self.screen, color, rect, width=2, border_radius=10)
-        texto_y = rect.y + 12
+        texto_y = rect.y + 8
         for linha in linhas:
             sombra = font.render(linha, True, (0, 0, 0))
             self.screen.blit(sombra, sombra.get_rect(center=(rect.centerx + 2, texto_y + linha_altura // 2 + 2)))
@@ -921,12 +923,12 @@ class CodeQuestPygameMenu:
         _COR_BORDA = (100, 200, 120)
 
         cards = [
-            ("◆", "Nível", str(self.usuario.nivel)),
-            ("◆", "XP Total", str(self.usuario.xp)),
-            ("◆", "Prox. Nível", str(xp_para_proximo_nivel(self.usuario.xp))),
-            ("◆", "Idade", str(self.usuario.idade)),
+            ("Nível", str(self.usuario.nivel)),
+            ("XP Total", str(self.usuario.xp)),
+            ("Prox. Nível", str(xp_para_proximo_nivel(self.usuario.xp))),
+            ("Idade", str(self.usuario.idade)),
         ]
-        for idx, (icone, label, valor) in enumerate(cards):
+        for idx, (label, valor) in enumerate(cards):
             col = idx % 2
             row = idx // 2
             cx = _GX + col * (_CW + _HGAP)
@@ -934,18 +936,18 @@ class CodeQuestPygameMenu:
             rect = pygame.Rect(cx, cy, _CW, _CH)
             pygame.draw.rect(self.screen, _COR_FUNDO, rect, border_radius=12)
             pygame.draw.rect(self.screen, _COR_BORDA, rect, width=2, border_radius=12)
-            _lbl_surf = self.font_credit_small_bold.render(f"{icone}  {label}", True, _COR_BORDA)
-            self.screen.blit(_lbl_surf, _lbl_surf.get_rect(center=(cx + _CW // 2, cy + 38)))
-            _val_surf = self.font_credit_section.render(valor, True, _BRANCO)
-            self.screen.blit(_val_surf, _val_surf.get_rect(center=(cx + _CW // 2, cy + 98)))
+            _lbl_surf = self.font_profile_label.render(label, True, _COR_BORDA)
+            self.screen.blit(_lbl_surf, _lbl_surf.get_rect(center=(cx + _CW // 2, cy + 36)))
+            _val_surf = self.font_profile_value.render(valor, True, _BRANCO)
+            self.screen.blit(_val_surf, _val_surf.get_rect(center=(cx + _CW // 2, cy + 96)))
 
         _sect_y = _GY + 2 * (_CH + _VGAP)
         _sect_rect = pygame.Rect(_GX, _sect_y, _CW * 2 + _HGAP, 100)
         pygame.draw.rect(self.screen, _COR_FUNDO, _sect_rect, border_radius=12)
         pygame.draw.rect(self.screen, _COR_BORDA, _sect_rect, width=2, border_radius=12)
-        _conq_lbl = self.font_credit_small_bold.render("Conquistas", True, _COR_BORDA)
+        _conq_lbl = self.font_profile_label.render("Conquistas", True, _COR_BORDA)
         self.screen.blit(_conq_lbl, _conq_lbl.get_rect(center=(_sect_rect.centerx, _sect_rect.y + 28)))
-        _em_breve = self.font_credit_body_bold.render("EM BREVE", True, _COR_BORDA)
+        _em_breve = self.font_profile_value.render("EM BREVE", True, _COR_BORDA)
         self.screen.blit(_em_breve, _em_breve.get_rect(center=(_sect_rect.centerx, _sect_rect.y + 68)))
 
     def _renderizar_cutscene(self):
@@ -1283,7 +1285,7 @@ class CodeQuestPygameMenu:
             self.screen.blit(_ft.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
             _x += _char_w[_i] + _GAP
 
-        # Subtítulo "Aula X: [nome da aula]" em ElmsSans branco com sombra preta
+        # Subtítulo "Aula X: [nome da aula]" em RammettoOne branco com sombra preta
         _sub = self.aula["titulo"]
         _sub_y = _tcy + _char_h // 2 + 22
         _fes = self.font_hub_subtitle
@@ -1292,7 +1294,7 @@ class CodeQuestPygameMenu:
         _ss = _fes.render(_sub, True, _BRANCO)
         self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
 
-        # Conteúdo Montserrat-Bold branco, margens 100px, espaçamento generoso entre parágrafos
+        # Conteúdo WendyOne branco, margens 100px, espaçamento generoso entre parágrafos
         _MARG = 100
         _cw = WINDOW.width - _MARG * 2
         _fc = self.font_lesson_content
@@ -1507,90 +1509,6 @@ class CodeQuestPygameMenu:
         """
         self.status_message = mensagem
         self.status_kind = kind
-
-    def _estilo_credito(self, style):
-        """Resolve fonte, cor RGB e espaçamento vertical para um estilo de linha de créditos.
-
-        Recebe:
-            style (str): Um dos valores: "title", "subtitle", "section", "body",
-            "small", "quote" ou "footer".
-
-        Retorna:
-            tuple[pygame.font.Font, tuple[int,int,int], int]: Fonte, cor e
-            espaçamento vertical em pixels para a linha. Estilos desconhecidos
-            recebem o mesmo tratamento que "footer".
-        """
-        if style == "title":
-            return self.font_title, _VERDE_CLARO, 62
-        if style == "subtitle":
-            return self.font_credit_body_bold, _BRANCO, 32
-        if style == "section":
-            return self.font_credit_section, _VERDE_CLARO, 40
-        if style == "body":
-            return self.font_credit_body_bold, _BRANCO, 32
-        if style == "small":
-            return self.font_credit_small_bold, _BRANCO, 30
-        if style == "quote":
-            return self.font_credit_quote, (160, 220, 160), 28
-        if style == "footer":
-            return self.font_credit_footer_bold, _BRANCO, 26
-        return self.font_credit_footer_bold, _BRANCO, 26
-
-    def _bold_font_para_estilo(self, style):
-        """Retorna a fonte negrito associada a um estilo de linha de créditos.
-
-        Usada por _renderizar_creditos para renderizar segmentos **bold** inline.
-
-        Recebe:
-            style (str): Estilo da linha ("body" ou qualquer outro valor).
-
-        Retorna:
-            pygame.font.Font: font_credit_body_bold para "body";
-            font_credit_small_bold para todos os outros estilos.
-        """
-        if style == "body":
-            return self.font_credit_body_bold
-        return self.font_credit_small_bold
-
-    def _desenhar_credito_inline(self, text, font_regular, font_bold, color, y):
-        """Renderiza uma linha de créditos centralizada com partes em negrito marcadas por **.
-
-        Parseia sequências **palavra** no texto, alterna entre font_regular e
-        font_bold para cada segmento e blita tudo horizontalmente centralizado na
-        largura da janela.
-
-        Recebe:
-            text (str): Texto com marcadores **negrito** mesclados ao texto normal.
-            font_regular (pygame.font.Font): Fonte para segmentos sem negrito.
-            font_bold (pygame.font.Font): Fonte para segmentos entre **.
-            color (tuple[int, int, int]): Cor RGB aplicada a todos os segmentos.
-            y (int): Coordenada vertical do centro da linha.
-        """
-        parts = []
-        remaining = text
-        while "**" in remaining:
-            idx = remaining.find("**")
-            if idx > 0:
-                parts.append((remaining[:idx], False))
-            remaining = remaining[idx + 2:]
-            idx2 = remaining.find("**")
-            if idx2 >= 0:
-                parts.append((remaining[:idx2], True))
-                remaining = remaining[idx2 + 2:]
-            else:
-                parts.append((remaining, True))
-                remaining = ""
-                break
-        if remaining:
-            parts.append((remaining, False))
-        total_w = sum((font_bold if b else font_regular).size(t)[0] for t, b in parts)
-        x = WINDOW.width // 2 - total_w // 2
-        h = max((font_bold if b else font_regular).get_height() for _, b in parts)
-        y_off = y - h // 2
-        for t, b in parts:
-            f = font_bold if b else font_regular
-            self.screen.blit(f.render(t, True, color), (x, y_off))
-            x += f.size(t)[0]
 
     def _novo_jogo(self):
         """Reseta o banco de dados, limpa o estado do usuário e navega para a criação de personagem."""
