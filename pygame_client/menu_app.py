@@ -60,52 +60,36 @@ class CodeQuestPygameMenu:
         _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
         self.font_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 52)
         self.font_title_large = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 64)
-        _mont = os.path.join(_data_dir, "Montserrat-VariableFont_wght.ttf")
-        self.font_subtitle = pygame.font.Font(_mont, 28)
-        self.font_subtitle.bold = True
-        _silkscreen = os.path.join(_data_dir, "Silkscreen-Regular.ttf")
-        _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
-        _sub_size = 22
-        _sub_texto = "Uma Jornada pelo Arquipélago de Bythos"
-        _font_sub = pygame.font.Font(_silkscreen, _sub_size)
-        while _font_sub.size(_sub_texto)[0] > _titulo_w and _sub_size > 8:
-            _sub_size -= 1
-            _font_sub = pygame.font.Font(_silkscreen, _sub_size)
-        self.font_subtitle_small = _font_sub
-        self.font_start_btn = pygame.font.Font(_silkscreen, 21)
-        self.font_welcome = pygame.font.Font(_mont, 20)
-        self.font_welcome.bold = True
-        self.font_body = pygame.font.Font(_mont, 21)
-        self.font_small = pygame.font.Font(_mont, 17)
-        self.font_tiny = pygame.font.Font(_mont, 15)
+        _wendyone = os.path.join(_data_dir, "WendyOne-Regular.ttf")
         _elms = os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf")
         _font_hub_sub = pygame.font.Font(_elms, 28)
         _font_hub_sub.bold = True
         self.font_hub_subtitle = _font_hub_sub
-        _silkscreen_bold = os.path.join(_data_dir, "Silkscreen-Bold.ttf")
-        self.font_block_title = pygame.font.Font(_silkscreen_bold, 18)
-        self.font_block_body = pygame.font.Font(_mont, 20)
-        self.font_block_body.bold = True
-        _mont_bold_c = pygame.font.Font(_mont, 24)
-        _mont_bold_c.bold = True
-        self.font_credit_section = _mont_bold_c
-        _mont_bold_b = pygame.font.Font(_mont, 22)
-        _mont_bold_b.bold = True
-        self.font_credit_body_bold = _mont_bold_b
-        _mont_bold_cs = pygame.font.Font(_mont, 26)
-        _mont_bold_cs.bold = True
-        self.font_cutscene_text = _mont_bold_cs
-        self.font_credit_body = pygame.font.Font(_mont, 22)
-        _mont_bold_s = pygame.font.Font(_mont, 20)
-        _mont_bold_s.bold = True
-        self.font_credit_small_bold = _mont_bold_s
-        self.font_credit_small_reg = pygame.font.Font(_mont, 20)
-        _mont_bold_q = pygame.font.Font(_mont, 18)
-        _mont_bold_q.bold = True
-        self.font_credit_quote = _mont_bold_q
-        _mont_bold_ft = pygame.font.Font(_mont, 16)
-        _mont_bold_ft.bold = True
-        self.font_credit_footer_bold = _mont_bold_ft
+        self.font_subtitle = pygame.font.Font(_elms, 28)
+        self.font_subtitle.bold = True
+        _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
+        _sub_size = 22
+        _sub_texto = "Uma Jornada pelo Arquipélago de Bythos"
+        _font_sub = pygame.font.Font(_wendyone, _sub_size)
+        while _font_sub.size(_sub_texto)[0] > _titulo_w and _sub_size > 8:
+            _sub_size -= 1
+            _font_sub = pygame.font.Font(_wendyone, _sub_size)
+        self.font_subtitle_small = _font_sub
+        self.font_start_btn = pygame.font.Font(_wendyone, 21)
+        self.font_welcome = pygame.font.Font(_wendyone, 20)
+        self.font_body = pygame.font.Font(_wendyone, 21)
+        self.font_small = pygame.font.Font(_wendyone, 17)
+        self.font_tiny = pygame.font.Font(_wendyone, 15)
+        self.font_block_title = pygame.font.Font(_wendyone, 18)
+        self.font_block_body = pygame.font.Font(_wendyone, 20)
+        self.font_credit_section = pygame.font.Font(_wendyone, 24)
+        self.font_credit_body_bold = pygame.font.Font(_wendyone, 22)
+        self.font_cutscene_text = pygame.font.Font(_wendyone, 26)
+        self.font_credit_body = pygame.font.Font(_wendyone, 22)
+        self.font_credit_small_bold = pygame.font.Font(_wendyone, 20)
+        self.font_credit_small_reg = pygame.font.Font(_wendyone, 20)
+        self.font_credit_quote = pygame.font.Font(_wendyone, 18)
+        self.font_credit_footer_bold = pygame.font.Font(_wendyone, 16)
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -150,7 +134,7 @@ class CodeQuestPygameMenu:
             _cpath = os.path.join(_cutscenes_dir, f"{_i}.jpeg")
             if os.path.exists(_cpath):
                 _cimg = pygame.image.load(_cpath).convert()
-                self.cutscene_images.append(pygame.transform.scale(_cimg, (960, 400)))
+                self.cutscene_images.append(pygame.transform.scale(_cimg, (900, 500)))
             else:
                 self.cutscene_images.append(None)
         self.cutscene_index = 0
@@ -184,9 +168,7 @@ class CodeQuestPygameMenu:
         self.mundos_glow_timer = 0
         self.lesson_glow_timer = 0
         self.font_lesson_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 28)
-        _mont_lc = pygame.font.Font(_mont, 20)
-        _mont_lc.bold = True
-        self.font_lesson_content = _mont_lc
+        self.font_lesson_content = pygame.font.Font(_wendyone, 20)
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
         self.lesson_overlay = _less_ov
@@ -982,7 +964,7 @@ class CodeQuestPygameMenu:
         "Pular história" e "Avançar →" lado a lado no canto inferior direito.
         """
         _FADE_SPEED = 8
-        _IMG_W, _IMG_H = 960, 400
+        _IMG_W, _IMG_H = 900, 500
         _IMG_X = (WINDOW.width - _IMG_W) // 2
         _IMG_Y = 50
         _BTN_W, _BTN_H = 190, 45
@@ -1092,7 +1074,7 @@ class CodeQuestPygameMenu:
             self.screen.blit(_ov, (0, 0))
 
     def _renderizar_creditos(self):
-        """Renderiza os créditos com blocos visuais, título CodeQuest com glow e fundo animado."""
+        """Renderiza os créditos com seções estilizadas, título CodeQuest com glow e fundo animado."""
         if self.creditos_frame_paths:
             self.creditos_frame_timer += 1
             if self.creditos_frame_timer >= 6:
@@ -1103,140 +1085,128 @@ class CodeQuestPygameMenu:
             _cred_ov.fill((0, 0, 0, 120))
             self.screen.blit(_cred_ov, (0, 0))
 
-        _COR_B_FUNDO = (23, 67, 40)
-        _COR_B_BORDA = (100, 200, 120)
+        _COR_BORDA = (100, 200, 120)
         _COR_PLACA = (0, 0, 0, 178)
-        _BX = 130
-        _BW = WINDOW.width - (_BX * 2)
-        _PAD_V = 18
-        _PAD_H = 24
-        _ESPACO = 24
-        _GAP_SMALL = 28
-        _FT = self.font_block_title
-        _FB = self.font_block_body
-        _LINE_H = _FB.get_linesize() + 3
-        _EMPTY_H = _LINE_H // 2
-        _BADGE_PAD_H = 10
-        _BADGE_PAD_V = 5
-        _TITLE_BODY_GAP = 12
-        _FT_H = _FT.get_height()
-        _BADGE_H = _FT_H + _BADGE_PAD_V * 2
-        _FULL_CW = _BW - _PAD_H * 2
-        _SMALL_W = (_BW - _GAP_SMALL) // 2
-        _SMALL_CW = _SMALL_W - _PAD_H * 2
+        _MARG = 100
+        _CW = WINDOW.width - _MARG * 2
+        _ft_titulo = self.font_lesson_title
+        _ft_sub = self.font_hub_subtitle
+        _ft_body = self.font_lesson_content
+        _LH_SUB = _ft_sub.get_linesize() + 2
+        _LH_BODY = _ft_body.get_linesize() + 4
+        _ESPACO_SECAO = 40
 
-        def _calc_h(linhas, cw):
-            h = _PAD_V + _BADGE_H + _TITLE_BODY_GAP
-            for _l in linhas:
-                h += _EMPTY_H if not _l else len(quebrar_texto(_l, _FB, cw)) * _LINE_H
-            return h + _PAD_V
-
-        def _desenhar_bloco(bx, by, bw, titulo, linhas, cw, altura_forcada=None):
-            _bh = altura_forcada or _calc_h(linhas, cw)
-            pygame.draw.rect(self.screen, _COR_B_FUNDO, pygame.Rect(bx, by, bw, _bh), border_radius=12)
-            pygame.draw.rect(self.screen, _COR_B_BORDA, pygame.Rect(bx, by, bw, _bh), width=2, border_radius=12)
-            # Badge do título: fundo preto semitransparente + borda verde claro + texto branco
-            _ts = _FT.render(titulo, True, _BRANCO)
-            _bdg_w = _ts.get_width() + _BADGE_PAD_H * 2
-            _bdg_rect = pygame.Rect(bx + _PAD_H, by + _PAD_V, _bdg_w, _BADGE_H)
-            _bdg_surf = pygame.Surface((_bdg_w, _BADGE_H), pygame.SRCALPHA)
-            _bdg_surf.fill((0, 0, 0, 160))
-            self.screen.blit(_bdg_surf, _bdg_rect.topleft)
-            pygame.draw.rect(self.screen, _COR_B_BORDA, _bdg_rect, width=2, border_radius=5)
-            self.screen.blit(_ts, (bx + _PAD_H + _BADGE_PAD_H, by + _PAD_V + _BADGE_PAD_V))
-            # Corpo de texto em Montserrat branco
-            _ty = by + _PAD_V + _BADGE_H + _TITLE_BODY_GAP
-            for _l in linhas:
-                if not _l:
-                    _ty += _EMPTY_H
-                else:
-                    for _sub in quebrar_texto(_l, _FB, cw):
-                        self.screen.blit(_FB.render(_sub, True, _BRANCO), (bx + _PAD_H, _ty))
-                        _ty += _LINE_H
-
-        _blocos_layout = [
-            ("pair", [
-                ("Instituição e Disciplina", [
-                    "Universidade Federal de Alagoas (UFAL)",
-                    "Curso: Ciência da Computação - 1° Período",
-                    "Disciplina: Algoritmos e Programação de Computadores",
-                    "Professor: Alexandre Barbosa",
-                ]),
-                ("Data", [
-                    "Maio - Junho de 2025",
-                ]),
+        _secoes = [
+            ("EQUIPE DE DESENVOLVIMENTO", [
+                ("sub",   "Neto  —  Backend e Persistência"),
+                ("body",  "Sistema de XP, SQLite, organização de dados e arquitetura."),
+                ("space", ""),
+                ("sub",   "Anthony  —  Interface e Experiência"),
+                ("body",  "Telas Pygame, navegação, estilo visual e polimento de interação."),
+                ("space", ""),
+                ("sub",   "Mayanderson  —  Conteúdo e Pedagogia"),
+                ("body",  "Aulas, exercícios, progressão pedagógica, narrativa e revisão."),
             ]),
-            ("full", ("Equipe de Desenvolvimento", [
-                "Neto - Backend e Persistência",
-                "Sistema de XP, SQLite, organização de dados e arquitetura.",
-                "",
-                "Anthony - Interface e Experiência",
-                "Telas Pygame, navegação, estilo visual e polimento de interação.",
-                "",
-                "Mayanderson - Conteúdo e Pedagogia",
-                "Aulas, exercícios, progressão pedagógica, narrativa e revisão.",
-            ])),
-            ("pair", [
-                ("Agradecimentos", [
-                    "Ao Professor Alexandre Barbosa pela orientação ao longo da disciplina.",
-                    "Aos colegas que testaram o jogo e ajudaram com feedback.",
-                ]),
-                ("Tecnologias", [
-                    "Python | Pygame | SQLite | Pytest | Git e GitHub",
-                ]),
+            ("INSTITUIÇÃO E DISCIPLINA", [
+                ("sub",  "Universidade Federal de Alagoas (UFAL)"),
+                ("body", "Curso: Ciência da Computação — 1° Período"),
+                ("body", "Disciplina: Algoritmos e Programação de Computadores"),
+                ("body", "Professor: Alexandre Barbosa"),
             ]),
-            ("full", ("Mensagem Final", [
-                "Este projeto foi desenvolvido por Mayanderson, Neto e Anthony,",
-                "alunos do primeiro período da UFAL.",
-                "",
-                "Obrigado por embarcar nessa jornada pelo Arquipélago de Bythos.",
-                "",
-                "Que o CodeQuest ajude a acender sua curiosidade por programação.",
-            ])),
-            ("full", ("Links", [
-                "github.com/netojoseluizferreira-sys/CodeQuest",
-            ])),
+            ("TECNOLOGIAS UTILIZADAS", [
+                ("body", "Python  |  Pygame  |  SQLite  |  Pytest  |  Git e GitHub"),
+            ]),
+            ("AGRADECIMENTOS", [
+                ("body", "Ao Professor Alexandre Barbosa pela orientação ao longo da disciplina."),
+                ("body", "Aos colegas que testaram o jogo e ajudaram com feedback."),
+            ]),
+            ("MENSAGEM FINAL", [
+                ("body",  "Este projeto foi desenvolvido por Mayanderson, Neto e Anthony, alunos do primeiro período da UFAL."),
+                ("space", ""),
+                ("body",  "Obrigado por embarcar nessa jornada pelo Arquipélago de Bythos."),
+                ("space", ""),
+                ("body",  "Que o CodeQuest ajude a acender sua curiosidade por programação."),
+            ]),
+            ("DATA", [
+                ("body", "Maio — Junho de 2025"),
+            ]),
+            ("LINKS", [
+                ("body", "github.com/netojoseluizferreira-sys/CodeQuest"),
+            ]),
         ]
 
-        _AREA_TOP = 195
-        _AREA_BOTTOM = WINDOW.height - 92
+        def _plate_h(titulo):
+            return _ft_titulo.get_height() + 16
+
+        def _secao_h(linhas, titulo):
+            h = _plate_h(titulo) + 14
+            for style, text in linhas:
+                if style == "sub":
+                    h += len(quebrar_texto(text, _ft_sub, _CW)) * _LH_SUB
+                elif style == "body":
+                    h += len(quebrar_texto(text, _ft_body, _CW)) * _LH_BODY
+                elif style == "space":
+                    h += 14
+            return h
+
+        def _desenhar_secao_titulo(ty, titulo):
+            _ts = _ft_titulo.render(titulo, True, _BRANCO)
+            _ph = _ft_titulo.get_height() + 16
+            _pw = _ts.get_width() + 48
+            _pr = pygame.Rect(0, 0, _pw, _ph)
+            _pr.center = (WINDOW.width // 2, ty + _ph // 2)
+            _pbg = pygame.Surface((_pw, _ph), pygame.SRCALPHA)
+            _pbg.fill(_COR_PLACA)
+            self.screen.blit(_pbg, _pr.topleft)
+            pygame.draw.rect(self.screen, _COR_BORDA, _pr, width=2, border_radius=8)
+            _shadow = _ft_titulo.render(titulo, True, (0, 0, 0))
+            self.screen.blit(_shadow, _shadow.get_rect(center=(_pr.centerx + 2, _pr.centery + 2)))
+            self.screen.blit(_ts, _ts.get_rect(center=_pr.center))
+            return _ph
+
+        _AREA_TOP = 112
+        _AREA_BOTTOM = WINDOW.height - 90
         self.screen.set_clip(pygame.Rect(0, _AREA_TOP, WINDOW.width, _AREA_BOTTOM - _AREA_TOP))
 
-        y = _AREA_TOP + 8 - self.credit_scroll
-
-        for _tipo_bloco, _dados_bloco in _blocos_layout:
-            if _tipo_bloco == "full":
-                _titulo_b, _linhas = _dados_bloco
-                _bh = _calc_h(_linhas, _FULL_CW)
-                if y + _bh >= _AREA_TOP and y <= _AREA_BOTTOM:
-                    _desenhar_bloco(_BX, y, _BW, _titulo_b, _linhas, _FULL_CW)
-                y += _bh + _ESPACO
-                continue
-
-            _pair_h = max(_calc_h(linhas, _SMALL_CW) for _, linhas in _dados_bloco)
-            if y + _pair_h >= _AREA_TOP and y <= _AREA_BOTTOM:
-                for _k, (_titulo_b, _linhas) in enumerate(_dados_bloco):
-                    _sx = _BX + _k * (_SMALL_W + _GAP_SMALL)
-                    _desenhar_bloco(_sx, y, _SMALL_W, _titulo_b, _linhas, _SMALL_CW, _pair_h)
-            y += _pair_h + _ESPACO
+        y = _AREA_TOP + 12 - self.credit_scroll
+        for _titulo_sec, _linhas in _secoes:
+            _sh = _secao_h(_linhas, _titulo_sec)
+            if y + _sh >= _AREA_TOP and y <= _AREA_BOTTOM:
+                _ph = _desenhar_secao_titulo(y, _titulo_sec)
+                _ty = y + _ph + 14
+                for style, text in _linhas:
+                    if style == "sub":
+                        for _sub in quebrar_texto(text, _ft_sub, _CW):
+                            _ss = _ft_sub.render(_sub, True, (0, 0, 0))
+                            self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _ty + _LH_SUB // 2 + 2)))
+                            _ss = _ft_sub.render(_sub, True, _BRANCO)
+                            self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _ty + _LH_SUB // 2)))
+                            _ty += _LH_SUB
+                    elif style == "body":
+                        for _sub in quebrar_texto(text, _ft_body, _CW):
+                            self.screen.blit(_ft_body.render(_sub, True, _BRANCO), (_MARG, _ty))
+                            _ty += _LH_BODY
+                    elif style == "space":
+                        _ty += 14
+            y += _sh + _ESPACO_SECAO
 
         self.screen.set_clip(None)
 
-        # Título "CodeQuest" com glow verde pulsante — desenhado por cima dos blocos
+        # Título "CodeQuest" com glow verde pulsante e nameplate — desenhado por cima das seções
         _TITULO = "CodeQuest"
         _GAP = 2
         _char_w = [self.font_title_large.size(c)[0] for c in _TITULO]
         _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
         _tx0 = WINDOW.width // 2 - _total_w // 2
         _char_h = self.font_title_large.get_height()
-        _tcy = 92
+        _tcy = 52
 
         _title_rect = pygame.Rect(0, 0, _total_w + 72, _char_h + 28)
         _title_rect.center = (WINDOW.width // 2, _tcy)
         _title_bg = pygame.Surface(_title_rect.size, pygame.SRCALPHA)
         _title_bg.fill(_COR_PLACA)
         self.screen.blit(_title_bg, _title_rect.topleft)
-        pygame.draw.rect(self.screen, _COR_B_BORDA, _title_rect, width=2, border_radius=10)
+        pygame.draw.rect(self.screen, _COR_BORDA, _title_rect, width=2, border_radius=10)
 
         self.glow_timer += 1
         _glow_alpha = int(40 + 80 * abs(math.sin(self.glow_timer * 0.04)))
@@ -1261,19 +1231,6 @@ class CodeQuestPygameMenu:
             self.screen.blit(self.font_title_large.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
             _x += _char_w[_i] + _GAP
 
-        _subtitulo = "Uma Jornada pelo Arquipelago de Bythos"
-        _sub_font = self.font_subtitle_small
-        _sub_surf = _sub_font.render(_subtitulo, True, _BRANCO)
-        _sub_y = 156
-        _sub_rect = pygame.Rect(0, 0, _sub_surf.get_width() + 44, _sub_surf.get_height() + 20)
-        _sub_rect.center = (WINDOW.width // 2, _sub_y)
-        _sub_bg = pygame.Surface(_sub_rect.size, pygame.SRCALPHA)
-        _sub_bg.fill(_COR_PLACA)
-        self.screen.blit(_sub_bg, _sub_rect.topleft)
-        pygame.draw.rect(self.screen, _COR_B_BORDA, _sub_rect, width=2, border_radius=8)
-        _sub_shadow = _sub_font.render(_subtitulo, True, (0, 0, 0))
-        self.screen.blit(_sub_shadow, _sub_shadow.get_rect(center=(_sub_rect.centerx + 2, _sub_rect.centery + 2)))
-        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=_sub_rect.center))
 
     def _renderizar_fluxo_aprendizado(self):
         """Despacha para _renderizar_segmento_aula ou _renderizar_segmento_exercicio conforme o segmento atual."""
