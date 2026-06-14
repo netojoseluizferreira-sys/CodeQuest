@@ -539,7 +539,10 @@ class CodeQuestPygameMenu:
         elif self.screen_name == "cutscene":
             self._renderizar_cutscene()
         else:
-            if self.screen_name in {"create", "credits"}:
+            if self.screen_name == "create":
+                self._renderizar_fundo_perfil()
+                self.screen.blit(self.lesson_overlay, (0, 0))
+            elif self.screen_name == "credits":
                 self.screen.fill((11, 25, 11))
             else:
                 self.screen.fill(PALETTE.background)
