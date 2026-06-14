@@ -1,3 +1,5 @@
+"""Aplicacao Pygame principal do CodeQuest e fluxo de telas do jogo."""
+
 import glob
 import math
 import os
@@ -100,12 +102,6 @@ class CodeQuestPygameMenu:
         _mont_bold_ft = pygame.font.Font(_mont, 16)
         _mont_bold_ft.bold = True
         self.font_credit_footer_bold = _mont_bold_ft
-        _credits_img_path = os.path.join(_data_dir, "imagem_creditos.jpeg")
-        if os.path.exists(_credits_img_path):
-            _img = pygame.image.load(_credits_img_path).convert()
-            self.credits_bg = pygame.transform.scale(_img, (WINDOW.width, WINDOW.height))
-        else:
-            self.credits_bg = None
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -260,25 +256,6 @@ class CodeQuestPygameMenu:
             Button(pygame.Rect(x, y_inicial + _esp * 2, largura, altura), "Sair", self._sair, **_KW_VERDE),
             Button(pygame.Rect(WINDOW.width - 190, WINDOW.height - 75, 160, 45), "Creditos", self._abrir_creditos, **_KW_VERDE),
         ]
-
-        # Botão de Créditos no Canto Inferior Direito
-        btn_width = 180
-        btn_height = 50
-        x_creditos = WINDOW.width - btn_width - 30
-        y_creditos = WINDOW.height - btn_height - 30
-
-        # Logica de inversao de cores hover para o botão de créditos também
-        botoes.append(Button(
-            pygame.Rect(x_creditos, y_creditos, btn_width, btn_height),
-            "Creditos",
-            self._abrir_creditos,
-            background=(30, 100, 50),
-            hover_background=(255, 255, 255),
-            text_color=(255, 255, 255),
-            hover_text_color=(30, 100, 50)
-        ))
-
-        return botoes
 
     def _botoes_criacao(self):
         """Constrói os botões da tela de criação de personagem (Criar e Voltar).
@@ -1192,21 +1169,11 @@ class CodeQuestPygameMenu:
             return
 
         self._desenhar_paragrafo(exercicio["pergunta"], self.content_x, 205, self.content_width, self.font_body, PALETTE.text)
-        if exercicio["tipo"] == "multipla_escolha":
-            self._renderizar_opcoes(exercicio)
-        else:
+        if exercicio["tipo"] != "multipla_escolha":
             placeholder = exercicio.get("placeholder", "Digite sua resposta")
             self._desenhar_input(pygame.Rect(self.content_x, 455, self.content_width, 52), self.resposta_texto, "resposta", placeholder)
 
         self._desenhar_status(WINDOW.height - 118)
-
-    def _renderizar_opcoes(self, exercicio):
-        """Placeholder para exercícios de múltipla escolha — as alternativas são renderizadas pelos botões em _botoes_fluxo_aprendizado.
-
-        Recebe:
-            exercicio (dict): Dicionário do exercício atual (não utilizado diretamente aqui).
-        """
-        return None
 
     def _renderizar_conclusao(self):
         """Renderiza a tela de conclusão exibida ao final de todos os segmentos da aula."""

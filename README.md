@@ -2,51 +2,70 @@
 
 CodeQuest e um jogo educacional em Pygame para ensinar logica de programacao e Python por meio de aulas curtas, exercicios, XP, niveis e progressao por mundos.
 
-## Status Atual
+## Status
 
-O projeto esta em transicao para uma experiencia centralizada em Pygame. A interface web/Streamlit saiu do escopo versionado, e o fluxo principal agora acontece dentro da janela Pygame.
+Versao atual: beta 0.9.
+
+O projeto esta centralizado no Pygame. O fluxo principal roda em janela local, com persistencia em SQLite e conteudo versionado em JSON.
 
 Fluxo implementado:
 
-- tela inicial com Novo jogo, Continuar, Creditos e Sair;
-- criacao de personagem quando nao houver usuario salvo;
-- menu principal apos login;
-- tela de perfil com XP, nivel e dados do usuario;
+- menu inicial com Novo jogo, Continuar, Creditos e Sair;
+- criacao de personagem;
+- hub principal apos existir usuario;
+- tela de perfil com nome, idade, XP e nivel;
 - tela Arquipelago de Bythos com Mundo 1;
 - Aula 1 no formato texto -> 5 exercicios -> texto -> 5 exercicios -> texto -> 5 exercicios;
 - persistencia local em SQLite;
 - bloqueio de XP duplicado para exercicios ja concluidos;
-- XP dinamico: comeca em 10, perde 2 por erro e respeita piso minimo de 2.
+- XP dinamico: comeca em 10, perde 2 por erro e respeita piso minimo de 2;
+- creditos atualizados para a versao Pygame.
 
 ## Estrutura
 
 ```text
 CodeQuest/
-├── backend/
-│   ├── exercicio.py
-│   ├── usuario.py
-│   └── xp_system.py
-├── data/
-│   ├── aulas.json
-│   └── exercicios.json
-├── pygame_client/
-│   ├── audio.py
-│   ├── content.py
-│   ├── credits.py
-│   ├── learning_progress.py
-│   ├── menu_app.py
-│   ├── palette.py
-│   ├── settings.py
-│   └── ui.py
-├── utils/
-│   ├── database.py
-│   ├── database_config.py
-│   ├── database_connection.py
-│   ├── exercise_progress_repository.py
-│   ├── user_mapper.py
-│   └── user_repository.py
-├── requirements.txt
-└── README.md
+|-- app.py
+|-- backend/
+|   |-- exercicio.py
+|   |-- usuario.py
+|   `-- xp_system.py
+|-- data/
+|   |-- aulas.json
+|   |-- exercicios.json
+|   |-- cutscenes/
+|   |-- hub_frames/
+|   |-- mundos_frames/
+|   |-- perfil_frames/
+|   |-- creditos_frames/
+|   `-- video_frames/
+|-- docs/
+|   `-- arquitetura.md
+|-- pygame_client/
+|   |-- audio.py
+|   |-- content.py
+|   |-- credits.py
+|   |-- learning_progress.py
+|   |-- menu_app.py
+|   |-- palette.py
+|   |-- settings.py
+|   `-- ui.py
+|-- tests/
+|   |-- conftest.py
+|   |-- test_content_and_credits.py
+|   |-- test_database.py
+|   |-- test_learning_progress.py
+|   |-- test_ui_components.py
+|   `-- test_xp_system.py
+|-- utils/
+|   |-- database.py
+|   |-- database_config.py
+|   |-- database_connection.py
+|   |-- exercise_progress_repository.py
+|   |-- user_mapper.py
+|   `-- user_repository.py
+|-- requirements.txt
+`-- README.md
 ```
 
 ## Como Rodar
@@ -76,24 +95,38 @@ Os conteudos versionados ficam em:
 - `data/aulas.json`
 - `data/exercicios.json`
 
-O progresso local usa SQLite em `data/codequest.db`.
+O progresso local usa SQLite em `data/codequest.db`. Esse arquivo e gerado automaticamente durante a execucao.
+
+Tabelas principais:
+
+- `usuarios`: guarda o save ativo.
+- `exercicios_concluidos`: impede XP duplicado em exercicios ja finalizados.
+- `exercicio_erros`: registra erros para calcular o XP potencial.
 
 ## Testes
 
-Se `pytest` estiver instalado, rode:
+Execute a suite com:
 
 ```bash
 python -m pytest tests
 ```
 
-A pasta `tests/` e local e nao faz parte dos commits do repositorio.
+Os testes cobrem persistencia, regras de XP, validacao de respostas, carregamento de conteudo, creditos e componentes basicos de UI em modo headless.
+
+## Documentacao Tecnica
+
+A documentacao detalhada da arquitetura esta em:
+
+- [docs/arquitetura.md](docs/arquitetura.md)
+
+Ela explica o fluxo interno, as camadas do projeto, a chamada entre modulos, as tabelas SQLite e os pontos de extensao.
 
 ## Roadmap
 
 - expandir o mapa do Arquipelago de Bythos;
 - adicionar novos mundos e modulos de Python;
-- criar telas de cutscene entre mundos;
+- criar novas cutscenes entre mundos;
 - melhorar acessibilidade de leitura e contraste;
 - adicionar conquistas e itens cosmeticos;
-- revisar a trilha sonora e efeitos de interface;
+- revisar trilha sonora e efeitos de interface;
 - empacotar o jogo para execucao local mais simples.

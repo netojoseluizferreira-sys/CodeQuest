@@ -1,3 +1,5 @@
+"""Validacao de respostas, calculo de XP e registro de progresso."""
+
 import unicodedata
 
 from backend.xp_system import adicionar_xp

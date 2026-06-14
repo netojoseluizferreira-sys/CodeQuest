@@ -1,3 +1,5 @@
+"""Repositorio SQLite para conclusoes e erros por exercicio."""
+
 from contextlib import closing
 
 from utils.database_connection import conectar, inicializar_banco

@@ -1,3 +1,5 @@
+"""Modelo de dominio que representa o jogador e sua progressao."""
+
 from dataclasses import dataclass, field
 
 

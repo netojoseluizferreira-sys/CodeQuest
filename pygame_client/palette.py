@@ -1,3 +1,5 @@
+"""Paleta visual compartilhada pelas telas Pygame do CodeQuest."""
+
 from dataclasses import dataclass
 
 

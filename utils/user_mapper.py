@@ -1,3 +1,5 @@
+"""Conversores entre dados SQLite, dicionarios legados e Usuario."""
+
 import json
 
 from backend.usuario import Usuario

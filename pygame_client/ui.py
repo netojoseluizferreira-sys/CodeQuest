@@ -1,3 +1,5 @@
+"""Componentes e funcoes de desenho reutilizados pelo cliente Pygame."""
+
 from dataclasses import dataclass
 from typing import Callable
 
@@ -66,8 +68,6 @@ class Button:
         background = self.background or PALETTE.primary
         hover_background = self.hover_background or PALETTE.primary_hover
         color = hover_background if hovered else background
-
-        texto_color_final = (self.hover_text_color if self.hover_text_color else self.text_color) if hovered else self.text_color
 
         pygame.draw.rect(screen, color, self.rect, border_radius=8)
         pygame.draw.rect(screen, self.border_color or PALETTE.border, self.rect, width=2, border_radius=8)

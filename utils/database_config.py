@@ -1,3 +1,5 @@
+"""Constantes de caminho usadas pela camada de banco de dados."""
+
 import os
 
 
