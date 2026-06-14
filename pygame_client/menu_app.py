@@ -1011,21 +1011,26 @@ class CodeQuestPygameMenu:
             )
         self.screen.blit(_glow_surf, (0, 0))
 
-        # Imagem principal com borda arredondada
+        # Imagem principal com máscara e borda arredondadas para esconder quinas.
         _img = self.cutscene_images[self.cutscene_index] if self.cutscene_index < len(self.cutscene_images) else None
         if _img:
-            self.screen.blit(_img, (_IMG_X, _IMG_Y))
+            _img_round = pygame.Surface((_IMG_W, _IMG_H), pygame.SRCALPHA)
+            _img_round.blit(_img, (0, 0))
+            _mask = pygame.Surface((_IMG_W, _IMG_H), pygame.SRCALPHA)
+            pygame.draw.rect(_mask, _BRANCO, _mask.get_rect(), border_radius=16)
+            _img_round.blit(_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            self.screen.blit(_img_round, (_IMG_X, _IMG_Y))
         else:
-            pygame.draw.rect(self.screen, (20, 50, 30), pygame.Rect(_IMG_X, _IMG_Y, _IMG_W, _IMG_H))
+            pygame.draw.rect(self.screen, (20, 50, 30), pygame.Rect(_IMG_X, _IMG_Y, _IMG_W, _IMG_H), border_radius=16)
         pygame.draw.rect(
             self.screen, _VERDE_CLARO,
             pygame.Rect(_IMG_X, _IMG_Y, _IMG_W, _IMG_H),
-            width=3, border_radius=12,
+            width=6, border_radius=16,
         )
 
         # Caixa de texto estilo alerta abaixo da imagem
         _font = self.font_cutscene_text
-        _text_max_w = _IMG_W - 40
+        _text_max_w = _IMG_W - 56
         _linhas = quebrar_texto(CUTSCENE_TEXTS[self.cutscene_index], _font, _text_max_w)
         _lh = _font.get_linesize() + 2
         _pad = 14
@@ -1035,11 +1040,12 @@ class CodeQuestPygameMenu:
         pygame.draw.rect(self.screen, (20, 55, 30), _box_rect, border_radius=10)
         pygame.draw.rect(self.screen, _VERDE_CLARO, _box_rect, width=2, border_radius=10)
         _ty = _box_top + _pad
+        _text_x = _box_rect.x + 28
         for _l in _linhas:
             _sombra = _font.render(_l, True, (0, 0, 0))
-            self.screen.blit(_sombra, _sombra.get_rect(center=(_box_rect.centerx + 1, _ty + _lh // 2 + 1)))
+            self.screen.blit(_sombra, (_text_x + 1, _ty + 1))
             _surf = _font.render(_l, True, _BRANCO)
-            self.screen.blit(_surf, _surf.get_rect(center=(_box_rect.centerx, _ty + _lh // 2)))
+            self.screen.blit(_surf, (_text_x, _ty))
             _ty += _lh
 
         # Caixa-contador estilo alerta no canto inferior esquerdo
@@ -1049,7 +1055,7 @@ class CodeQuestPygameMenu:
         _cnt_rect = pygame.Rect(20, _BTN_Y, _cnt_w, _BTN_H)
         pygame.draw.rect(self.screen, (20, 55, 30), _cnt_rect, border_radius=8)
         pygame.draw.rect(self.screen, _VERDE_CLARO, _cnt_rect, width=2, border_radius=8)
-        _cnt_surf = _cnt_font.render(_cnt_text, True, (100, 220, 120))
+        _cnt_surf = _cnt_font.render(_cnt_text, True, _BRANCO)
         self.screen.blit(_cnt_surf, _cnt_surf.get_rect(center=_cnt_rect.center))
 
         # Botões "Pular história" e "Avançar →" lado a lado no canto inferior direito
