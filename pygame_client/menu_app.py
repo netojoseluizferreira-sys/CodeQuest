@@ -187,6 +187,7 @@ class CodeQuestPygameMenu:
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
         self.audio.tocar_trilha()
         while self.running:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)  # Resetando cursor para seta no inicio do frame
             self._processar_eventos()
             self._renderizar()
             self.clock.tick(WINDOW.fps)
@@ -259,6 +260,25 @@ class CodeQuestPygameMenu:
             Button(pygame.Rect(x, y_inicial + _esp * 2, largura, altura), "Sair", self._sair, **_KW_VERDE),
             Button(pygame.Rect(WINDOW.width - 190, WINDOW.height - 75, 160, 45), "Creditos", self._abrir_creditos, **_KW_VERDE),
         ]
+
+        # Botão de Créditos no Canto Inferior Direito
+        btn_width = 180
+        btn_height = 50
+        x_creditos = WINDOW.width - btn_width - 30
+        y_creditos = WINDOW.height - btn_height - 30
+
+        # Logica de inversao de cores hover para o botão de créditos também
+        botoes.append(Button(
+            pygame.Rect(x_creditos, y_creditos, btn_width, btn_height),
+            "Creditos",
+            self._abrir_creditos,
+            background=(30, 100, 50),
+            hover_background=(255, 255, 255),
+            text_color=(255, 255, 255),
+            hover_text_color=(30, 100, 50)
+        ))
+
+        return botoes
 
     def _botoes_criacao(self):
         """Constrói os botões da tela de criação de personagem (Criar e Voltar).
@@ -1162,6 +1182,7 @@ class CodeQuestPygameMenu:
             segmento (dict): Segmento de tipo "exercicios" com chaves "titulo"
             e "exercicios" (list[str] de IDs).
         """
+        self.link_rect = None  # Evita clique fantasma em botoes de link que sumiram
         exercicio = self._exercicio_atual()
         numero = self.exercicio_indice + 1
         total = len(segmento["exercicios"])
