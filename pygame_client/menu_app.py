@@ -201,6 +201,14 @@ class CodeQuestPygameMenu:
         self.mundos_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         self.mundos_overlay.fill((0, 0, 0, 150))
         self.mundos_glow_timer = 0
+        self.lesson_glow_timer = 0
+        self.font_lesson_title = pygame.font.Font(os.path.join(_data_dir, "PressStart2P-Regular.ttf"), 28)
+        _mont_lc = pygame.font.Font(_mont, 20)
+        _mont_lc.bold = True
+        self.font_lesson_content = _mont_lc
+        _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        _less_ov.fill((0, 0, 0, 160))
+        self.lesson_overlay = _less_ov
 
     def run(self):
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
@@ -318,11 +326,9 @@ class CodeQuestPygameMenu:
             return [self._botao_voltar_hub()]
 
         if segmento["tipo"] == "aula":
-            x_btn = self.content_x if self.btn_continuar_y is not None else WINDOW.width - 340
-            y_btn = self.btn_continuar_y if self.btn_continuar_y is not None else WINDOW.height - 88
             return [
-                Button(pygame.Rect(x_btn, y_btn, 250, 52), "Continuar", self._avancar_segmento),
-                self._botao_voltar_mundos(),
+                Button(pygame.Rect(WINDOW.width - 310, WINDOW.height - 88, 250, 52), "Continuar", self._avancar_segmento, **_KW_VERDE),
+                self._botao_voltar_mundos(**_KW_VERDE),
             ]
 
         if self.exercicio_respondido:
@@ -1122,33 +1128,102 @@ class CodeQuestPygameMenu:
             self._renderizar_segmento_exercicio(segmento)
 
     def _renderizar_segmento_aula(self, segmento):
-        """Renderiza os parágrafos de um segmento de aula e, no texto_1 do mundo_1, o link do YouTube.
+        """Renderiza um segmento de aula sobre fundo imagem_cut com título glow, conteúdo e link YouTube."""
+        # Fundo: imagem_cut redimensionada + camada escura alpha 160
+        if self.cutscene_bg:
+            self.screen.blit(self.cutscene_bg, (0, 0))
+        else:
+            self.screen.fill((11, 25, 11))
+        self.screen.blit(self.lesson_overlay, (0, 0))
 
-        Atualiza self.link_rect e self.btn_continuar_y para que o clique no link
-        e o posicionamento dinâmico do botão Continuar funcionem corretamente.
+        # Título PressStart2P com glow verde pulsante (igual à tela inicial)
+        _TITULO = segmento["titulo"]
+        _GAP = 2
+        _ft = self.font_lesson_title
+        _char_w = [_ft.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = _ft.get_height()
+        _tcy = 52
 
-        Recebe:
-            segmento (dict): Segmento de tipo "aula" com chaves "titulo", "id" e "conteudo".
-        """
-        self._desenhar_cabecalho(segmento["titulo"], self.aula["titulo"])
-        y = 205
-        for paragrafo in segmento["conteudo"]:
-            y = self._desenhar_paragrafo(paragrafo, self.content_x, y, self.content_width, self.font_small, PALETTE.text) + 12
+        self.lesson_glow_timer += 1
+        _ga = int(40 + 80 * abs(math.sin(self.lesson_glow_timer * 0.04)))
+        _gs = [_ft.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _gs:
+            _s.set_alpha(_ga)
+        for _sp in (8, 5, 2):
+            for _dx in (-_sp, 0, _sp):
+                for _dy in (-_sp, 0, _sp):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_gs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft.render(_c, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
 
+        # Subtítulo "Aula X: [nome da aula]" em ElmsSans branco com sombra preta
+        _sub = self.aula["titulo"]
+        _sub_y = _tcy + _char_h // 2 + 22
+        _fes = self.font_hub_subtitle
+        _ss = _fes.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _sub_y + 2)))
+        _ss = _fes.render(_sub, True, _BRANCO)
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
+
+        # Conteúdo Montserrat-Bold branco, margens 100px, espaçamento generoso entre parágrafos
+        _MARG = 100
+        _cw = WINDOW.width - _MARG * 2
+        _fc = self.font_lesson_content
+        _lh = _fc.get_linesize() + 4
+        _y = _sub_y + _fes.get_height() // 2 + 30
+        _max_y = WINDOW.height - 110
+
+        for para in segmento["conteudo"]:
+            for linha in quebrar_texto(para, _fc, _cw):
+                if _y >= _max_y:
+                    break
+                self.screen.blit(_fc.render(linha, True, _BRANCO), (_MARG, _y))
+                _y += _lh
+            _y += 18
+            if _y >= _max_y:
+                break
+
+        # Mensagem CTA e link YouTube (apenas mundo_1 / texto_1)
         if MUNDO_ATIVO == "mundo_1" and segmento.get("id") == "texto_1":
-            chamada = "Quer se aprofundar um pouco mais no tema? Clica no link abaixo e assista a uma aula completa!"
-            y = self._desenhar_paragrafo(chamada, self.content_x, y + 10, self.content_width, self.font_body, PALETTE.accent) + 10
-
-            link_texto = "Assistir Aula Completa (YouTube)"
-            link_surface = self.font_body.render(link_texto, True, (0, 150, 255))
-            self.link_rect = link_surface.get_rect(topleft=(self.content_x, y))
-            self.screen.blit(link_surface, self.link_rect)
-
-            y = self.link_rect.bottom + 20
-            self.btn_continuar_y = y
+            _chamada = "Quer se aprofundar um pouco mais no tema? Clica no link abaixo e assista a uma aula completa!"
+            _lhe = _fes.get_linesize() + 4
+            _y += 6
+            for _cl in quebrar_texto(_chamada, _fes, _cw):
+                if _y >= _max_y:
+                    break
+                self.screen.blit(_fes.render(_cl, True, _VERDE_CLARO), (_MARG, _y))
+                _y += _lhe
+            _y += 8
+            if _y < _max_y:
+                _ltxt = "Assistir Aula Completa (YouTube)"
+                _lsurf = self.font_lesson_content.render(_ltxt, True, _VERDE_CLARO)
+                self.link_rect = _lsurf.get_rect(topleft=(_MARG, _y))
+                self.screen.blit(_lsurf, self.link_rect)
+                pygame.draw.line(
+                    self.screen, _VERDE_CLARO,
+                    (_MARG, _y + _lsurf.get_height()),
+                    (_MARG + _lsurf.get_width(), _y + _lsurf.get_height()),
+                    2,
+                )
+            else:
+                self.link_rect = None
         else:
             self.link_rect = None
-            self.btn_continuar_y = None
+
+        self.btn_continuar_y = None
 
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercício atual dentro de um bloco de prática.
