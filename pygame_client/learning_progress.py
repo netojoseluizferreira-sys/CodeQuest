@@ -15,25 +15,27 @@ XP_MINIMO = 2
 
 
 def calcular_xp_potencial(erros):
-    """Calcula o XP que ainda pode ser ganho em um exercicio.
+    """Calcula o XP máximo que ainda pode ser ganho em um exercício dado o número de erros.
 
     Recebe:
-        erros: Quantidade de erros ja registrados no exercicio.
+        erros (int): Quantidade de erros já registrados no exercício.
 
     Retorna:
-        XP entre 2 e 10, reduzindo 2 pontos por erro.
+        int: XP entre XP_MINIMO (2) e XP_BASE (10), reduzindo XP_PENALIDADE_ERRO
+        (2 pontos) por erro acumulado.
     """
     return max(XP_BASE - (int(erros) * XP_PENALIDADE_ERRO), XP_MINIMO)
 
 
 def frase_xp(xp):
-    """Retorna uma frase curta para o resultado de XP.
+    """Retorna a mensagem de feedback correspondente ao XP recebido ou potencial.
 
     Recebe:
-        xp: Quantidade de XP recebida ou potencial.
+        xp (int): Quantidade de XP (0, 2, 4, 6, 8 ou 10).
 
     Retorna:
-        Mensagem amigavel para exibicao no Pygame.
+        str: Mensagem amigável mapeada ao valor de XP, ou mensagem genérica
+        para valores não mapeados.
     """
     frases = {
         10: "Perfeito! Voce garantiu 10 XP.",
@@ -47,13 +49,16 @@ def frase_xp(xp):
 
 
 def normalizar_resposta(resposta):
-    """Normaliza texto livre para comparacao de respostas.
+    """Normaliza texto livre para comparação insensível a maiúsculas, acentos e pontuação.
+
+    Remove acentos via decomposição NFD, converte para minúsculas e substitui
+    vírgulas, barras e hífens por espaços antes de colapsar múltiplos espaços.
 
     Recebe:
-        resposta: Texto digitado pelo jogador.
+        resposta (str | any): Texto digitado pelo jogador; convertido para str.
 
     Retorna:
-        Texto em minusculas, sem acentos e com espacos normalizados.
+        str: Texto em minúsculas, sem marcas diacríticas e com espaços normalizados.
     """
     texto = unicodedata.normalize("NFD", str(resposta).strip().lower())
     texto = "".join(char for char in texto if unicodedata.category(char) != "Mn")
@@ -61,14 +66,19 @@ def normalizar_resposta(resposta):
 
 
 def resposta_esta_correta(exercicio, resposta):
-    """Valida a resposta enviada para um exercicio.
+    """Valida a resposta enviada pelo jogador para um exercício.
+
+    Para múltipla escolha, compara o índice numérico com o campo "resposta" do
+    exercício. Para texto livre, normaliza a resposta e verifica se ela está na
+    lista "respostas_aceitas".
 
     Recebe:
-        exercicio: Dicionario do exercicio atual.
-        resposta: Indice escolhido ou texto digitado pelo jogador.
+        exercicio (dict): Dicionário do exercício com campos "tipo", "resposta"
+        (int para múltipla escolha) e "respostas_aceitas" (list[str] para texto livre).
+        resposta (int | str): Índice da alternativa escolhida ou texto digitado.
 
     Retorna:
-        True quando a resposta esta correta; caso contrario, False.
+        bool: True quando a resposta for aceita; False caso contrário.
     """
     if exercicio["tipo"] == "multipla_escolha":
         return int(resposta) == int(exercicio["resposta"])
@@ -81,16 +91,26 @@ def resposta_esta_correta(exercicio, resposta):
 
 
 def registrar_resposta(mundo, exercicio, resposta, usuario):
-    """Registra uma tentativa de resposta e aplica XP quando cabivel.
+    """Registra uma tentativa de resposta, aplica XP e retorna o resultado.
+
+    Se a resposta estiver correta e o exercício ainda não tiver sido concluído,
+    calcula o XP pelo número de erros acumulados, chama adicionar_xp e persiste
+    a conclusão. Se já concluído, retorna acerto sem XP. Se incorreta, incrementa
+    o contador de erros e retorna o XP potencial restante.
 
     Recebe:
-        mundo: Identificador do mundo do exercicio.
-        exercicio: Dicionario do exercicio respondido.
-        resposta: Indice ou texto informado pelo jogador.
-        usuario: Usuario ativo que recebera XP quando aplicavel.
+        mundo (str): Identificador do mundo do exercício, ex.: "mundo_1".
+        exercicio (dict): Dicionário do exercício com pelo menos os campos
+        "id" e "tipo".
+        resposta (int | str): Índice da alternativa ou texto livre enviado.
+        usuario (Usuario): Instância do usuário ativo que receberá o XP.
 
     Retorna:
-        Dicionario com acerto, XP ganho, erros e mensagem.
+        dict: Dicionário com as chaves:
+            "acertou" (bool): Se a resposta foi aceita.
+            "xp" (int): XP concedido nesta tentativa (0 em erros ou re-acerto).
+            "erros" (int): Total de erros do exercício antes desta tentativa.
+            "mensagem" (str): Feedback textual para exibição no Pygame.
     """
     exercicio_id = str(exercicio["id"])
     ja_concluido = exercicio_foi_concluido(mundo, exercicio_id, usuario)

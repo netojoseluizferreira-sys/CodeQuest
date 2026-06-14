@@ -1,12 +1,12 @@
 CREDIT_LINES = [
+    ("small", ""),
     ("title", "CodeQuest"),
-    ("subtitle", "Uma Jornada pelo Arquipélago de Bythos"),
     ("section", "Equipe de Desenvolvimento"),
-    ("body", "Neto (Luiz Neto) - Backend & API"),
+    ("body", "**Neto** - Backend & API"),
     ("small", "Sistema de XP e níveis | Banco de dados | API de mídia | Arquitetura"),
-    ("body", "Anthony - Frontend & Interface"),
+    ("body", "**Anthony** - Frontend & Interface"),
     ("small", "Interface Streamlit | Navegação | Cutscenes em Pygame | Design visual"),
-    ("body", "Mayanderson - Conteúdo & Pedagogia"),
+    ("body", "**Mayanderson** - Conteúdo & Pedagogia"),
     ("small", "Aulas e exercícios | Progressão pedagógica | Narrativa | Revisão"),
     ("section", "Instituição e Disciplina"),
     ("body", "Universidade Federal de Alagoas (UFAL)"),
@@ -14,11 +14,11 @@ CREDIT_LINES = [
     ("small", "Disciplina: Algoritmos e Programação de Computadores"),
     ("small", "Professor: Alexandre Barbosa"),
     ("section", "Data"),
-    ("body", "Maio/Junho de 2025"),
+    ("body", "Maio-Junho de 2025"),
     ("section", "Agradecimentos Especiais"),
-    ("small", "Agradecemos ao Professor Alexandre Barbosa pela orientação e ensinamentos."),
-    ("small", "Agradecemos também aos colegas que testaram e deram feedback."),
-    ("small", "E a comunidade de código aberto pelas ferramentas utilizadas."),
+    ("small", "Agradecemos ao Professor **Alexandre Barbosa** pela orientação e ensinamentos."),
+    ("small", "Agradecemos também aos **colegas** que testaram e deram feedback."),
+    ("small", "E a **comunidade de código aberto** pelas ferramentas utilizadas."),
     ("section", "Tecnologias Utilizadas"),
     ("body", "Python | Streamlit | Pygame | FastAPI | Git & GitHub"),
     ("section", "Mensagem Final"),
@@ -42,12 +42,12 @@ CREDIT_LINES = [
 
 
 def obter_linhas_creditos():
-    """Retorna o conteudo da tela de creditos.
-
-    Recebe:
-        Nenhum parâmetro.
+    """Retorna a lista estática de linhas que compõem a tela de créditos.
 
     Retorna:
-        Lista de tuplas com estilo e texto para renderizacao no Pygame.
+        list[tuple[str, str]]: Cada tupla contém o estilo da linha
+        ("title", "section", "body", "small", "quote" ou "footer") e o texto
+        correspondente. Textos podem conter marcadores **palavra** para negrito
+        inline renderizado por _desenhar_credito_inline.
     """
     return CREDIT_LINES

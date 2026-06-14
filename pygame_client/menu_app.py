@@ -3,7 +3,7 @@ import math
 import os
 
 import pygame
-import webbrowser  # Adicionei a importacao do webbrowser para abrir links no navegador
+import webbrowser
 
 from backend.xp_system import xp_para_proximo_nivel
 from pygame_client.audio import AudioController
@@ -24,18 +24,30 @@ _BRANCO = (255, 255, 255)
 _VERDE_CLARO = (100, 200, 120)
 _KW_VERDE = dict(background=_VERDE, hover_background=_BRANCO, text_color=_BRANCO, hover_text_color=_VERDE, border_color=_VERDE_CLARO)
 
+CUTSCENE_TEXTS = [
+    "Em um dia comum, Faísca estava em seu quarto, mexendo no seu computador...",
+    "Quando menos esperava, alguém bateu à sua porta. Curioso, ele foi até lá atender.",
+    "Quando abriu, era Frederick, o entregador do bairro. Tinha uma encomenda em seu nome. Faísca ficou confuso, pois não estava esperando por nada. Mesmo assim, ele recebeu a caixa.",
+    "Quando abriu, ficou surpreso com o que tinha dentro...",
+    "Um pen-drive, aparentemente já usado. Colocou o pen-drive de volta na caixa e voltou para o seu quarto, sem dar muita importância.",
+    "De volta ao quarto, deixou o pen-drive de lado e voltou ao que estava fazendo. Ainda tinha muito jogo pela frente.",
+    "O cansaço começou a tomar conta e, pouco a pouco, Faísca sentia seus olhos ficarem mais pesados. Era hora de descansar.",
+    "Ele desligou o monitor e se levantou da cadeira, pronto para ir dormir. Ao se levantar, tropeçou em algo no chão. Era o pen-drive. Olhou para ele por alguns segundos, intrigado e...",
+    "CATAPLÓFITE!!! Assim que conectou o pen-drive, a tela acendeu sozinha. Letras vermelhas piscavam na tela: ERRO! Você está sendo transferido para o Arquipélago de Bythos...",
+    "Antes que Faísca pudesse reagir, uma luz verde brilhante começou a engoli-lo. Ele sentiu seu corpo sendo puxado, sugado para dentro da tela do computador. Tudo ficou escuro. Ele estava sendo transferido para outra dimensão.",
+]
+
 
 class CodeQuestPygameMenu:
-    """Aplicacao Pygame principal do CodeQuest."""
+    """Loop Pygame principal do CodeQuest: gerencia telas, eventos, áudio e progresso."""
 
     def __init__(self):
-        """Inicializa estado visual, audio, usuario e conteudo.
+        """Inicializa Pygame, carrega fontes/imagens/vídeos e restaura o save do usuário.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        Configura a janela 1280×800, o AudioController, todas as fontes Montserrat e
+        PressStart2P, os frames de vídeo de fundo (start, hub, créditos, perfil),
+        as imagens da cutscene (data/cutscenes/1-10.jpeg) e os atributos de estado
+        de tela, campo ativo, cutscene fade e fluxo de aprendizagem.
         """
         pygame.init()
         self.screen = pygame.display.set_mode((WINDOW.width, WINDOW.height))
@@ -64,6 +76,36 @@ class CodeQuestPygameMenu:
         self.font_body = pygame.font.Font(_mont, 21)
         self.font_small = pygame.font.Font(_mont, 17)
         self.font_tiny = pygame.font.Font(_mont, 15)
+        _elms = os.path.join(_data_dir, "ElmsSans-VariableFont_wght.ttf")
+        _font_hub_sub = pygame.font.Font(_elms, 28)
+        _font_hub_sub.bold = True
+        self.font_hub_subtitle = _font_hub_sub
+        _mont_bold_c = pygame.font.Font(_mont, 24)
+        _mont_bold_c.bold = True
+        self.font_credit_section = _mont_bold_c
+        _mont_bold_b = pygame.font.Font(_mont, 22)
+        _mont_bold_b.bold = True
+        self.font_credit_body_bold = _mont_bold_b
+        _mont_bold_cs = pygame.font.Font(_mont, 26)
+        _mont_bold_cs.bold = True
+        self.font_cutscene_text = _mont_bold_cs
+        self.font_credit_body = pygame.font.Font(_mont, 22)
+        _mont_bold_s = pygame.font.Font(_mont, 20)
+        _mont_bold_s.bold = True
+        self.font_credit_small_bold = _mont_bold_s
+        self.font_credit_small_reg = pygame.font.Font(_mont, 20)
+        _mont_bold_q = pygame.font.Font(_mont, 18)
+        _mont_bold_q.bold = True
+        self.font_credit_quote = _mont_bold_q
+        _mont_bold_ft = pygame.font.Font(_mont, 16)
+        _mont_bold_ft.bold = True
+        self.font_credit_footer_bold = _mont_bold_ft
+        _credits_img_path = os.path.join(_data_dir, "imagem_creditos.jpeg")
+        if os.path.exists(_credits_img_path):
+            _img = pygame.image.load(_credits_img_path).convert()
+            self.credits_bg = pygame.transform.scale(_img, (WINDOW.width, WINDOW.height))
+        else:
+            self.credits_bg = None
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -81,8 +123,8 @@ class CodeQuestPygameMenu:
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
-        self.link_rect = None  # Adicionei a variavel para armazenar o retangulo do link
-        self.btn_continuar_y = None  # Adicionei a variavel para armazenar o Y do botao continuar
+        self.link_rect = None
+        self.btn_continuar_y = None
         _frames_dir = os.path.join(_data_dir, "video_frames")
         _frames_paths = sorted(glob.glob(os.path.join(_frames_dir, "*.jpg")))
         self.video_frames = [
@@ -94,16 +136,74 @@ class CodeQuestPygameMenu:
         self.glow_timer = 0
         self.start_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         self.start_overlay.fill((0, 0, 0, 140))
+        _hub_frames_dir = os.path.join(_data_dir, "hub_frames")
+        _hub_frames_paths = sorted(glob.glob(os.path.join(_hub_frames_dir, "*.jpg")))
+        self.hub_frames = [
+            pygame.transform.scale(pygame.image.load(p).convert(), (WINDOW.width, WINDOW.height))
+            for p in _hub_frames_paths
+        ]
+        self.hub_frame_index = 0
+        self.hub_frame_timer = 0
+        self.hub_glow_timer = 0
+        self.hub_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        self.hub_overlay.fill((0, 0, 0, 140))
+        _creditos_frames_dir = os.path.join(_data_dir, "creditos_frames")
+        _creditos_frames_paths = sorted(glob.glob(os.path.join(_creditos_frames_dir, "*.jpg")))
+        self.creditos_frames = [
+            pygame.transform.scale(pygame.image.load(p).convert(), (WINDOW.width, WINDOW.height))
+            for p in _creditos_frames_paths
+        ]
+        self.creditos_frame_index = 0
+        self.creditos_frame_timer = 0
+        _cutscenes_dir = os.path.join(_data_dir, "cutscenes")
+        self.cutscene_images = []
+        for _i in range(1, 11):
+            _cpath = os.path.join(_cutscenes_dir, f"{_i}.jpeg")
+            if os.path.exists(_cpath):
+                _cimg = pygame.image.load(_cpath).convert()
+                self.cutscene_images.append(pygame.transform.scale(_cimg, (960, 400)))
+            else:
+                self.cutscene_images.append(None)
+        self.cutscene_index = 0
+        self.cutscene_fade_alpha = 0
+        self.cutscene_fade_state = "visible"
+        self.cutscene_fade_next = None
+        self._cutscene_prev_frame = None
+        _cut_bg_path = None
+        for _ext in ("jpeg", "jpg", "png"):
+            _p = os.path.join(_data_dir, f"imagem_cut.{_ext}")
+            if os.path.exists(_p):
+                _cut_bg_path = _p
+                break
+        if _cut_bg_path:
+            _cbg = pygame.image.load(_cut_bg_path).convert()
+            self.cutscene_bg = pygame.transform.scale(_cbg, (WINDOW.width, WINDOW.height))
+        else:
+            self.cutscene_bg = None
+        _perfil_frames_dir = os.path.join(_data_dir, "perfil_frames")
+        _perfil_frames_paths = sorted(glob.glob(os.path.join(_perfil_frames_dir, "*.jpg")))
+        self.perfil_frames = [
+            pygame.transform.scale(pygame.image.load(p).convert(), (WINDOW.width, WINDOW.height))
+            for p in _perfil_frames_paths
+        ]
+        self.perfil_frame_index = 0
+        self.perfil_frame_timer = 0
+        self.perfil_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        self.perfil_overlay.fill((0, 0, 0, 120))
+        _mundos_frames_dir = os.path.join(_data_dir, "mundos_frames")
+        _mundos_frames_paths = sorted(glob.glob(os.path.join(_mundos_frames_dir, "*.jpg")))
+        self.mundos_frames = [
+            pygame.transform.scale(pygame.image.load(p).convert(), (WINDOW.width, WINDOW.height))
+            for p in _mundos_frames_paths
+        ]
+        self.mundos_frame_index = 0
+        self.mundos_frame_timer = 0
+        self.mundos_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        self.mundos_overlay.fill((0, 0, 0, 150))
+        self.mundos_glow_timer = 0
 
     def run(self):
-        """Executa o loop principal da aplicacao.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
         self.audio.tocar_trilha()
         while self.running:
             self._processar_eventos()
@@ -114,13 +214,11 @@ class CodeQuestPygameMenu:
         pygame.quit()
 
     def _botoes_tela(self):
-        """Cria os botoes da tela ativa.
-
-        Recebe:
-            Nenhum parametro.
+        """Retorna a lista de botões da tela atualmente ativa.
 
         Retorna:
-            Lista de instancias Button da tela atual.
+            list[Button]: Botões prontos para desenho e tratamento de evento;
+            lista vazia para telas sem botões registrados.
         """
         if self.screen_name == "start":
             return self._botoes_inicio()
@@ -131,9 +229,11 @@ class CodeQuestPygameMenu:
         if self.screen_name == "worlds":
             return self._botoes_mundos()
         if self.screen_name == "profile":
-            return [self._botao_voltar_hub(**_KW_VERDE)]
+            return [Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE)]
         if self.screen_name == "credits":
             return [self._botao_voltar_hub(**_KW_VERDE) if self.usuario else self._botao_voltar_inicio(**_KW_VERDE)]
+        if self.screen_name == "cutscene":
+            return []
         if self.screen_name == "lesson":
             return self._botoes_fluxo_aprendizado()
         if self.screen_name == "complete":
@@ -141,13 +241,11 @@ class CodeQuestPygameMenu:
         return []
 
     def _botoes_inicio(self):
-        """Monta botoes da tela inicial.
-
-        Recebe:
-            Nenhum parametro.
+        """Constrói os quatro botões da tela inicial (Novo jogo, Continuar, Sair, Créditos).
 
         Retorna:
-            Lista de botoes de inicio.
+            list[Button]: Botões posicionados verticalmente a partir de y=380
+            com espaçamento de 65px entre si.
         """
         largura = 420
         altura = 58
@@ -162,13 +260,10 @@ class CodeQuestPygameMenu:
         ]
 
     def _botoes_criacao(self):
-        """Monta botoes da criacao de personagem.
-
-        Recebe:
-            Nenhum parametro.
+        """Constrói os botões da tela de criação de personagem (Criar e Voltar).
 
         Retorna:
-            Lista de botoes da tela de criacao.
+            list[Button]: Dois botões lado a lado na linha y=505.
         """
         return [
             Button(pygame.Rect(410, 505, 220, 54), "Criar", self._criar_personagem, **_KW_VERDE),
@@ -176,55 +271,53 @@ class CodeQuestPygameMenu:
         ]
 
     def _botoes_hub(self):
-        """Monta botoes do menu principal apos login.
-
-        Recebe:
-            Nenhum parametro.
+        """Constrói os botões do hub principal (Arquipélago, Tela inicial, Sair, Perfil).
 
         Retorna:
-            Lista de botoes do hub.
+            list[Button]: Três botões centralizados a partir de y=385 e um botão
+            de perfil no canto inferior esquerdo.
         """
-        return self._botoes_centralizados(
-            [
-                ("Arquipelago de Bythos", self._abrir_mundos),
-                ("Perfil", self._abrir_perfil),
-                ("Creditos", self._abrir_creditos),
-                ("Tela inicial", self._voltar_inicio),
-                ("Sair", self._sair),
-            ],
-            y_inicial=225,
-            **_KW_VERDE,
-        )
+        largura = 420
+        altura = 58
+        x = (WINDOW.width - largura) // 2
+        y_inicial = 385
+        _esp = 65
+        return [
+            Button(pygame.Rect(x, y_inicial, largura, altura), "Arquipelago de Bythos", self._abrir_cutscene, **_KW_VERDE),
+            Button(pygame.Rect(x, y_inicial + _esp, largura, altura), "Tela inicial", self._voltar_inicio, **_KW_VERDE),
+            Button(pygame.Rect(x, y_inicial + _esp * 2, largura, altura), "Sair", self._sair, **_KW_VERDE),
+            Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Perfil", self._abrir_perfil, **_KW_VERDE),
+        ]
 
     def _botoes_mundos(self):
-        """Monta botoes da tela de selecao de mundos.
-
-        Recebe:
-            Nenhum parametro.
+        """Constrói os botões da tela de seleção de mundos.
 
         Retorna:
-            Lista de botoes da tela de mundos.
+            list[Button]: Botão do Mundo 1 centralizado e botão Voltar no canto inferior esquerdo.
         """
+        _bw = 500
+        _bx = (WINDOW.width - _bw) // 2
         return [
-            Button(pygame.Rect(390, 285, 500, 62), "Mundo 1 - Cabana do Oraculo", self._iniciar_mundo_1, **_KW_VERDE),
-            self._botao_voltar_hub(**_KW_VERDE),
+            Button(pygame.Rect(_bx, 295, _bw, 62), "Mundo 1 - Cabana do Oráculo", self._iniciar_mundo_1, **_KW_VERDE),
+            Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE),
         ]
 
     def _botoes_fluxo_aprendizado(self):
-        """Monta botoes do segmento atual de aula ou exercicio.
+        """Constrói os botões do segmento de aula ou exercício atualmente exibido.
 
-        Recebe:
-            Nenhum parametro.
+        Para aulas: botão Continuar com posição dinâmica dependendo de btn_continuar_y.
+        Para múltipla escolha: um botão por alternativa (A–D) mais Voltar.
+        Para texto livre: botão Responder ou Próximo (após acerto) mais Voltar.
 
         Retorna:
-            Lista de botoes de navegacao ou resposta.
+            list[Button]: Botões prontos para o segmento ativo; contém apenas
+            o botão Voltar quando não houver segmento carregado.
         """
         segmento = self._segmento_atual()
         if segmento is None:
             return [self._botao_voltar_hub()]
 
         if segmento["tipo"] == "aula":
-            # Mudei a posicao do botao 'Continuar' para acompanhar o y dinamico calculado ao exibir o link, se aplicavel (apenas para modulo 1 aula 1)
             x_btn = self.content_x if self.btn_continuar_y is not None else WINDOW.width - 340
             y_btn = self.btn_continuar_y if self.btn_continuar_y is not None else WINDOW.height - 88
             return [
@@ -261,67 +354,41 @@ class CodeQuestPygameMenu:
             self._botao_voltar_mundos(),
         ]
 
-    def _botoes_centralizados(self, itens, y_inicial, **kwargs):
-        """Cria botoes centralizados com espacamento uniforme.
-
-        Recebe:
-            itens: Lista de tuplas com texto e acao.
-            y_inicial: Coordenada vertical inicial.
-            **kwargs: Argumentos extras repassados a cada Button.
-
-        Retorna:
-            Lista de botoes configurados.
-        """
-        largura = 420
-        altura = 58
-        x = (WINDOW.width - largura) // 2
-        return [
-            Button(pygame.Rect(x, y_inicial + (indice * 72), largura, altura), texto, acao, **kwargs)
-            for indice, (texto, acao) in enumerate(itens)
-        ]
-
     def _botao_voltar_inicio(self, **kw):
-        """Cria botao de retorno para a tela inicial.
+        """Cria o botão Voltar que navega para a tela inicial.
 
         Recebe:
-            **kw: Kwargs opcionais repassados ao Button.
+            **kw: Kwargs de estilo repassados ao Button (background, hover_background, etc.).
 
         Retorna:
-            Botao Voltar.
+            Button: Botão posicionado no canto inferior esquerdo (x=60, y=height-88).
         """
         return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._voltar_inicio, **kw)
 
     def _botao_voltar_hub(self, **kw):
-        """Cria botao de retorno para o hub.
+        """Cria o botão Voltar que navega para o hub.
 
         Recebe:
-            **kw: Kwargs opcionais repassados ao Button.
+            **kw: Kwargs de estilo repassados ao Button.
 
         Retorna:
-            Botao Voltar.
+            Button: Botão posicionado no canto inferior esquerdo (x=60, y=height-88).
         """
         return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Voltar", self._abrir_hub, **kw)
 
     def _botao_voltar_mundos(self, **kw):
-        """Cria botao de retorno para a tela de mundos.
+        """Cria o botão Mundos que navega para a seleção de mundos.
 
         Recebe:
-            **kw: Kwargs opcionais repassados ao Button.
+            **kw: Kwargs de estilo repassados ao Button.
 
         Retorna:
-            Botao Voltar.
+            Button: Botão posicionado no canto inferior esquerdo (x=60, y=height-88).
         """
         return Button(pygame.Rect(60, WINDOW.height - 88, 190, 52), "Mundos", self._abrir_mundos, **kw)
 
     def _processar_eventos(self):
-        """Processa eventos de teclado, mouse e janela.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Drena a fila de eventos do Pygame e despacha para os handlers de tecla e clique."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._sair()
@@ -331,13 +398,15 @@ class CodeQuestPygameMenu:
                 self._processar_clique(event)
 
     def _processar_clique(self, event):
-        """Processa cliques de mouse da tela atual.
+        """Trata cliques de mouse conforme a tela ativa.
+
+        Na tela "create", ativa o campo nome ou idade pelo rect clicado.
+        Na tela "cutscene", detecta clique no botão Avançar manual.
+        Na tela "lesson", detecta clique no link do YouTube e no campo de resposta.
+        Em seguida repassa o evento a todos os botões da tela via handle_event.
 
         Recebe:
-            event: Evento de clique recebido pelo Pygame.
-
-        Retorna:
-            None.
+            event (pygame.event.Event): Evento MOUSEBUTTONDOWN com atributo pos.
         """
         if self.screen_name == "create":
             if pygame.Rect(390, 285, 500, 50).collidepoint(event.pos):
@@ -345,10 +414,19 @@ class CodeQuestPygameMenu:
             elif pygame.Rect(390, 385, 220, 50).collidepoint(event.pos):
                 self.active_field = "idade"
 
+        if self.screen_name == "cutscene":
+            _cs_bw, _cs_bh = 190, 45
+            _cs_by = WINDOW.height - 65
+            _cs_bx2 = WINDOW.width - 20 - _cs_bw
+            _cs_bx1 = _cs_bx2 - 10 - _cs_bw
+            if pygame.Rect(_cs_bx2, _cs_by, _cs_bw, _cs_bh).collidepoint(event.pos):
+                self._avancar_cutscene()
+            elif pygame.Rect(_cs_bx1, _cs_by, _cs_bw, _cs_bh).collidepoint(event.pos):
+                self._abrir_mundos()
+
         if self.screen_name == "lesson":
             segmento = self._segmento_atual()
 
-            # Adicionei a verificacao de clique no link do Youtube
             if self.link_rect and self.link_rect.collidepoint(event.pos):
                 webbrowser.open("https://www.youtube.com/watch?v=8mei6uVttho")
 
@@ -363,13 +441,15 @@ class CodeQuestPygameMenu:
                 break
 
     def _processar_tecla(self, event):
-        """Processa teclado de navegacao e campos de texto.
+        """Trata teclas conforme a tela ativa.
+
+        ESC chama _voltar_contextual em qualquer tela. Na tela "credits",
+        W/S e setas controlam a rolagem. Na tela "cutscene", qualquer tecla
+        avança a cena. Nas telas "create" e "lesson", encaminha para os
+        handlers de digitação específicos.
 
         Recebe:
-            event: Evento KEYDOWN recebido pelo Pygame.
-
-        Retorna:
-            None.
+            event (pygame.event.Event): Evento KEYDOWN com atributos key e unicode.
         """
         if event.key == pygame.K_ESCAPE:
             self._voltar_contextual()
@@ -382,19 +462,24 @@ class CodeQuestPygameMenu:
                 self.credit_scroll += 32
             return
 
+        if self.screen_name == "cutscene":
+            self._avancar_cutscene()
+            return
+
         if self.screen_name == "create":
             self._digitar_criacao(event)
         elif self.screen_name == "lesson" and self.active_field == "resposta":
             self._digitar_resposta(event)
 
     def _digitar_criacao(self, event):
-        """Atualiza campos da tela de criacao de personagem.
+        """Processa teclas no formulário de criação de personagem.
+
+        Enter submete o formulário, Tab alterna entre nome e idade,
+        Backspace apaga o último caractere do campo ativo. Letras vão para
+        nome (máx 24 chars) e dígitos vão para idade (máx 3 chars).
 
         Recebe:
-            event: Evento KEYDOWN recebido pelo Pygame.
-
-        Retorna:
-            None.
+            event (pygame.event.Event): Evento KEYDOWN com atributos key e unicode.
         """
         if event.key == pygame.K_RETURN:
             self._criar_personagem()
@@ -416,13 +501,13 @@ class CodeQuestPygameMenu:
             self.idade_input += event.unicode
 
     def _digitar_resposta(self, event):
-        """Atualiza campo de resposta textual.
+        """Processa teclas no campo de resposta textual livre.
+
+        Enter submete a resposta, Backspace apaga o último caractere.
+        Caracteres imprimíveis são acumulados até o limite de 80.
 
         Recebe:
-            event: Evento KEYDOWN recebido pelo Pygame.
-
-        Retorna:
-            None.
+            event (pygame.event.Event): Evento KEYDOWN com atributos key e unicode.
         """
         if event.key == pygame.K_RETURN:
             self._responder_texto_livre()
@@ -434,33 +519,28 @@ class CodeQuestPygameMenu:
             self.resposta_texto += event.unicode
 
     def _renderizar(self):
-        """Renderiza a tela ativa.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
-        _FUNDO_VERDE = (20, 40, 20)
+        """Renderiza a tela ativa e todos os botões por cima, depois chama display.flip."""
         if self.screen_name == "start":
             self._renderizar_fundo_video()
             self._renderizar_inicio()
+        elif self.screen_name == "hub":
+            self._renderizar_fundo_hub()
+            self._renderizar_hub()
+        elif self.screen_name == "profile":
+            self._renderizar_fundo_perfil()
+            self._renderizar_perfil()
+        elif self.screen_name == "worlds":
+            self._renderizar_fundo_mundos()
+            self._renderizar_mundos()
+        elif self.screen_name == "cutscene":
+            self._renderizar_cutscene()
         else:
-            if self.screen_name in {"create", "hub", "worlds", "profile"}:
-                self.screen.fill(_FUNDO_VERDE)
-            elif self.screen_name == "credits":
+            if self.screen_name in {"create", "credits"}:
                 self.screen.fill((11, 25, 11))
             else:
                 self.screen.fill(PALETTE.background)
             if self.screen_name == "create":
                 self._renderizar_criacao()
-            elif self.screen_name == "hub":
-                self._renderizar_hub()
-            elif self.screen_name == "worlds":
-                self._renderizar_mundos()
-            elif self.screen_name == "profile":
-                self._renderizar_perfil()
             elif self.screen_name == "credits":
                 self._renderizar_creditos()
             elif self.screen_name == "lesson":
@@ -469,20 +549,13 @@ class CodeQuestPygameMenu:
                 self._renderizar_conclusao()
 
         mouse_pos = pygame.mouse.get_pos()
-        _btn_font = self.font_start_btn if self.screen_name == "start" else self.font_body
+        _btn_font = self.font_start_btn if self.screen_name in {"start", "hub", "profile", "worlds"} else self.font_body
         for button in self._botoes_tela():
             button.draw(self.screen, _btn_font, mouse_pos)
         pygame.display.flip()
 
     def _renderizar_fundo_video(self):
-        """Renderiza o frame atual do video de fundo e avanca a animacao.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Blita o frame atual da animação de fundo da tela inicial e avança o timer."""
         if not self.video_frames:
             self.screen.fill(PALETTE.background)
             return
@@ -492,15 +565,41 @@ class CodeQuestPygameMenu:
             self.video_frame_index = (self.video_frame_index + 1) % len(self.video_frames)
         self.screen.blit(self.video_frames[self.video_frame_index], (0, 0))
 
+    def _renderizar_fundo_hub(self):
+        """Blita o frame atual da animação de fundo do hub e avança o timer."""
+        if not self.hub_frames:
+            self.screen.fill((20, 40, 20))
+            return
+        self.hub_frame_timer += 1
+        if self.hub_frame_timer >= 2:
+            self.hub_frame_timer = 0
+            self.hub_frame_index = (self.hub_frame_index + 1) % len(self.hub_frames)
+        self.screen.blit(self.hub_frames[self.hub_frame_index], (0, 0))
+
+    def _renderizar_fundo_perfil(self):
+        """Blita o frame atual da animação de fundo do perfil e avança o timer."""
+        if not self.perfil_frames:
+            self.screen.fill((11, 25, 11))
+            return
+        self.perfil_frame_timer += 1
+        if self.perfil_frame_timer >= 2:
+            self.perfil_frame_timer = 0
+            self.perfil_frame_index = (self.perfil_frame_index + 1) % len(self.perfil_frames)
+        self.screen.blit(self.perfil_frames[self.perfil_frame_index], (0, 0))
+
+    def _renderizar_fundo_mundos(self):
+        """Blita o frame atual da animação de fundo da tela de mundos e avança o timer."""
+        if not self.mundos_frames:
+            self.screen.fill((20, 40, 20))
+            return
+        self.mundos_frame_timer += 1
+        if self.mundos_frame_timer >= 2:
+            self.mundos_frame_timer = 0
+            self.mundos_frame_index = (self.mundos_frame_index + 1) % len(self.mundos_frames)
+        self.screen.blit(self.mundos_frames[self.mundos_frame_index], (0, 0))
+
     def _renderizar_inicio(self):
-        """Renderiza a tela inicial.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Renderiza o overlay, título "CodeQuest" com glow pulsante e subtítulo da tela inicial."""
         self.screen.blit(self.start_overlay, (0, 0))
 
         # Titulo renderizado letra por letra com espaçamento manual uniforme
@@ -553,102 +652,451 @@ class CodeQuestPygameMenu:
             self._desenhar_status(600)
 
     def _renderizar_criacao(self):
-        """Renderiza a tela de criacao de personagem.
+        """Renderiza o título "Criar personagem" com glow e os campos nome/idade."""
+        _TITULO = "Criar personagem"
+        _GAP = 2
+        _char_w = [self.font_title.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title.get_height()
+        _tcy = 120
 
-        Recebe:
-            Nenhum parametro.
+        self.glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.glow_timer * 0.04)))
+        _glow_surfs = [self.font_title.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _glow_surfs:
+            _s.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_glow_surfs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
 
-        Retorna:
-            None.
-        """
-        self._desenhar_cabecalho("Criar personagem", "Defina quem vai explorar Bythos")
-        self._desenhar_label("Nome do aventureiro", 390, 252)
-        self._desenhar_input(pygame.Rect(390, 285, 500, 50), self.nome_input, "nome", "Digite seu nome")
-        self._desenhar_label("Idade", 390, 352)
-        self._desenhar_input(pygame.Rect(390, 385, 220, 50), self.idade_input, "idade", "18")
-        self._desenhar_status(610)
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, (0, 0, 0))
+            self.screen.blit(_s, (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, _BRANCO)
+            self.screen.blit(_s, (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        _sub = "Defina quem vai explorar Bythos"
+        _sub_som = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_sub_som, _sub_som.get_rect(center=(WINDOW.width // 2 + 2, 187)))
+        _sub_surf = self.font_hub_subtitle.render(_sub, True, _BRANCO)
+        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 185)))
+
+        _lbl = self.font_credit_body_bold.render("Nome do aventureiro", True, _BRANCO)
+        self.screen.blit(_lbl, (390, 252))
+        self._desenhar_input_verde(pygame.Rect(390, 285, 500, 50), self.nome_input, "nome", "Digite seu nome")
+
+        _lbl = self.font_credit_body_bold.render("Idade", True, _BRANCO)
+        self.screen.blit(_lbl, (390, 352))
+        self._desenhar_input_verde(pygame.Rect(390, 385, 220, 50), self.idade_input, "idade", "18")
+
+        if self.status_kind in {"success", "error"}:
+            self._desenhar_status_hub(610)
 
     def _renderizar_hub(self):
-        """Renderiza o menu principal do jogador.
+        """Renderiza o hub com overlay, título "Menu de Jornada", saudação ao jogador e status."""
+        self.screen.blit(self.hub_overlay, (0, 0))
+
+        nome = self.usuario.nome if self.usuario else "Aventureiro"
+
+        _TITULO = "Menu de Jornada"
+        _GAP = 2
+        _char_w = [self.font_title.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title.get_height()
+        _tcy = 255
+
+        self.hub_glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.hub_glow_timer * 0.04)))
+        _glow_surfs = [self.font_title.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _glow_surfs:
+            _s.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_glow_surfs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, (0, 0, 0))
+            self.screen.blit(_s, (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, _BRANCO)
+            self.screen.blit(_s, (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        _sub = f"Bem-vindo, {nome}"
+        _sub_som = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_sub_som, _sub_som.get_rect(center=(WINDOW.width // 2 + 2, 327)))
+        _sub_surf = self.font_hub_subtitle.render(_sub, True, _BRANCO)
+        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 325)))
+
+        if self.status_kind in {"success", "error"}:
+            self._desenhar_status_hub(665)
+
+    def _desenhar_status_hub(self, y):
+        """Desenha um banner de status centralizado com largura proporcional ao texto.
+
+        Usa font_hub_subtitle, bordas coloridas conforme status_kind e sombra de texto.
 
         Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+            y (int): Coordenada vertical do centro da caixa de status.
         """
-        nome = self.usuario.nome if self.usuario else "Aventureiro"
-        self._desenhar_cabecalho("Menu de Jornada", f"Bem-vindo, {nome}")
-        self._desenhar_status(585)
+        color = PALETTE.success if self.status_kind == "success" else PALETTE.error
+        font = self.font_hub_subtitle
+        linhas = quebrar_texto(self.status_message, font, WINDOW.width - 200)
+        linha_altura = font.get_linesize()
+        max_w = max(font.size(l)[0] for l in linhas)
+        box_w = min(max_w + 80, WINDOW.width - 100)
+        altura = max(58, len(linhas) * linha_altura + 24)
+        rect = pygame.Rect(WINDOW.width // 2 - box_w // 2, y - altura // 2, box_w, altura)
+        pygame.draw.rect(self.screen, PALETTE.surface, rect, border_radius=10)
+        pygame.draw.rect(self.screen, color, rect, width=2, border_radius=10)
+        texto_y = rect.y + 12
+        for linha in linhas:
+            sombra = font.render(linha, True, (0, 0, 0))
+            self.screen.blit(sombra, sombra.get_rect(center=(rect.centerx + 2, texto_y + linha_altura // 2 + 2)))
+            surface = font.render(linha, True, _BRANCO)
+            self.screen.blit(surface, surface.get_rect(center=(rect.centerx, texto_y + linha_altura // 2)))
+            texto_y += linha_altura
 
     def _renderizar_mundos(self):
-        """Renderiza a selecao de mundos.
+        """Renderiza a tela de seleção de mundos com fundo animado, título com glow e caixa de aviso."""
+        self.screen.blit(self.mundos_overlay, (0, 0))
 
-        Recebe:
-            Nenhum parametro.
+        _TITULO = "Arquipelago de Bythos"
+        _GAP = 2
+        _char_w = [self.font_title.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title.get_height()
+        _tcy = 175
 
-        Retorna:
-            None.
-        """
-        self._desenhar_cabecalho("Arquipelago de Bythos", "Escolha o proximo destino")
-        self._desenhar_paragrafo(
-            "A Cabana do Oraculo guarda a primeira aula: programacao, algoritmos e linguagens.",
-            280,
-            390,
-            720,
-            self.font_body,
-            PALETTE.text,
-        )
-        self._desenhar_status(650)
+        self.mundos_glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.mundos_glow_timer * 0.04)))
+        _glow_surfs = [self.font_title.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _glow_surfs:
+            _s.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_glow_surfs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, (0, 0, 0))
+            self.screen.blit(_s, (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, _BRANCO)
+            self.screen.blit(_s, (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        _sub = "Escolha o próximo destino"
+        _sub_som = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_sub_som, _sub_som.get_rect(center=(WINDOW.width // 2 + 2, 242)))
+        _sub_surf = self.font_hub_subtitle.render(_sub, True, _BRANCO)
+        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 240)))
+
+        # Descrição do mundo centralizada abaixo do botão (botão em y=295, h=62 → bottom 357)
+        _desc = "A Cabana do Oraculo guarda a primeira aula: programacao, algoritmos e linguagens."
+        _desc_linhas = quebrar_texto(_desc, self.font_body, WINDOW.width - 300)
+        _dl_h = self.font_body.get_linesize() + 4
+        _dy = 378
+        for _dl in _desc_linhas:
+            _ds = self.font_body.render(_dl, True, (0, 0, 0))
+            self.screen.blit(_ds, _ds.get_rect(center=(WINDOW.width // 2 + 1, _dy + 1)))
+            _ds = self.font_body.render(_dl, True, _BRANCO)
+            self.screen.blit(_ds, _ds.get_rect(center=(WINDOW.width // 2, _dy)))
+            _dy += _dl_h
+
+        # Caixa de aviso com a mensagem de status
+        _aviso_font = self.font_hub_subtitle
+        _aviso_linhas = quebrar_texto(self.status_message, _aviso_font, WINDOW.width - 200)
+        _lh = _aviso_font.get_linesize()
+        _pad = 16
+        _aviso_h = len(_aviso_linhas) * _lh + _pad * 2
+        _aviso_w = min(max(_aviso_font.size(l)[0] for l in _aviso_linhas) + 80, WINDOW.width - 100)
+        _aviso_rect = pygame.Rect(WINDOW.width // 2 - _aviso_w // 2, 455, _aviso_w, _aviso_h)
+        _cor_borda_aviso = _VERDE_CLARO
+        if self.status_kind == "success":
+            _cor_borda_aviso = PALETTE.success
+        elif self.status_kind == "error":
+            _cor_borda_aviso = PALETTE.error
+        pygame.draw.rect(self.screen, (20, 55, 30), _aviso_rect, border_radius=10)
+        pygame.draw.rect(self.screen, _cor_borda_aviso, _aviso_rect, width=2, border_radius=10)
+        _ty = _aviso_rect.y + _pad
+        for _l in _aviso_linhas:
+            _ss = _aviso_font.render(_l, True, (0, 0, 0))
+            self.screen.blit(_ss, _ss.get_rect(center=(_aviso_rect.centerx + 1, _ty + _lh // 2 + 1)))
+            _ss = _aviso_font.render(_l, True, _BRANCO)
+            self.screen.blit(_ss, _ss.get_rect(center=(_aviso_rect.centerx, _ty + _lh // 2)))
+            _ty += _lh
 
     def _renderizar_perfil(self):
-        """Renderiza a tela de perfil do usuario.
+        """Renderiza o perfil do usuário com quatro cards de estatísticas e seção de conquistas."""
+        self.screen.blit(self.perfil_overlay, (0, 0))
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
         self.usuario = carregar_usuario()
-        self._desenhar_cabecalho("Perfil", "Seu progresso em Bythos")
         if self.usuario is None:
             self._desenhar_paragrafo("Nenhum personagem criado ainda.", 360, 300, 560, self.font_body, PALETTE.text)
             return
 
-        dados = [
-            f"Nome: {self.usuario.nome}",
-            f"Idade: {self.usuario.idade}",
-            f"Nivel: {self.usuario.nivel}",
-            f"XP total: {self.usuario.xp}",
-            f"XP para o proximo nivel: {xp_para_proximo_nivel(self.usuario.xp)}",
+        _TITULO = self.usuario.nome
+        _GAP = 2
+        _char_w = [self.font_title.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title.get_height()
+        _tcy = 120
+
+        self.glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.glow_timer * 0.04)))
+        _glow_surfs = [self.font_title.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _glow_surfs:
+            _s.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_glow_surfs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, (0, 0, 0))
+            self.screen.blit(_s, (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            _s = self.font_title.render(_c, True, _BRANCO)
+            self.screen.blit(_s, (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        _sub = "Seu progresso em Bythos"
+        _sub_som = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_sub_som, _sub_som.get_rect(center=(WINDOW.width // 2 + 2, 187)))
+        _sub_surf = self.font_hub_subtitle.render(_sub, True, _BRANCO)
+        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 185)))
+
+        _CW, _CH = 280, 140
+        _HGAP, _VGAP = 40, 25
+        _GX = WINDOW.width // 2 - (_CW * 2 + _HGAP) // 2
+        _GY = 230
+        _COR_FUNDO = (30, 80, 50)
+        _COR_BORDA = (100, 200, 120)
+
+        cards = [
+            ("◆", "Nível", str(self.usuario.nivel)),
+            ("◆", "XP Total", str(self.usuario.xp)),
+            ("◆", "Prox. Nível", str(xp_para_proximo_nivel(self.usuario.xp))),
+            ("◆", "Idade", str(self.usuario.idade)),
         ]
-        y = 250
-        for linha in dados:
-            self._desenhar_paragrafo(linha, 430, y, 520, self.font_body, PALETTE.text)
-            y += 48
+        for idx, (icone, label, valor) in enumerate(cards):
+            col = idx % 2
+            row = idx // 2
+            cx = _GX + col * (_CW + _HGAP)
+            cy = _GY + row * (_CH + _VGAP)
+            rect = pygame.Rect(cx, cy, _CW, _CH)
+            pygame.draw.rect(self.screen, _COR_FUNDO, rect, border_radius=12)
+            pygame.draw.rect(self.screen, _COR_BORDA, rect, width=2, border_radius=12)
+            _lbl_surf = self.font_credit_small_bold.render(f"{icone}  {label}", True, _COR_BORDA)
+            self.screen.blit(_lbl_surf, _lbl_surf.get_rect(center=(cx + _CW // 2, cy + 38)))
+            _val_surf = self.font_credit_section.render(valor, True, _BRANCO)
+            self.screen.blit(_val_surf, _val_surf.get_rect(center=(cx + _CW // 2, cy + 98)))
+
+        _sect_y = _GY + 2 * (_CH + _VGAP)
+        _sect_rect = pygame.Rect(_GX, _sect_y, _CW * 2 + _HGAP, 100)
+        pygame.draw.rect(self.screen, _COR_FUNDO, _sect_rect, border_radius=12)
+        pygame.draw.rect(self.screen, _COR_BORDA, _sect_rect, width=2, border_radius=12)
+        _conq_lbl = self.font_credit_small_bold.render("Conquistas", True, _COR_BORDA)
+        self.screen.blit(_conq_lbl, _conq_lbl.get_rect(center=(_sect_rect.centerx, _sect_rect.y + 28)))
+        _em_breve = self.font_credit_body_bold.render("EM BREVE", True, _COR_BORDA)
+        self.screen.blit(_em_breve, _em_breve.get_rect(center=(_sect_rect.centerx, _sect_rect.y + 68)))
+
+    def _renderizar_cutscene(self):
+        """Renderiza a cena atual da cutscene com três estados de fade.
+
+        Estados:
+        - "fade_out_entry": hub escurece para preto (único fade — ocorre só na entrada).
+        - "fade_in": primeira cena aparece saindo do preto.
+        - "visible": cena visível, transições entre cenas são instantâneas.
+
+        Renderiza: fundo imagem_cut.jpeg com overlay escuro; imagem principal 960×400
+        centralizada com glow pulsante e borda arredondada; caixa de texto estilo
+        alerta abaixo da imagem; caixa-contador no canto inferior esquerdo; botões
+        "Pular história" e "Avançar →" lado a lado no canto inferior direito.
+        """
+        _FADE_SPEED = 8
+        _IMG_W, _IMG_H = 960, 400
+        _IMG_X = (WINDOW.width - _IMG_W) // 2
+        _IMG_Y = 50
+        _BTN_W, _BTN_H = 190, 45
+        _BTN_Y = WINDOW.height - 65
+        _BTN2_X = WINDOW.width - 20 - _BTN_W
+        _BTN1_X = _BTN2_X - 10 - _BTN_W
+        _ARROW_RECT = pygame.Rect(_BTN2_X, _BTN_Y, _BTN_W, _BTN_H)
+        _PULAR_RECT = pygame.Rect(_BTN1_X, _BTN_Y, _BTN_W, _BTN_H)
+
+        # Fase de entrada: hub escurecendo para preto — único fade do modo cutscene
+        if self.cutscene_fade_state == "fade_out_entry":
+            if self._cutscene_prev_frame:
+                self.screen.blit(self._cutscene_prev_frame, (0, 0))
+            else:
+                self.screen.fill((0, 0, 0))
+            self.cutscene_fade_alpha = min(255, self.cutscene_fade_alpha + _FADE_SPEED)
+            _ov = pygame.Surface((WINDOW.width, WINDOW.height))
+            _ov.fill((0, 0, 0))
+            _ov.set_alpha(self.cutscene_fade_alpha)
+            self.screen.blit(_ov, (0, 0))
+            if self.cutscene_fade_alpha >= 255:
+                self.cutscene_fade_state = "fade_in"
+                self.cutscene_fade_alpha = 255
+            return
+
+        # Fundo: imagem_cut.jpeg escalada + overlay escuro semitransparente
+        if self.cutscene_bg:
+            self.screen.blit(self.cutscene_bg, (0, 0))
+            _bg_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+            _bg_ov.fill((0, 0, 0, 150))
+            self.screen.blit(_bg_ov, (0, 0))
+        else:
+            self.screen.fill((11, 25, 11))
+
+        # Glow pulsante ao redor da imagem principal
+        _gt = pygame.time.get_ticks()
+        _g_a = int(40 + 60 * abs(math.sin(_gt * 0.0015)))
+        _glow_surf = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        for _sp, _fa in ((16, max(0, _g_a // 5)), (10, max(0, _g_a // 3)), (5, max(0, _g_a // 2))):
+            pygame.draw.rect(
+                _glow_surf, (*_VERDE_CLARO, _fa),
+                pygame.Rect(_IMG_X - _sp, _IMG_Y - _sp, _IMG_W + _sp * 2, _IMG_H + _sp * 2),
+                border_radius=12 + _sp,
+            )
+        self.screen.blit(_glow_surf, (0, 0))
+
+        # Imagem principal com borda arredondada
+        _img = self.cutscene_images[self.cutscene_index] if self.cutscene_index < len(self.cutscene_images) else None
+        if _img:
+            self.screen.blit(_img, (_IMG_X, _IMG_Y))
+        else:
+            pygame.draw.rect(self.screen, (20, 50, 30), pygame.Rect(_IMG_X, _IMG_Y, _IMG_W, _IMG_H))
+        pygame.draw.rect(
+            self.screen, _VERDE_CLARO,
+            pygame.Rect(_IMG_X, _IMG_Y, _IMG_W, _IMG_H),
+            width=3, border_radius=12,
+        )
+
+        # Caixa de texto estilo alerta abaixo da imagem
+        _font = self.font_cutscene_text
+        _text_max_w = _IMG_W - 40
+        _linhas = quebrar_texto(CUTSCENE_TEXTS[self.cutscene_index], _font, _text_max_w)
+        _lh = _font.get_linesize() + 2
+        _pad = 14
+        _box_h = len(_linhas) * _lh + _pad * 2
+        _box_top = _IMG_Y + _IMG_H + 14
+        _box_rect = pygame.Rect(_IMG_X, _box_top, _IMG_W, _box_h)
+        pygame.draw.rect(self.screen, (20, 55, 30), _box_rect, border_radius=10)
+        pygame.draw.rect(self.screen, _VERDE_CLARO, _box_rect, width=2, border_radius=10)
+        _ty = _box_top + _pad
+        for _l in _linhas:
+            _sombra = _font.render(_l, True, (0, 0, 0))
+            self.screen.blit(_sombra, _sombra.get_rect(center=(_box_rect.centerx + 1, _ty + _lh // 2 + 1)))
+            _surf = _font.render(_l, True, _BRANCO)
+            self.screen.blit(_surf, _surf.get_rect(center=(_box_rect.centerx, _ty + _lh // 2)))
+            _ty += _lh
+
+        # Caixa-contador estilo alerta no canto inferior esquerdo
+        _cnt_text = f"{self.cutscene_index + 1} / {len(CUTSCENE_TEXTS)}"
+        _cnt_font = self.font_credit_section
+        _cnt_w = _cnt_font.size(_cnt_text)[0] + 40
+        _cnt_rect = pygame.Rect(20, _BTN_Y, _cnt_w, _BTN_H)
+        pygame.draw.rect(self.screen, (20, 55, 30), _cnt_rect, border_radius=8)
+        pygame.draw.rect(self.screen, _VERDE_CLARO, _cnt_rect, width=2, border_radius=8)
+        _cnt_surf = _cnt_font.render(_cnt_text, True, (100, 220, 120))
+        self.screen.blit(_cnt_surf, _cnt_surf.get_rect(center=_cnt_rect.center))
+
+        # Botões "Pular história" e "Avançar →" lado a lado no canto inferior direito
+        _mouse = pygame.mouse.get_pos()
+        for _rect, _label in ((_PULAR_RECT, "Pular história"), (_ARROW_RECT, "Avançar →")):
+            _hov = _rect.collidepoint(_mouse) and self.cutscene_fade_state == "visible"
+            pygame.draw.rect(self.screen, _BRANCO if _hov else _VERDE, _rect, border_radius=8)
+            pygame.draw.rect(self.screen, _VERDE_CLARO, _rect, width=2, border_radius=8)
+            _b_surf = self.font_start_btn.render(_label, True, _VERDE if _hov else _BRANCO)
+            self.screen.blit(_b_surf, _b_surf.get_rect(center=_rect.center))
+
+        # Fade de entrada saindo do preto
+        if self.cutscene_fade_state == "fade_in":
+            self.cutscene_fade_alpha = max(0, self.cutscene_fade_alpha - _FADE_SPEED)
+            if self.cutscene_fade_alpha == 0:
+                self.cutscene_fade_state = "visible"
+
+        if self.cutscene_fade_alpha > 0:
+            _ov = pygame.Surface((WINDOW.width, WINDOW.height))
+            _ov.fill((0, 0, 0))
+            _ov.set_alpha(self.cutscene_fade_alpha)
+            self.screen.blit(_ov, (0, 0))
 
     def _renderizar_creditos(self):
-        """Renderiza a tela de creditos com rolagem.
+        """Renderiza os créditos com animação de fundo, suporte a rolagem e texto inline-bold."""
+        if self.creditos_frames:
+            self.creditos_frame_timer += 1
+            if self.creditos_frame_timer >= 6:
+                self.creditos_frame_timer = 0
+                self.creditos_frame_index = (self.creditos_frame_index + 1) % len(self.creditos_frames)
+            self.screen.blit(self.creditos_frames[self.creditos_frame_index], (0, 0))
+            _overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+            _overlay.fill((0, 0, 0, 120))
+            self.screen.blit(_overlay, (0, 0))
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
         _box_h = 48
-        _area_h = WINDOW.height - _box_h - 16
         y = 30 - self.credit_scroll
         largura_texto = WINDOW.width - 160
         for style, text in obter_linhas_creditos():
             font, color, spacing = self._estilo_credito(style)
-            for line in quebrar_texto(text, font, largura_texto):
-                desenhar_texto_centralizado(self.screen, line, font, color, y)
+            display_text = text.upper() if style == "section" else text
+            if "**" in display_text:
+                bold_font = self._bold_font_para_estilo(style)
+                self._desenhar_credito_inline(display_text, font, bold_font, color, y)
                 y += spacing
+            else:
+                for line in quebrar_texto(display_text, font, largura_texto):
+                    desenhar_texto_centralizado(self.screen, line, font, color, y)
+                    y += spacing
             y += 8
 
-        # Caixa de instrucoes no estilo dos botoes da tela inicial
         _msg = "W/S ou setas para rolar   |   ESC para voltar"
         _msg_surf = self.font_small.render(_msg, True, _BRANCO)
         _box_w = _msg_surf.get_width() + 48
@@ -663,14 +1111,7 @@ class CodeQuestPygameMenu:
         self.screen.blit(_msg_surf, _msg_surf.get_rect(center=_box_rect.center))
 
     def _renderizar_fluxo_aprendizado(self):
-        """Renderiza aula ou exercicio atual.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Despacha para _renderizar_segmento_aula ou _renderizar_segmento_exercicio conforme o segmento atual."""
         segmento = self._segmento_atual()
         if segmento is None:
             self.screen_name = "complete"
@@ -681,20 +1122,19 @@ class CodeQuestPygameMenu:
             self._renderizar_segmento_exercicio(segmento)
 
     def _renderizar_segmento_aula(self, segmento):
-        """Renderiza um texto de aula.
+        """Renderiza os parágrafos de um segmento de aula e, no texto_1 do mundo_1, o link do YouTube.
+
+        Atualiza self.link_rect e self.btn_continuar_y para que o clique no link
+        e o posicionamento dinâmico do botão Continuar funcionem corretamente.
 
         Recebe:
-            segmento: Dicionario do segmento de aula atual.
-
-        Retorna:
-            None.
+            segmento (dict): Segmento de tipo "aula" com chaves "titulo", "id" e "conteudo".
         """
         self._desenhar_cabecalho(segmento["titulo"], self.aula["titulo"])
         y = 205
         for paragrafo in segmento["conteudo"]:
             y = self._desenhar_paragrafo(paragrafo, self.content_x, y, self.content_width, self.font_small, PALETTE.text) + 12
 
-        # Adicionei checagem para Módulo 1 (MUNDO_ATIVO) e primeira aula (texto_1)
         if MUNDO_ATIVO == "mundo_1" and segmento.get("id") == "texto_1":
             chamada = "Quer se aprofundar um pouco mais no tema? Clica no link abaixo e assista a uma aula completa!"
             y = self._desenhar_paragrafo(chamada, self.content_x, y + 10, self.content_width, self.font_body, PALETTE.accent) + 10
@@ -705,19 +1145,21 @@ class CodeQuestPygameMenu:
             self.screen.blit(link_surface, self.link_rect)
 
             y = self.link_rect.bottom + 20
-            self.btn_continuar_y = y  # Salva para posicionar o botão continuar
+            self.btn_continuar_y = y
         else:
             self.link_rect = None
             self.btn_continuar_y = None
 
     def _renderizar_segmento_exercicio(self, segmento):
-        """Renderiza o exercicio atual dentro de uma lista de pratica.
+        """Renderiza o exercício atual dentro de um bloco de prática.
+
+        Exibe cabeçalho com contador "X de Y", pergunta do exercício, campo de
+        resposta ou alternativas (via botões em _botoes_fluxo_aprendizado) e
+        banner de status.
 
         Recebe:
-            segmento: Dicionario do bloco de exercicios atual.
-
-        Retorna:
-            None.
+            segmento (dict): Segmento de tipo "exercicios" com chaves "titulo"
+            e "exercicios" (list[str] de IDs).
         """
         exercicio = self._exercicio_atual()
         numero = self.exercicio_indice + 1
@@ -737,25 +1179,15 @@ class CodeQuestPygameMenu:
         self._desenhar_status(WINDOW.height - 118)
 
     def _renderizar_opcoes(self, exercicio):
-        """Mantem o espaco das alternativas, renderizadas pelos botoes.
+        """Placeholder para exercícios de múltipla escolha — as alternativas são renderizadas pelos botões em _botoes_fluxo_aprendizado.
 
         Recebe:
-            exercicio: Dicionario do exercicio atual.
-
-        Retorna:
-            None.
+            exercicio (dict): Dicionário do exercício atual (não utilizado diretamente aqui).
         """
         return None
 
     def _renderizar_conclusao(self):
-        """Renderiza a tela de conclusao da aula.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Renderiza a tela de conclusão exibida ao final de todos os segmentos da aula."""
         self._desenhar_cabecalho("Aula concluida", "A primeira rota de Bythos foi vencida")
         self._desenhar_paragrafo(
             "Voce completou o fluxo de texto, pratica e revisao. Volte ao menu para ver seu perfil.",
@@ -767,14 +1199,11 @@ class CodeQuestPygameMenu:
         )
 
     def _desenhar_cabecalho(self, titulo, subtitulo):
-        """Desenha cabecalho padrao da tela.
+        """Desenha o cabeçalho padrão de 170px com título e subtítulo centralizados.
 
         Recebe:
-            titulo: Titulo principal.
-            subtitulo: Texto secundario.
-
-        Retorna:
-            None.
+            titulo (str): Texto principal renderizado com font_title.
+            subtitulo (str): Texto secundário renderizado com font_subtitle em cor accent.
         """
         pygame.draw.rect(self.screen, PALETTE.surface, pygame.Rect(0, 0, WINDOW.width, 170))
         pygame.draw.line(self.screen, PALETTE.border, (0, 170), (WINDOW.width, 170), 2)
@@ -782,29 +1211,26 @@ class CodeQuestPygameMenu:
         desenhar_texto_centralizado(self.screen, subtitulo, self.font_subtitle, PALETTE.accent, 120)
 
     def _desenhar_label(self, texto, x, y):
-        """Desenha um label de formulario.
+        """Renderiza um rótulo de formulário com font_small na cor muted.
 
         Recebe:
-            texto: Texto do label.
-            x: Coordenada horizontal.
-            y: Coordenada vertical.
-
-        Retorna:
-            None.
+            texto (str): Texto do rótulo.
+            x (int): Coordenada horizontal do canto superior esquerdo.
+            y (int): Coordenada vertical do canto superior esquerdo.
         """
         self.screen.blit(self.font_small.render(texto, True, PALETTE.muted), (x, y))
 
     def _desenhar_input(self, rect, valor, campo, placeholder):
-        """Desenha campo de entrada de texto.
+        """Renderiza um campo de texto com estilo escuro padrão.
+
+        Destaca a borda em accent quando o campo estiver ativo; mostra
+        placeholder em cor muted quando valor for vazio.
 
         Recebe:
-            rect: Retangulo do campo.
-            valor: Texto atual.
-            campo: Nome interno do campo.
-            placeholder: Texto exibido quando vazio.
-
-        Retorna:
-            None.
+            rect (pygame.Rect): Posição e tamanho do campo.
+            valor (str): Texto digitado atualmente.
+            campo (str): Nome interno do campo para comparação com self.active_field.
+            placeholder (str): Texto exibido quando valor for vazio.
         """
         ativo = self.active_field == campo
         cor_borda = PALETTE.accent if ativo else PALETTE.border
@@ -814,19 +1240,38 @@ class CodeQuestPygameMenu:
         cor = PALETTE.text if valor else PALETTE.muted
         self.screen.blit(self.font_body.render(texto, True, cor), (rect.x + 14, rect.y + 10))
 
-    def _desenhar_paragrafo(self, texto, x, y, largura, font, color):
-        """Desenha texto quebrado em varias linhas.
+    def _desenhar_input_verde(self, rect, valor, campo, placeholder):
+        """Renderiza um campo de texto com estilo verde escuro para telas de fundo verde.
+
+        Análogo a _desenhar_input mas com paleta _VERDE/_VERDE_CLARO em vez de PALETTE.
 
         Recebe:
-            texto: Conteudo textual.
-            x: Coordenada horizontal.
-            y: Coordenada vertical.
-            largura: Largura maxima.
-            font: Fonte usada no texto.
-            color: Cor RGB.
+            rect (pygame.Rect): Posição e tamanho do campo.
+            valor (str): Texto digitado atualmente.
+            campo (str): Nome interno do campo para comparação com self.active_field.
+            placeholder (str): Texto exibido quando valor for vazio.
+        """
+        ativo = self.active_field == campo
+        cor_borda = _VERDE_CLARO if ativo else _VERDE
+        pygame.draw.rect(self.screen, (15, 35, 15), rect, border_radius=8)
+        pygame.draw.rect(self.screen, cor_borda, rect, width=2, border_radius=8)
+        texto = valor or placeholder
+        cor = _BRANCO if valor else (100, 150, 100)
+        self.screen.blit(self.font_body.render(texto, True, cor), (rect.x + 14, rect.y + 10))
+
+    def _desenhar_paragrafo(self, texto, x, y, largura, font, color):
+        """Renderiza um bloco de texto quebrado em múltiplas linhas.
+
+        Recebe:
+            texto (str): Conteúdo textual a renderizar.
+            x (int): Margem esquerda em pixels.
+            y (int): Coordenada vertical inicial.
+            largura (int): Largura máxima disponível em pixels.
+            font (pygame.font.Font): Fonte usada na renderização.
+            color (tuple[int, int, int]): Cor RGB do texto.
 
         Retorna:
-            Proxima coordenada y apos o bloco.
+            int: Coordenada y imediatamente após o último pixel do bloco de texto.
         """
         linha_altura = font.get_linesize() + 4
         for linha in quebrar_texto(texto, font, largura):
@@ -835,13 +1280,13 @@ class CodeQuestPygameMenu:
         return y
 
     def _desenhar_status(self, y):
-        """Desenha mensagem de status atual.
+        """Renderiza o banner de status quando status_kind for "success" ou "error".
+
+        Para "normal", exibe apenas o texto em cor muted. Para "success"/"error",
+        desenha um retângulo com borda colorida e texto centralizado.
 
         Recebe:
-            y: Coordenada vertical central da mensagem.
-
-        Retorna:
-            None.
+            y (int): Coordenada vertical central do banner.
         """
         if self.status_kind in {"success", "error"}:
             color = PALETTE.success if self.status_kind == "success" else PALETTE.error
@@ -863,64 +1308,101 @@ class CodeQuestPygameMenu:
         desenhar_texto_centralizado(self.screen, self.status_message, self.font_tiny, PALETTE.muted, y)
 
     def _definir_status(self, mensagem, kind="normal"):
-        """Atualiza a mensagem de status e seu estilo visual.
+        """Atualiza a mensagem de status e seu estilo visual exibido por _desenhar_status.
 
         Recebe:
-            mensagem: Texto que sera exibido no rodape ou banner.
-            kind: Tipo visual da mensagem: normal, success ou error.
-
-        Retorna:
-            None.
+            mensagem (str): Texto a exibir.
+            kind (str): "normal" (texto muted), "success" (borda verde) ou "error" (borda vermelha).
         """
         self.status_message = mensagem
         self.status_kind = kind
 
-    def _desenhar_rodape(self, texto):
-        """Desenha rodape fixo na base da tela.
-
-        Recebe:
-            texto: Mensagem exibida no rodape.
-
-        Retorna:
-            None.
-        """
-        rodape = pygame.Rect(0, WINDOW.height - 54, WINDOW.width, 54)
-        pygame.draw.rect(self.screen, PALETTE.surface, rodape)
-        pygame.draw.line(self.screen, PALETTE.border, (0, WINDOW.height - 54), (WINDOW.width, WINDOW.height - 54), 2)
-        desenhar_texto_centralizado(self.screen, texto, self.font_small, PALETTE.muted, WINDOW.height - 27)
-
     def _estilo_credito(self, style):
-        """Resolve fonte, cor e espacamento de uma linha de creditos.
+        """Resolve fonte, cor RGB e espaçamento vertical para um estilo de linha de créditos.
 
         Recebe:
-            style: Nome do estilo da linha de creditos.
+            style (str): Um dos valores: "title", "subtitle", "section", "body",
+            "small", "quote" ou "footer".
 
         Retorna:
-            Tupla com fonte, cor RGB e espacamento vertical.
+            tuple[pygame.font.Font, tuple[int,int,int], int]: Fonte, cor e
+            espaçamento vertical em pixels para a linha. Estilos desconhecidos
+            recebem o mesmo tratamento que "footer".
         """
         if style == "title":
             return self.font_title, _VERDE_CLARO, 62
         if style == "subtitle":
-            return self.font_welcome, _BRANCO, 32
+            return self.font_credit_body_bold, _BRANCO, 32
         if style == "section":
-            return self.font_welcome, _VERDE_CLARO, 34
+            return self.font_credit_section, _VERDE_CLARO, 40
         if style == "body":
-            return self.font_small, _BRANCO, 26
+            return self.font_credit_body_bold, _BRANCO, 32
+        if style == "small":
+            return self.font_credit_small_bold, _BRANCO, 30
         if style == "quote":
-            return self.font_small, (160, 220, 160), 24
+            return self.font_credit_quote, (160, 220, 160), 28
         if style == "footer":
-            return self.font_small, PALETTE.gold, 26
-        return self.font_small, (160, 200, 160), 22
+            return self.font_credit_footer_bold, _BRANCO, 26
+        return self.font_credit_footer_bold, _BRANCO, 26
 
-    def _novo_jogo(self):
-        """Inicia novo jogo e abre criacao de personagem.
+    def _bold_font_para_estilo(self, style):
+        """Retorna a fonte negrito associada a um estilo de linha de créditos.
+
+        Usada por _renderizar_creditos para renderizar segmentos **bold** inline.
 
         Recebe:
-            Nenhum parametro.
+            style (str): Estilo da linha ("body" ou qualquer outro valor).
 
         Retorna:
-            None.
+            pygame.font.Font: font_credit_body_bold para "body";
+            font_credit_small_bold para todos os outros estilos.
         """
+        if style == "body":
+            return self.font_credit_body_bold
+        return self.font_credit_small_bold
+
+    def _desenhar_credito_inline(self, text, font_regular, font_bold, color, y):
+        """Renderiza uma linha de créditos centralizada com partes em negrito marcadas por **.
+
+        Parseia sequências **palavra** no texto, alterna entre font_regular e
+        font_bold para cada segmento e blita tudo horizontalmente centralizado na
+        largura da janela.
+
+        Recebe:
+            text (str): Texto com marcadores **negrito** mesclados ao texto normal.
+            font_regular (pygame.font.Font): Fonte para segmentos sem negrito.
+            font_bold (pygame.font.Font): Fonte para segmentos entre **.
+            color (tuple[int, int, int]): Cor RGB aplicada a todos os segmentos.
+            y (int): Coordenada vertical do centro da linha.
+        """
+        parts = []
+        remaining = text
+        while "**" in remaining:
+            idx = remaining.find("**")
+            if idx > 0:
+                parts.append((remaining[:idx], False))
+            remaining = remaining[idx + 2:]
+            idx2 = remaining.find("**")
+            if idx2 >= 0:
+                parts.append((remaining[:idx2], True))
+                remaining = remaining[idx2 + 2:]
+            else:
+                parts.append((remaining, True))
+                remaining = ""
+                break
+        if remaining:
+            parts.append((remaining, False))
+        total_w = sum((font_bold if b else font_regular).size(t)[0] for t, b in parts)
+        x = WINDOW.width // 2 - total_w // 2
+        h = max((font_bold if b else font_regular).get_height() for _, b in parts)
+        y_off = y - h // 2
+        for t, b in parts:
+            f = font_bold if b else font_regular
+            self.screen.blit(f.render(t, True, color), (x, y_off))
+            x += f.size(t)[0]
+
+    def _novo_jogo(self):
+        """Reseta o banco de dados, limpa o estado do usuário e navega para a criação de personagem."""
         resetar_banco_de_dados()
         self.usuario = None
         self.nome_input = ""
@@ -930,29 +1412,21 @@ class CodeQuestPygameMenu:
         self.screen_name = "create"
 
     def _continuar(self):
-        """Continua save existente ou abre criacao quando nao houver usuario.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Carrega o save existente e navega para o hub; exibe erro se não houver save."""
         self.usuario = carregar_usuario()
         if self.usuario is None:
-            self._definir_status("Nenhum save encontrado. Crie seu personagem.", "error")
-            self.screen_name = "create"
+            self._definir_status(
+                "Você ainda não tem um progresso salvo. Inicie um novo jogo primeiro.",
+                "error",
+            )
             return
         self._abrir_hub()
 
     def _criar_personagem(self):
-        """Valida formulario e cria usuario ativo.
+        """Valida os campos do formulário de criação, persiste o usuário e vai para o hub.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        Exibe erros de status quando nome estiver vazio, idade não for numérica
+        ou estiver fora do intervalo [1, 120].
         """
         nome = self.nome_input.strip()
         if not nome:
@@ -972,14 +1446,7 @@ class CodeQuestPygameMenu:
         self._abrir_hub()
 
     def _abrir_hub(self):
-        """Abre o menu principal do jogador.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Navega para o hub; redireciona para criação de personagem se não houver save."""
         self.usuario = carregar_usuario()
         if self.usuario is None:
             self.screen_name = "create"
@@ -988,14 +1455,7 @@ class CodeQuestPygameMenu:
         self.active_field = "nome"
 
     def _abrir_mundos(self):
-        """Abre a tela de mundos.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Navega para a seleção de mundos; bloqueia com erro se não houver personagem criado."""
         if carregar_usuario() is None:
             self._definir_status("Crie um personagem antes de viajar.", "error")
             self.screen_name = "create"
@@ -1004,37 +1464,45 @@ class CodeQuestPygameMenu:
         self._definir_status("Escolha um mundo para estudar.")
 
     def _abrir_perfil(self):
-        """Abre a tela de perfil.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Navega para a tela de perfil do jogador."""
         self.screen_name = "profile"
 
     def _abrir_creditos(self):
-        """Abre a tela de creditos.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Toca o som de créditos, zera o scroll e navega para a tela de créditos."""
         self.audio.tocar_creditos()
         self.screen_name = "credits"
         self.credit_scroll = 0
 
+    def _abrir_cutscene(self):
+        """Captura o frame atual do hub para o fade de entrada e inicia a cutscene do início.
+
+        Armazena o frame capturado em _cutscene_prev_frame para uso em _renderizar_cutscene
+        durante o estado "fade_out_entry". Reseta índice, alpha e estado de fade.
+        """
+        self._cutscene_prev_frame = self.screen.copy()
+        self.cutscene_index = 0
+        self.cutscene_fade_alpha = 0
+        self.cutscene_fade_state = "fade_out_entry"
+        self.cutscene_fade_next = None
+        self.screen_name = "cutscene"
+
+    def _avancar_cutscene(self):
+        """Avança diretamente para a próxima cena (sem fade) ou abre mundos na última.
+
+        Ignorado enquanto o fade de entrada estiver em andamento (estado != "visible").
+        """
+        if self.cutscene_fade_state != "visible":
+            return
+        if self.cutscene_index >= len(CUTSCENE_TEXTS) - 1:
+            self._abrir_mundos()
+        else:
+            self.cutscene_index += 1
+
     def _iniciar_mundo_1(self):
-        """Carrega a primeira aula e inicia o fluxo de aprendizagem.
+        """Carrega a aula e exercícios do Mundo 1 e inicia o fluxo de aprendizagem.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        Redireciona para criação de personagem se não houver save, ou exibe erro
+        de status quando o arquivo de aula não puder ser carregado.
         """
         self.usuario = carregar_usuario()
         if self.usuario is None:
@@ -1055,13 +1523,11 @@ class CodeQuestPygameMenu:
         self.screen_name = "lesson"
 
     def _segmento_atual(self):
-        """Retorna o segmento atual da trilha.
-
-        Recebe:
-            Nenhum parametro.
+        """Retorna o segmento na posição trilha_indice da trilha da aula carregada.
 
         Retorna:
-            Dicionario do segmento atual ou None quando terminou.
+            dict | None: Dicionário do segmento atual, ou None quando não houver
+            aula carregada ou trilha_indice ultrapassar o total de segmentos.
         """
         if not self.aula:
             return None
@@ -1071,13 +1537,11 @@ class CodeQuestPygameMenu:
         return trilha[self.trilha_indice]
 
     def _exercicio_atual(self):
-        """Retorna o exercicio atual dentro do bloco de pratica.
-
-        Recebe:
-            Nenhum parametro.
+        """Retorna o exercício na posição exercicio_indice do segmento de prática atual.
 
         Retorna:
-            Dicionario do exercicio atual ou None.
+            dict | None: Dicionário do exercício, ou None quando o segmento não
+            for do tipo "exercicios" ou o ID não for encontrado em self.exercicios.
         """
         segmento = self._segmento_atual()
         if not segmento or segmento["tipo"] != "exercicios":
@@ -1086,14 +1550,7 @@ class CodeQuestPygameMenu:
         return obter_exercicio(self.exercicios, exercicio_id)
 
     def _avancar_segmento(self):
-        """Avanca para o proximo segmento da trilha.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Incrementa trilha_indice, reseta o estado de exercício e navega para "complete" ao final."""
         self.trilha_indice += 1
         self.exercicio_indice = 0
         self.resposta_texto = ""
@@ -1103,14 +1560,7 @@ class CodeQuestPygameMenu:
             self.screen_name = "complete"
 
     def _avancar_exercicio(self):
-        """Avanca para o proximo exercicio ou segmento.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Vai para o próximo exercício do bloco ou avança para o próximo segmento ao esgotar a lista."""
         segmento = self._segmento_atual()
         if not segmento:
             self.screen_name = "complete"
@@ -1124,27 +1574,18 @@ class CodeQuestPygameMenu:
             self._definir_status("Proximo desafio.")
 
     def _responder_texto_livre(self):
-        """Envia resposta textual do exercicio atual.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Valida que o campo de resposta não está vazio e encaminha para _responder_exercicio."""
         if not self.resposta_texto.strip():
             self._definir_status("Digite uma resposta antes de enviar.", "error")
             return
         self._responder_exercicio(self.resposta_texto)
 
     def _responder_exercicio(self, resposta):
-        """Valida resposta, persiste erros/conclusao e atualiza XP.
+        """Valida a resposta via registrar_resposta, atualiza XP e define o feedback de status.
 
         Recebe:
-            resposta: Indice de alternativa ou texto digitado.
-
-        Retorna:
-            None.
+            resposta (int | str): Índice da alternativa escolhida (múltipla escolha)
+            ou texto digitado (texto livre).
         """
         exercicio = self._exercicio_atual()
         self.usuario = carregar_usuario()
@@ -1160,17 +1601,14 @@ class CodeQuestPygameMenu:
             self.active_field = "nome"
 
     def _voltar_contextual(self):
-        """Volta para a tela mais adequada ao contexto atual.
+        """Navega para a tela anterior mais lógica com base em screen_name atual.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        "hub"/"create" → tela inicial; "worlds"/"profile"/"complete"/"cutscene" → hub;
+        "lesson" → mundos; "credits" → hub (logado) ou início (sem usuário); outros → sair.
         """
         if self.screen_name in {"hub", "create"}:
             self._voltar_inicio()
-        elif self.screen_name in {"worlds", "profile", "complete"}:
+        elif self.screen_name in {"worlds", "profile", "complete", "cutscene"}:
             self._abrir_hub()
         elif self.screen_name == "lesson":
             self._abrir_mundos()
@@ -1180,38 +1618,17 @@ class CodeQuestPygameMenu:
             self._sair()
 
     def _voltar_inicio(self):
-        """Retorna para a tela inicial.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Navega para a tela inicial e reseta a mensagem de status."""
         self.screen_name = "start"
         self._definir_status("Bem-vindo ao CodeQuest.")
 
     def _sair(self):
-        """Encerra o loop principal.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Define self.running como False, encerrando o loop principal no próximo ciclo."""
         self.running = False
 
 
 def main():
-    """Executa o CodeQuest em Pygame.
-
-    Recebe:
-        Nenhum parametro.
-
-    Retorna:
-        None.
-    """
+    """Instancia CodeQuestPygameMenu e inicia o loop principal do jogo."""
     CodeQuestPygameMenu().run()
 
 

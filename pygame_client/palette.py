@@ -3,7 +3,11 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class CodeQuestPalette:
-    """Paleta escura usada pelas telas Pygame do CodeQuest."""
+    """Paleta de cores imutável usada pelas telas Pygame do CodeQuest.
+
+    Todos os campos são tuplas RGB (int, int, int) e não devem ser modificados
+    em tempo de execução (frozen=True). Acesse via a instância global PALETTE.
+    """
 
     background: tuple[int, int, int] = (11, 18, 32)
     surface: tuple[int, int, int] = (22, 31, 49)

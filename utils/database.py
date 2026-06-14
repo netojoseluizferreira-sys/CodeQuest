@@ -13,9 +13,7 @@ from utils.user_repository import (
     UsuarioCRUD,
     carregar_usuario,
     criar_usuario,
-    deletar_usuario,
     garantir_usuario,
-    listar_usuarios,
     obter_usuario_id,
     salvar_usuario,
     usuario_crud,
@@ -31,13 +29,12 @@ USUARIO_ATIVO_ID = database_config.USUARIO_ATIVO_ID
 
 
 def resetar_banco_de_dados():
-    """Remove todos os dados locais salvos para testes.
+    """Apaga todos os dados das três tabelas e remove os arquivos de save legados.
 
-    Recebe:
-        Nenhum parametro.
-
-    Retorna:
-        None.
+    Deleta todas as linhas de usuarios, exercicios_concluidos e exercicio_erros
+    via DELETE sem cláusula WHERE, e remove os JSONs legados de usuário e
+    progresso quando existirem. Usado exclusivamente em testes; não deve ser
+    chamado em produção.
     """
     inicializar_banco()
 

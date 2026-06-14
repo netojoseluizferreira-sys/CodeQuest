@@ -6,14 +6,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def carregar_aula(mundo, aula_id):
-    """Carrega os dados de uma aula cadastrada no JSON de aulas.
+    """Lê e retorna os dados de uma aula do arquivo data/aulas.json.
 
     Recebe:
-        mundo: Identificador do mundo onde a aula esta cadastrada.
-        aula_id: Identificador da aula dentro do mundo.
+        mundo (str): Chave de primeiro nível no JSON, ex.: "mundo_1".
+        aula_id (str): Chave de segundo nível dentro do mundo, ex.: "aula_1".
 
     Retorna:
-        Dicionario com os dados da aula ou None quando nao existir.
+        dict | None: Dicionário com os dados da aula (título, trilha, conteúdo)
+        ou None quando o arquivo não existir ou as chaves não forem encontradas.
+        Imprime uma mensagem de erro descritiva no stdout em caso de falha.
     """
     caminho_aula = os.path.join(BASE_DIR, "data", "aulas.json")
 
@@ -30,13 +32,15 @@ def carregar_aula(mundo, aula_id):
 
 
 def carregar_exercicios(mundo):
-    """Carrega os exercicios cadastrados para um mundo.
+    """Lê e retorna os exercícios de um mundo do arquivo data/exercicios.json.
 
     Recebe:
-        mundo: Identificador do mundo desejado.
+        mundo (str): Chave de primeiro nível no JSON, ex.: "mundo_1".
 
     Retorna:
-        Dicionario de exercicios do mundo ou um dicionario vazio em caso de erro.
+        dict: Dicionário de exercícios do mundo indexado por ID string,
+        ou dicionário vazio quando o mundo não existir, o arquivo não for
+        encontrado ou o JSON estiver malformado. Imprime mensagem de erro no stdout.
     """
     caminho_exercicios = os.path.join(BASE_DIR, "data", "exercicios.json")
 

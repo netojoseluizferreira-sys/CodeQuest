@@ -6,13 +6,14 @@ from utils import database_config
 
 
 def conectar():
-    """Abre uma conexao com o banco SQLite local.
+    """Abre e retorna uma conexão com o banco SQLite local definido em database_config.
 
-    Recebe:
-        Nenhum parametro.
+    Cria o diretório data/ se não existir. Configura row_factory para sqlite3.Row,
+    permitindo acesso às colunas pelo nome em vez de índice.
 
     Retorna:
-        Conexao SQLite configurada para acessar colunas pelo nome.
+        sqlite3.Connection: Conexão aberta e configurada; deve ser fechada pelo
+        chamador, preferencialmente via contextlib.closing.
     """
     os.makedirs(database_config.DATA_DIR, exist_ok=True)
     conexao = sqlite3.connect(database_config.DB_PATH)
@@ -21,13 +22,11 @@ def conectar():
 
 
 def inicializar_banco():
-    """Garante que as tabelas usadas pela persistencia existam.
+    """Cria as tabelas do banco caso ainda não existam (CREATE TABLE IF NOT EXISTS).
 
-    Recebe:
-        Nenhum parametro.
-
-    Retorna:
-        None.
+    Garante a existência de três tabelas: usuarios, exercicios_concluidos e
+    exercicio_erros, com suas respectivas chaves primárias e estrangeiras.
+    Seguro para chamadas repetidas; não destrói dados existentes.
     """
     with closing(conectar()) as conexao, conexao:
         conexao.execute(

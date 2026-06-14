@@ -7,15 +7,16 @@ from pygame_client.palette import PALETTE
 
 
 def _quebrar_texto_botao(texto, font, largura_maxima):
-    """Divide o texto do botao em linhas que cabem dentro do retangulo.
+    """Divide um texto em linhas que caibam dentro da largura do botão.
 
     Recebe:
-        texto: Texto exibido no botao.
-        font: Fonte usada para medir cada linha.
-        largura_maxima: Largura maxima disponivel em pixels.
+        texto (str): Texto completo do botão.
+        font (pygame.font.Font): Fonte usada para medir a largura de cada token.
+        largura_maxima (int): Largura disponível em pixels, já descontado o padding.
 
     Retorna:
-        Lista de linhas prontas para renderizacao.
+        list[str]: Lista de linhas prontas para renderização; contém ao menos
+        um elemento (o texto original) quando nenhuma quebra for possível.
     """
     palavras = texto.split()
     linhas = []
@@ -38,7 +39,7 @@ def _quebrar_texto_botao(texto, font, largura_maxima):
 
 @dataclass
 class Button:
-    """Botao retangular usado pelas telas do menu Pygame."""
+    """Botão retangular interativo usado pelas telas do menu Pygame."""
 
     rect: pygame.Rect
     text: str
@@ -50,15 +51,12 @@ class Button:
     border_color: tuple[int, int, int] | None = None
 
     def draw(self, screen, font, mouse_pos):
-        """Desenha o botao na tela.
+        """Renderiza o botão na surface, aplicando cor de hover quando o mouse está sobre ele.
 
         Recebe:
-            screen: Superficie principal do Pygame.
-            font: Fonte usada para renderizar o texto.
-            mouse_pos: Posicao atual do mouse.
-
-        Retorna:
-            None.
+            screen (pygame.Surface): Surface principal onde o botão é desenhado.
+            font (pygame.font.Font): Fonte usada para renderizar o rótulo.
+            mouse_pos (tuple[int, int]): Posição atual do cursor em pixels.
         """
         hovered = self.rect.collidepoint(mouse_pos)
         background = self.background or PALETTE.primary
@@ -79,13 +77,14 @@ class Button:
             y += linha_altura
 
     def handle_event(self, event):
-        """Executa a acao do botao quando houver clique.
+        """Executa a ação do botão quando há clique esquerdo dentro do seu rect.
 
         Recebe:
-            event: Evento do Pygame recebido no loop principal.
+            event (pygame.event.Event): Evento do Pygame recebido no loop principal.
 
         Retorna:
-            True quando o botao foi clicado; caso contrario, False.
+            bool: True quando o clique coincidiu com o rect e a ação foi chamada;
+            False em qualquer outro caso.
         """
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
@@ -95,17 +94,14 @@ class Button:
 
 
 def desenhar_texto_centralizado(screen, text, font, color, y):
-    """Desenha uma linha de texto centralizada horizontalmente.
+    """Renderiza uma linha de texto centralizada horizontalmente na surface.
 
     Recebe:
-        screen: Superficie principal do Pygame.
-        text: Texto renderizado.
-        font: Fonte usada para renderizar o texto.
-        color: Cor RGB do texto.
-        y: Coordenada vertical do centro do texto.
-
-    Retorna:
-        None.
+        screen (pygame.Surface): Surface onde o texto é desenhado.
+        text (str): Texto a renderizar.
+        font (pygame.font.Font): Fonte usada na renderização.
+        color (tuple[int, int, int]): Cor RGB do texto.
+        y (int): Coordenada vertical do centro do texto.
     """
     surface = font.render(text, True, color)
     rect = surface.get_rect(center=(screen.get_width() // 2, y))
@@ -113,15 +109,16 @@ def desenhar_texto_centralizado(screen, text, font, color, y):
 
 
 def quebrar_texto(texto, font, largura_maxima):
-    """Divide um texto em linhas que cabem na largura informada.
+    """Divide um texto em linhas que caibam na largura informada.
 
     Recebe:
-        texto: Texto que sera quebrado.
-        font: Fonte usada para medir a largura.
-        largura_maxima: Largura maxima em pixels.
+        texto (str): Texto a quebrar.
+        font (pygame.font.Font): Fonte usada para medir a largura de cada token.
+        largura_maxima (int): Largura máxima disponível em pixels.
 
     Retorna:
-        Lista de linhas ajustadas para renderizacao.
+        list[str]: Lista de linhas ajustadas; contém ao menos um elemento
+        (o texto original) quando nenhuma quebra for possível.
     """
     palavras = texto.split()
     linhas = []
