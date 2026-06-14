@@ -10,13 +10,15 @@ from utils.user_mapper import garantir_usuario, usuario_from_linha
 
 
 def migrar_usuario_json_legado():
-    """Migra o usuario salvo no JSON legado para SQLite quando existir.
+    """Lê o save legado em JSON e o persiste no SQLite, descartando o arquivo original.
 
-    Recebe:
-        Nenhum parametro.
+    Só executa quando o arquivo definido em database_config.LEGACY_USUARIO_JSON_PATH
+    existir. Após a migração o JSON não é removido; a lógica de remoção fica a
+    cargo de resetar_banco_de_dados.
 
     Retorna:
-        Usuario migrado ou None quando nao houver arquivo legado.
+        Usuario | None: Instância migrada e salva, ou None quando o arquivo
+        legado não existir.
     """
     if not os.path.exists(database_config.LEGACY_USUARIO_JSON_PATH):
         return None
@@ -30,19 +32,19 @@ def migrar_usuario_json_legado():
 
 @dataclass
 class UsuarioCRUD:
-    """Repositorio SQLite responsavel pelo CRUD de Usuario."""
+    """Repositório SQLite para operações de leitura e escrita do usuário ativo."""
 
     usuario_ativo_id: int = database_config.USUARIO_ATIVO_ID
 
     def criar(self, nome, idade):
-        """Cria e persiste o usuario ativo.
+        """Instancia um Usuario novo, atribui o ID ativo e persiste no banco.
 
         Recebe:
-            nome: Nome informado pelo jogador.
-            idade: Idade informada pelo jogador.
+            nome (str): Nome informado pelo jogador.
+            idade (int | str): Idade informada; convertida para int por Usuario.criar.
 
         Retorna:
-            Usuario criado e salvo no banco.
+            Usuario: Instância criada e já salva no SQLite.
         """
         usuario = Usuario.criar(nome, idade)
         usuario.id = self.usuario_ativo_id
@@ -50,13 +52,14 @@ class UsuarioCRUD:
         return usuario
 
     def salvar(self, usuario):
-        """Cria ou atualiza um usuario no banco.
+        """Persiste um Usuario no banco usando upsert (INSERT … ON CONFLICT DO UPDATE).
 
         Recebe:
-            usuario: Instancia de Usuario ou dicionario legado com dados do usuario.
+            usuario (Usuario | dict): Instância de Usuario ou dicionário legado;
+            normalizado por garantir_usuario antes da escrita.
 
         Retorna:
-            Usuario normalizado que foi persistido.
+            Usuario: Instância normalizada que foi persistida.
         """
         inicializar_banco()
         usuario = garantir_usuario(usuario)
@@ -86,13 +89,15 @@ class UsuarioCRUD:
         return usuario
 
     def carregar(self, usuario_id=None):
-        """Busca um usuario pelo ID informado.
+        """Busca um usuário pelo ID; tenta migração do JSON legado quando não encontrar.
 
         Recebe:
-            usuario_id: ID do usuario desejado; quando omitido, usa o usuario ativo.
+            usuario_id (int | None): ID a buscar; None usa usuario_ativo_id.
 
         Retorna:
-            Usuario encontrado, usuario migrado do JSON legado ou None.
+            Usuario | None: Instância encontrada no banco, migrada do JSON legado
+            (quando o ID buscado for o ativo e existir o arquivo legado), ou None
+            quando não houver registro nem arquivo legado.
         """
         inicializar_banco()
         usuario_id = usuario_id or self.usuario_ativo_id
@@ -112,127 +117,63 @@ class UsuarioCRUD:
 
         return None if linha is None else usuario_from_linha(linha)
 
-    def listar(self):
-        """Lista todos os usuarios persistidos.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            Lista de instancias de Usuario ordenada por ID.
-        """
-        inicializar_banco()
-
-        with closing(conectar()) as conexao, conexao:
-            linhas = conexao.execute(
-                """
-                SELECT id, nome, idade, xp, nivel, conquistas
-                FROM usuarios
-                ORDER BY id
-                """
-            ).fetchall()
-
-        return [usuario_from_linha(linha) for linha in linhas]
-
-    def deletar(self, usuario_id=None):
-        """Remove um usuario e seus dados relacionados.
-
-        Recebe:
-            usuario_id: ID do usuario removido; quando omitido, usa o usuario ativo.
-
-        Retorna:
-            None.
-        """
-        inicializar_banco()
-        usuario_id = usuario_id or self.usuario_ativo_id
-
-        with closing(conectar()) as conexao, conexao:
-            conexao.execute("DELETE FROM exercicios_concluidos WHERE usuario_id = ?", (usuario_id,))
-            conexao.execute("DELETE FROM exercicio_erros WHERE usuario_id = ?", (usuario_id,))
-            conexao.execute("DELETE FROM usuarios WHERE id = ?", (usuario_id,))
-
 
 def usuario_crud():
-    """Instancia o repositorio de usuarios.
-
-    Recebe:
-        Nenhum parametro.
+    """Cria e retorna uma instância de UsuarioCRUD com a configuração padrão do banco.
 
     Retorna:
-        Instancia de UsuarioCRUD usando a configuracao atual do banco.
+        UsuarioCRUD: Instância pronta para uso com usuario_ativo_id do database_config.
     """
     return UsuarioCRUD()
 
 
 def criar_usuario(nome, idade):
-    """Cria e salva o usuario ativo.
+    """Cria e persiste o usuário ativo com nome e idade informados.
 
     Recebe:
-        nome: Nome informado pelo jogador.
-        idade: Idade informada pelo jogador.
+        nome (str): Nome do jogador.
+        idade (int | str): Idade do jogador.
 
     Retorna:
-        Usuario criado e persistido.
+        Usuario: Instância criada e salva no banco.
     """
     return usuario_crud().criar(nome, idade)
 
 
 def salvar_usuario(usuario):
-    """Persiste dados do usuario ativo no SQLite.
+    """Persiste as alterações de um usuário existente no SQLite.
 
     Recebe:
-        usuario: Instancia de Usuario ou dicionario legado com dados do usuario.
+        usuario (Usuario | dict): Dados do usuário; dicionários legados são
+        normalizados antes da escrita.
 
     Retorna:
-        Usuario normalizado que foi salvo.
+        Usuario: Instância normalizada que foi persistida.
     """
     return usuario_crud().salvar(usuario)
 
 
 def carregar_usuario(usuario_id=None):
-    """Carrega um usuario salvo no SQLite.
+    """Carrega um usuário do SQLite pelo ID, com fallback para migração do JSON legado.
 
     Recebe:
-        usuario_id: ID do usuario desejado; quando omitido, usa o usuario ativo.
+        usuario_id (int | None): ID a buscar; None carrega o usuário ativo padrão.
 
     Retorna:
-        Usuario encontrado ou None.
+        Usuario | None: Instância encontrada, migrada do JSON legado, ou None.
     """
     return usuario_crud().carregar(usuario_id)
 
 
-def listar_usuarios():
-    """Lista os usuarios salvos no SQLite.
-
-    Recebe:
-        Nenhum parametro.
-
-    Retorna:
-        Lista de instancias de Usuario.
-    """
-    return usuario_crud().listar()
-
-
-def deletar_usuario(usuario_id=None):
-    """Remove um usuario salvo no SQLite.
-
-    Recebe:
-        usuario_id: ID do usuario removido; quando omitido, usa o usuario ativo.
-
-    Retorna:
-        None.
-    """
-    return usuario_crud().deletar(usuario_id)
-
-
 def obter_usuario_id(usuario=None):
-    """Resolve o ID usado nas tabelas relacionadas ao usuario.
+    """Resolve o ID inteiro de um usuário a partir de instâncias, dicionários ou None.
 
     Recebe:
-        usuario: Usuario, dicionario legado ou None.
+        usuario (Usuario | dict | None): Valor a resolver.
 
     Retorna:
-        ID do usuario informado ou ID padrao do usuario ativo.
+        int: ID do objeto informado, ou USUARIO_ATIVO_ID quando usuario for None
+        ou não tiver ID definido.
     """
     usuario = garantir_usuario(usuario)
     if usuario and usuario.id:

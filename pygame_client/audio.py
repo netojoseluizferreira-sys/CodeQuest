@@ -5,16 +5,14 @@ import pygame
 
 
 class AudioController:
-    """Controla trilha sonora e efeitos simples gerados em memoria."""
+    """Controla trilha sonora e efeitos sonoros gerados proceduralmente em memória."""
 
     def __init__(self, sample_rate=44100):
-        """Inicializa o controlador de audio.
+        """Configura os atributos iniciais sem inicializar o mixer.
 
         Recebe:
-            sample_rate: Taxa de amostragem usada para gerar os sons.
-
-        Retorna:
-            None.
+            sample_rate (int): Taxa de amostragem em Hz usada na geração de áudio.
+            O mixer só é aberto quando inicializar() for chamado.
         """
         self.sample_rate = sample_rate
         self.enabled = False
@@ -23,13 +21,14 @@ class AudioController:
         self.credit_sound = None
 
     def inicializar(self):
-        """Inicializa o mixer e prepara os sons do menu.
+        """Inicializa o mixer do Pygame e pré-gera os efeitos sonoros.
 
-        Recebe:
-            Nenhum parametro.
+        Abre o mixer com formato PCM de 16 bits mono a sample_rate Hz, reserva
+        o canal 0 para a trilha e gera os sons de botão e créditos via _criar_tom.
+        Em caso de erro do mixer, desativa o áudio silenciosamente.
 
         Retorna:
-            True quando o audio foi inicializado; caso contrario, False.
+            bool: True quando o mixer foi inicializado com sucesso; False caso contrário.
         """
         try:
             pygame.mixer.pre_init(self.sample_rate, -16, 1, 512)
@@ -43,13 +42,10 @@ class AudioController:
         return self.enabled
 
     def tocar_trilha(self):
-        """Toca uma trilha sonora simples em loop.
+        """Gera e toca a trilha de fundo em loop infinito no canal 0.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        Só executa quando o áudio estiver habilitado e o canal disponível.
+        O volume do canal é fixado em 0.28 para não cobrir os efeitos.
         """
         if not self.enabled or self.music_channel is None:
             return
@@ -58,51 +54,36 @@ class AudioController:
         self.music_channel.play(trilha, loops=-1)
 
     def tocar_botao(self):
-        """Toca o efeito sonoro padrao dos botoes.
+        """Reproduz o efeito sonoro padrão de clique em botão.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        Só executa quando o áudio estiver habilitado e o som gerado.
         """
         if self.enabled and self.button_sound:
             self.button_sound.play()
 
     def tocar_creditos(self):
-        """Toca o efeito sonoro de abertura dos creditos.
+        """Reproduz o efeito sonoro de abertura da tela de créditos.
 
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
+        Só executa quando o áudio estiver habilitado e o som gerado.
         """
         if self.enabled and self.credit_sound:
             self.credit_sound.play()
 
     def encerrar(self):
-        """Finaliza o mixer quando ele estiver ativo.
-
-        Recebe:
-            Nenhum parametro.
-
-        Retorna:
-            None.
-        """
+        """Finaliza o mixer do Pygame quando o áudio estiver ativo."""
         if self.enabled:
             pygame.mixer.quit()
 
     def _criar_tom(self, frequencia, duracao, volume):
-        """Gera um efeito sonoro senoidal curto.
+        """Gera um tom senoidal com envelope de decaimento linear.
 
         Recebe:
-            frequencia: Frequencia do tom em Hertz.
-            duracao: Duracao do som em segundos.
-            volume: Volume entre 0.0 e 1.0.
+            frequencia (float): Frequência do tom em Hz.
+            duracao (float): Duração do som em segundos.
+            volume (float): Amplitude máxima entre 0.0 e 1.0.
 
         Retorna:
-            pygame.mixer.Sound com o tom gerado.
+            pygame.mixer.Sound: Objeto de som pronto para reprodução.
         """
         total = int(self.sample_rate * duracao)
         samples = array("h")
@@ -113,13 +94,13 @@ class AudioController:
         return pygame.mixer.Sound(buffer=samples.tobytes())
 
     def _criar_trilha(self):
-        """Gera uma trilha curta em loop com arpejos simples.
+        """Gera uma sequência de notas em arpejo para uso como trilha de fundo.
 
-        Recebe:
-            Nenhum parametro.
+        Sintetiza seis notas (C4-E4-G4-C5-G4-E4) com harmônico de segunda oitava,
+        usando um envelope de ataque rápido (40 ms) e decaimento proporcional.
 
         Retorna:
-            pygame.mixer.Sound com a trilha gerada.
+            pygame.mixer.Sound: Objeto de som com a trilha gerada, adequado para loop.
         """
         notas = (261.63, 329.63, 392.00, 523.25, 392.00, 329.63)
         duracao_nota = 0.32

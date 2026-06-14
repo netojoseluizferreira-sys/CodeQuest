@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Usuario:
-    """Representa o jogador ativo do CodeQuest."""
+    """Representa o jogador ativo do CodeQuest com seus atributos de progressão."""
 
     nome: str
     idade: int
@@ -14,26 +14,33 @@ class Usuario:
 
     @classmethod
     def criar(cls, nome, idade):
-        """Cria um usuario novo com os valores iniciais do jogo.
+        """Cria um Usuario novo com os valores padrão de início de jogo.
 
         Recebe:
-            nome: Nome informado no cadastro do perfil.
-            idade: Idade informada no cadastro do perfil.
+            nome (str): Nome informado no cadastro; espaços extras nas bordas
+            são removidos com strip().
+            idade (int | str): Idade informada; convertida para int.
 
         Retorna:
-            Uma instancia de Usuario pronta para ser persistida.
+            Usuario: Instância com id=1, xp=0, nivel=1 e conquistas vazias.
         """
         return cls(nome=nome.strip(), idade=int(idade))
 
     @classmethod
     def from_dict(cls, dados):
-        """Converte dados legados em dicionario para Usuario.
+        """Constrói um Usuario a partir de um dicionário, tolerando campos ausentes.
+
+        Usada para migração de saves legados em JSON e para carregar dados de
+        fontes externas sem garantia de todos os campos opcionais presentes.
 
         Recebe:
-            dados: Dicionario com campos de usuario vindo de JSON ou compatibilidade.
+            dados (dict): Dicionário com pelo menos as chaves "nome" e "idade".
+            Campos opcionais: "id" (padrão 1), "xp" (0), "nivel" (1),
+            "conquistas" ([]).
 
         Retorna:
-            Uma instancia de Usuario com valores padrao quando campos opcionais faltarem.
+            Usuario: Instância preenchida com valores do dicionário, usando
+            padrões para campos ausentes.
         """
         return cls(
             id=dados.get("id", 1),
@@ -45,14 +52,16 @@ class Usuario:
         )
 
     def adicionar_xp(self, quantidade, calcular_nivel):
-        """Aplica XP ao usuario e recalcula seu nivel.
+        """Soma XP ao usuário e recalcula o nível usando a função fornecida.
 
         Recebe:
-            quantidade: Total de XP que deve ser somado ao usuario.
-            calcular_nivel: Funcao que recebe o XP total e retorna o nivel correspondente.
+            quantidade (int): Pontos de XP a adicionar ao total atual.
+            calcular_nivel (Callable[[int], int]): Função que recebe o XP total
+            e retorna o nível correspondente.
 
         Retorna:
-            Uma tupla com um booleano indicando subida de nivel e o novo nivel.
+            tuple[bool, int]: Par (subiu_nivel, novo_nivel) onde subiu_nivel é
+            True quando o nível aumentou em relação ao anterior.
         """
         self.xp += quantidade
         novo_nivel = calcular_nivel(self.xp)

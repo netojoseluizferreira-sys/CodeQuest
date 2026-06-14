@@ -5,15 +5,17 @@ from utils.user_repository import obter_usuario_id
 
 
 def exercicio_foi_concluido(mundo, exercicio_id, usuario=None):
-    """Verifica se um exercicio ja foi concluido por um usuario.
+    """Verifica se um exercício já foi concluído por um usuário no banco.
 
     Recebe:
-        mundo: Identificador do mundo do exercicio.
-        exercicio_id: Identificador do exercicio.
-        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+        mundo (str): Identificador do mundo, ex.: "mundo_1".
+        exercicio_id (str | int): Identificador do exercício; convertido para str.
+        usuario (Usuario | dict | None): Usuário alvo. None usa o ID padrão
+        (USUARIO_ATIVO_ID = 1).
 
     Retorna:
-        True quando o exercicio ja foi concluido; caso contrario, False.
+        bool: True quando existe uma linha em exercicios_concluidos para a
+        combinação (usuario_id, mundo, exercicio_id); False caso contrário.
     """
     inicializar_banco()
 
@@ -31,16 +33,16 @@ def exercicio_foi_concluido(mundo, exercicio_id, usuario=None):
 
 
 def marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho=0, usuario=None):
-    """Marca um exercicio como concluido para bloquear nova recompensa.
+    """Insere um registro de conclusão de exercício, ignorando duplicatas.
+
+    Usa INSERT OR IGNORE, portanto re-concluir o mesmo exercício não sobrescreve
+    o registro original nem lança exceção.
 
     Recebe:
-        mundo: Identificador do mundo do exercicio.
-        exercicio_id: Identificador do exercicio.
-        xp_ganho: XP recebido na primeira conclusao.
-        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
-
-    Retorna:
-        None.
+        mundo (str): Identificador do mundo, ex.: "mundo_1".
+        exercicio_id (str | int): Identificador do exercício; convertido para str.
+        xp_ganho (int): XP recebido na primeira conclusão (padrão 0).
+        usuario (Usuario | dict | None): Usuário alvo. None usa o ID padrão.
     """
     inicializar_banco()
 
@@ -56,15 +58,15 @@ def marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho=0, usuario=None):
 
 
 def obter_erros_exercicio(mundo, exercicio_id, usuario=None):
-    """Busca a quantidade de erros persistida para um exercicio.
+    """Retorna a quantidade de erros registrados para um exercício específico.
 
     Recebe:
-        mundo: Identificador do mundo do exercicio.
-        exercicio_id: Identificador do exercicio.
-        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+        mundo (str): Identificador do mundo, ex.: "mundo_1".
+        exercicio_id (str | int): Identificador do exercício; convertido para str.
+        usuario (Usuario | dict | None): Usuário alvo. None usa o ID padrão.
 
     Retorna:
-        Quantidade de erros registrados para o exercicio.
+        int: Número de erros acumulados; 0 quando nenhum erro foi registrado ainda.
     """
     inicializar_banco()
 
@@ -82,15 +84,18 @@ def obter_erros_exercicio(mundo, exercicio_id, usuario=None):
 
 
 def registrar_erro_exercicio(mundo, exercicio_id, usuario=None):
-    """Incrementa a quantidade de erros de um exercicio.
+    """Incrementa em 1 o contador de erros do exercício, criando o registro se necessário.
+
+    Usa INSERT … ON CONFLICT … DO UPDATE para upsert atômico, evitando condição
+    de corrida em atualizações concorrentes.
 
     Recebe:
-        mundo: Identificador do mundo do exercicio.
-        exercicio_id: Identificador do exercicio.
-        usuario: Usuario, dicionario legado ou None para usar o usuario ativo.
+        mundo (str): Identificador do mundo, ex.: "mundo_1".
+        exercicio_id (str | int): Identificador do exercício; convertido para str.
+        usuario (Usuario | dict | None): Usuário alvo. None usa o ID padrão.
 
     Retorna:
-        Nova quantidade total de erros do exercicio.
+        int: Novo total de erros após o incremento.
     """
     inicializar_banco()
     usuario_id = obter_usuario_id(usuario)

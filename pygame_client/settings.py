@@ -3,7 +3,11 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class WindowSettings:
-    """Configuracoes visuais da janela Pygame."""
+    """Configurações imutáveis da janela Pygame do CodeQuest.
+
+    Acesse via a instância global WINDOW. Alterar valores exige reinicializar
+    o display manualmente; o dataclass frozen=True impede atribuições acidentais.
+    """
 
     width: int = 1280
     height: int = 800

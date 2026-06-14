@@ -2,13 +2,16 @@ from utils.database import salvar_usuario
 
 
 def calcular_nivel(xp):
-    """Calcula o nivel do usuario a partir do XP acumulado.
+    """Mapeia XP acumulado para o nível do jogador usando limiares fixos.
+
+    Limiares: nível 1 < 100 XP, nível 2 < 250, nível 3 < 450, nível 4 < 700,
+    nível 5 a partir de 700 XP.
 
     Recebe:
-        xp: Quantidade total de XP do usuario.
+        xp (int): Total de XP acumulado pelo usuário.
 
     Retorna:
-        Numero inteiro do nivel correspondente ao XP informado.
+        int: Nível entre 1 e 5 correspondente ao XP informado.
     """
     if xp < 100:
         return 1
@@ -22,14 +25,15 @@ def calcular_nivel(xp):
 
 
 def adicionar_xp(usuario, quantidade):
-    """Adiciona XP ao usuario, atualiza seu nivel e persiste a alteracao.
+    """Soma XP ao usuário, recalcula o nível e persiste o estado no banco.
 
     Recebe:
-        usuario: Instancia de Usuario que recebera o XP.
-        quantidade: Total de XP a ser somado.
+        usuario (Usuario): Instância do usuário ativo; modificada in-place.
+        quantidade (int): Pontos de XP a adicionar.
 
     Retorna:
-        Uma tupla com um booleano indicando subida de nivel e o novo nivel.
+        tuple[bool, int]: Par (subiu_nivel, novo_nivel) repassado de
+        Usuario.adicionar_xp, onde subiu_nivel é True quando o nível aumentou.
     """
     subiu, novo_nivel = usuario.adicionar_xp(quantidade, calcular_nivel)
     salvar_usuario(usuario)
@@ -38,13 +42,14 @@ def adicionar_xp(usuario, quantidade):
 
 
 def xp_para_proximo_nivel(xp_atual):
-    """Calcula quanto XP falta para o proximo nivel.
+    """Calcula quantos pontos de XP faltam para o jogador alcançar o próximo nível.
 
     Recebe:
-        xp_atual: Quantidade total de XP atual do usuario.
+        xp_atual (int): Total de XP atual do usuário.
 
     Retorna:
-        Quantidade de XP restante ate o proximo nivel, ou 0 no nivel maximo.
+        int: XP restante até o próximo limiar; 0 quando o jogador estiver
+        no nível máximo (>= 700 XP).
     """
     if xp_atual < 100:
         return 100 - xp_atual
@@ -55,23 +60,3 @@ def xp_para_proximo_nivel(xp_atual):
     if xp_atual < 700:
         return 700 - xp_atual
     return 0
-
-
-def progresso_para_proximo_nivel(xp_atual):
-    """Calcula a porcentagem de progresso dentro do nivel atual.
-
-    Recebe:
-        xp_atual: Quantidade total de XP atual do usuario.
-
-    Retorna:
-        Valor entre 0.0 e 1.0 usado pelo componente de progresso.
-    """
-    if xp_atual >= 700:
-        return 1.0
-    if xp_atual < 100:
-        return xp_atual / 100
-    if xp_atual < 250:
-        return (xp_atual - 100) / 150
-    if xp_atual < 450:
-        return (xp_atual - 250) / 200
-    return (xp_atual - 450) / 250

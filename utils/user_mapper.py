@@ -4,13 +4,17 @@ from backend.usuario import Usuario
 
 
 def garantir_usuario(usuario):
-    """Normaliza entradas de usuario para a dataclass Usuario.
+    """Normaliza entradas heterogêneas para a dataclass Usuario.
+
+    Aceita instâncias já convertidas, dicionários legados (salvos em JSON antes
+    da migração para SQLite) ou None, retornando sempre um tipo consistente.
 
     Recebe:
-        usuario: Instancia de Usuario, dicionario legado ou None.
+        usuario (Usuario | dict | None): Valor a normalizar.
 
     Retorna:
-        Instancia de Usuario equivalente ou None quando a entrada for None.
+        Usuario | None: Instância de Usuario correspondente, ou None quando a
+        entrada for None.
     """
     if usuario is None:
         return None
@@ -20,13 +24,15 @@ def garantir_usuario(usuario):
 
 
 def usuario_from_linha(linha):
-    """Converte uma linha da tabela usuarios em objeto de dominio.
+    """Converte uma linha da tabela usuarios (sqlite3.Row) em objeto de domínio.
 
     Recebe:
-        linha: sqlite3.Row com colunas de usuario.
+        linha (sqlite3.Row): Linha com colunas id, nome, idade, xp, nivel e
+        conquistas (JSON serializado como texto).
 
     Retorna:
-        Instancia de Usuario preenchida com os dados da linha.
+        Usuario: Instância preenchida com os dados da linha; conquistas é
+        desserializada de JSON, usando lista vazia quando o campo for nulo.
     """
     return Usuario(
         id=linha["id"],
