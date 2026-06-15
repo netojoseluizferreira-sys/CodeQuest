@@ -70,7 +70,9 @@
           "titulo": "Seu primeiro programa",
           "video_url": "https://www.youtube.com/watch?v=31llNGKWDdo",
           "conteudo": [
-            "A função print é a primeira ferramenta de um programador. Ela serve para exibir informações na tela, permitindo que o programa se comunique com quem o está usando. Para utilizá-la, basta escrever print() e colocar o que deseja exibir entre os parênteses; se for um texto, ele deve estar entre aspas, como em print(\"Olá, Mundo!\"). Simples assim: é com o print que você vê, pela primeira vez, o resultado do seu código funcionando."
+            "A função print é a primeira ferramenta de um programador. Ela serve para exibir informações na tela, permitindo que o programa se comunique com quem o está usando.",
+            "Para utilizá-la, basta escrever print() e colocar o que deseja exibir entre os parênteses. Se for um texto, ele deve estar entre aspas. Por exemplo: print(\"Olá, Mundo!\") fará o computador exibir exatamente essa frase na tela.",
+            "Simples assim. O print é o ponto de partida de qualquer programador. É com ele que você vê, pela primeira vez, o resultado do seu código funcionando."
           ]
         },
         {
@@ -85,7 +87,9 @@
           "titulo": "Comentários no código",
           "video_url": "https://www.youtube.com/watch?v=_IvNvs_fNkA",
           "conteudo": [
-            "Comentários são trechos do código que o computador ignora completamente. Eles existem para que o programador deixe anotações, explicações ou lembretes dentro do próprio código, tornando-o mais fácil de entender. Em Python, o símbolo # transforma tudo que vem depois dele, na mesma linha, em um comentário; já três aspas permitem criar comentários com múltiplas linhas. Comentar bem é um hábito importante para revisar, corrigir e compartilhar código."
+            "Comentários são trechos do código que o computador ignora completamente. Eles existem para que o programador deixe anotações, explicações ou lembretes dentro do próprio código, tornando-o mais fácil de entender.",
+            "Em Python, existem duas formas de comentar. O símbolo # transforma tudo que vem depois dele, na mesma linha, em um comentário. Já as três aspas permitem criar comentários com múltiplas linhas, úteis para explicações mais longas.",
+            "Comentar bem o código é um hábito importante. Um código bem comentado é mais fácil de revisar, corrigir e compartilhar com outras pessoas."
           ]
         },
         {
@@ -100,7 +104,9 @@
           "titulo": "Variáveis",
           "video_url": "https://www.youtube.com/watch?v=hdDHg1p3YVc",
           "conteudo": [
-            "Uma variável é um espaço na memória do computador onde você pode guardar uma informação para usar mais tarde. Pense nela como uma caixa com um nome, dentro da qual você coloca um valor. Para criar uma variável em Python, basta escolher um nome e atribuir um valor usando o sinal de igual, como idade = 15. O valor pode ser alterado ao longo do programa sempre que necessário, e por isso chamamos esse recurso de variável."
+            "Uma variável é um espaço na memória do computador onde você pode guardar uma informação para usar mais tarde. Pense nela como uma caixa com um nome, dentro da qual você coloca um valor.",
+            "Para criar uma variável em Python, basta escolher um nome e atribuir um valor a ela usando o sinal de igual. Por exemplo: idade = 15 cria uma variável chamada \"idade\" com o valor 15 guardado dentro dela.",
+            "O valor de uma variável pode ser alterado ao longo do programa sempre que necessário. É por isso que se chama \"variável\": porque o valor pode variar."
           ]
         },
         {
@@ -115,7 +121,9 @@
           "titulo": "Tipos de dados",
           "video_url": "https://www.youtube.com/watch?v=hdDHg1p3YVc",
           "conteudo": [
-            "Todo valor armazenado em uma variável tem um tipo. O tipo define o que aquela informação representa e o que pode ser feito com ela. Em Python, os quatro tipos mais básicos são: inteiro, decimal, texto e booleano. int representa números sem casas decimais, float representa números com casas decimais, str representa textos entre aspas e bool representa verdadeiro ou falso. Entender tipos é essencial porque o computador trata cada tipo de forma diferente."
+            "Todo valor armazenado em uma variável tem um tipo. O tipo define o que aquela informação representa e o que pode ser feito com ela. Em Python, os quatro tipos mais básicos são: inteiro, decimal, texto e booleano.",
+            "O inteiro (int) representa números sem casas decimais, como 5 ou 100. O decimal (float) representa números com casas decimais, como 3.14. O texto (str) representa palavras ou frases, sempre entre aspas. E o booleano (bool) representa apenas dois valores possíveis: verdadeiro (True) ou falso (False).",
+            "Entender os tipos de dados é essencial, pois o computador trata cada tipo de forma diferente. Somar dois números inteiros é diferente de juntar dois textos, por exemplo."
           ]
         },
         {
@@ -130,7 +138,9 @@
           "titulo": "Entrada e saída de dados",
           "video_url": "https://www.youtube.com/watch?v=hdDHg1p3YVc",
           "conteudo": [
-            "Todo programa útil precisa se comunicar com o usuário. A saída de dados acontece quando o programa exibe algo na tela, como já fazemos com print. A entrada de dados é o caminho inverso: o usuário fornece uma informação para o programa. Em Python, a função input recebe dados digitados pelo usuário, pausa o programa e permite guardar o valor em uma variável. Juntos, input e print formam a base da comunicação entre programa e usuário."
+            "Todo programa útil precisa se comunicar com o usuário. A saída de dados acontece quando o programa exibe algo na tela, o que já aprendemos a fazer com print. A entrada de dados é o caminho inverso: o usuário fornece uma informação para o programa.",
+            "Em Python, a função input é usada para receber dados do usuário. Ao ser executada, ela pausa o programa e aguarda que o usuário digite algo. O que for digitado pode ser guardado em uma variável para ser usado depois.",
+            "Juntos, input e print formam a base da comunicação entre o programa e o usuário, permitindo criar desde programas simples até interações muito mais complexas."
           ]
         },
         {
