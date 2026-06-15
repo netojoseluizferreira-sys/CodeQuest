@@ -1,6 +1,8 @@
 """Testes de validação de respostas e progresso dos exercícios."""
 
 from backend.usuario import Usuario
+from backend.exercicio import carregar_exercicios
+from backend.worlds import exercicios_obrigatorios
 from pygame_client.learning_progress import (
     calcular_xp_potencial,
     frase_xp,
@@ -64,3 +66,21 @@ def test_registrar_resposta_errada_reduz_xp_potencial(banco_temporario):
     assert erro["erros"] == 1
     assert "8 XP" in erro["mensagem"]
     assert acerto["xp"] == 8
+
+
+def test_registrar_ultimo_exercicio_marca_mundo_como_concluido(banco_temporario):
+    usuario = database.criar_usuario("Ada", 12)
+    exercicios = carregar_exercicios("mundo_1")
+    exercicio_ids = exercicios_obrigatorios("mundo_1")
+    ultimo_id = exercicio_ids[-1]
+
+    for exercicio_id in exercicio_ids[:-1]:
+        database.marcar_exercicio_concluido("mundo_1", exercicio_id, 10, usuario)
+
+    assert database.mundo_concluido("mundo_1", usuario) is False
+
+    ultimo_exercicio = exercicios[ultimo_id]
+    resultado = registrar_resposta("mundo_1", ultimo_exercicio, ultimo_exercicio["resposta"], usuario)
+
+    assert resultado["acertou"] is True
+    assert database.mundo_concluido("mundo_1", usuario) is True

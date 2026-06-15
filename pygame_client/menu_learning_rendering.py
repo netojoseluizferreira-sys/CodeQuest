@@ -31,9 +31,12 @@ class LearningRenderMixin:
 
     def _desenhar_fundo_aprendizado(self):
         """Desenha o fundo das telas de aula, exercício e conclusão do mundo ativo."""
-        if self.mundo_ativo == "mundo_2" and self.mundo2_bg:
-            self.screen.blit(self.mundo2_bg, (0, 0))
-            self.screen.blit(self.mundo2_overlay, (0, 0))
+        mundo_bg = getattr(self, "world_backgrounds", {}).get(self.mundo_ativo)
+        if mundo_bg:
+            self.screen.blit(mundo_bg, (0, 0))
+            mundo_overlay = getattr(self, "world_overlays", {}).get(self.mundo_ativo)
+            if mundo_overlay:
+                self.screen.blit(mundo_overlay, (0, 0))
             return
 
         if self.cutscene_bg:
@@ -94,7 +97,7 @@ class LearningRenderMixin:
         _fc = self.font_lesson_body
         _lh = _fc.get_linesize() + 2
         _body_top = _sub_y + _fes.get_height() // 2 + 32
-        _has_cta = bool(segmento.get("video_url")) or (self.mundo_ativo == "mundo_1" and segmento.get("id") == "texto_1")
+        _has_cta = bool(segmento.get("video_url"))
         _conteudo = segmento["conteudo"]
         if len(_conteudo) > 4:
             _meio = math.ceil(len(_conteudo) / 2)
@@ -334,7 +337,7 @@ class LearningRenderMixin:
             self.screen.blit(_surface, _surface.get_rect(center=(_panel_rect.centerx, _y + _lh // 2)))
             _y += _lh
 
-        if self.status_message.startswith("Mundo 3 em breve"):
+        if self.status_message.startswith("EM BREVE!"):
             self._desenhar_status(525)
 
     def _desenhar_cabecalho(self, titulo, subtitulo):

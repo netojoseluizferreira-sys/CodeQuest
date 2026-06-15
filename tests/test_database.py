@@ -4,8 +4,10 @@ import json
 import os
 
 from backend.usuario import Usuario
+from backend.worlds import exercicios_obrigatorios
 from utils import database
 from utils import database_config
+from utils.database_connection import conectar
 
 
 def test_salva_e_carrega_usuario_com_dataclass(banco_temporario):
@@ -82,12 +84,84 @@ def test_progresso_de_exercicio_e_isolado_por_usuario(banco_temporario):
     assert database.exercicio_foi_concluido("mundo_1", "1", usuario_2) is False
 
 
+def test_mundo_comeca_nao_concluido_e_pode_ser_marcado(banco_temporario):
+    usuario = database.criar_usuario("Teste", 12)
+
+    database.garantir_progresso_mundo("mundo_1", usuario)
+
+    assert database.mundo_concluido("mundo_1", usuario) is False
+
+    database.marcar_mundo_concluido("mundo_1", usuario)
+
+    assert database.mundo_concluido("mundo_1", usuario) is True
+    assert database.listar_mundos_concluidos(usuario) == ["mundo_1"]
+
+
+def test_conclusao_de_mundo_nao_duplica_registros(banco_temporario):
+    usuario = database.criar_usuario("Teste", 12)
+
+    database.marcar_mundo_concluido("mundo_1", usuario)
+    database.marcar_mundo_concluido("mundo_1", usuario)
+
+    with conectar() as conexao:
+        total = conexao.execute(
+            """
+            SELECT COUNT(*) AS total
+            FROM mundos_concluidos
+            WHERE usuario_id = ? AND mundo_id = ?
+            """,
+            (usuario.id, "mundo_1"),
+        ).fetchone()["total"]
+
+    assert total == 1
+
+
+def test_status_de_mundos_respeita_configuracao_de_desbloqueio(banco_temporario):
+    usuario = database.criar_usuario("Teste", 12)
+
+    assert database.obter_status_mundo("mundo_1", usuario)["estado"] == database.STATUS_DISPONIVEL
+    assert database.obter_status_mundo("mundo_2", usuario)["estado"] == database.STATUS_BLOQUEADO
+
+    database.marcar_mundo_concluido("mundo_1", usuario)
+
+    assert database.obter_status_mundo("mundo_2", usuario)["estado"] == database.STATUS_DISPONIVEL
+
+
+def test_mundo_nao_implementado_aparece_em_breve(banco_temporario):
+    usuario = database.criar_usuario("Teste", 12)
+    database.marcar_mundo_concluido("mundo_2", usuario)
+
+    status = database.obter_status_mundo("mundo_3", usuario)
+
+    assert status["estado"] == database.STATUS_EM_BREVE
+
+
+def test_mundo_concluido_migra_progresso_antigo_de_exercicios(banco_temporario):
+    usuario = database.criar_usuario("Teste", 12)
+
+    for exercicio_id in exercicios_obrigatorios("mundo_1"):
+        database.marcar_exercicio_concluido("mundo_1", exercicio_id, 10, usuario)
+
+    with conectar() as conexao:
+        antes = conexao.execute("SELECT COUNT(*) AS total FROM mundos_concluidos").fetchone()["total"]
+
+    assert antes == 0
+    assert database.mundo_concluido("mundo_1", usuario) is True
+
+    with conectar() as conexao:
+        depois = conexao.execute("SELECT COUNT(*) AS total FROM mundos_concluidos").fetchone()["total"]
+
+    assert depois == 1
+
+
 def test_resetar_banco_remove_dados_e_arquivos_legados(banco_temporario):
     database.criar_usuario("Teste", 12)
+    database.marcar_mundo_concluido("mundo_1")
     with open(database_config.LEGACY_PROGRESSO_JSON_PATH, "w", encoding="utf-8") as arquivo:
         json.dump({"qualquer": "valor"}, arquivo)
 
     database.resetar_banco_de_dados()
 
     assert database.carregar_usuario() is None
+    assert database.listar_mundos_concluidos() == []
     assert not os.path.exists(database_config.LEGACY_PROGRESSO_JSON_PATH)

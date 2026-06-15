@@ -15,9 +15,9 @@ O projeto está em versão jogável local, centralizado no Pygame. A antiga abor
 - Tela de perfil com nome, idade, XP, nível e progresso.
 - Cutscene inicial com imagens, texto e avanço manual.
 - Arquipélago de Bythos com seleção de mundos.
-- Mundo 1 completo: 3 textos de aula e 15 exercícios em blocos.
+- Mundo 1 completo com textos de aula e exercícios definidos na configuração.
 - Mundo 2 inicial: textos e exercícios no mesmo padrão visual do Mundo 1.
-- Bloqueio do Mundo 2 até concluir os 15 exercícios do Mundo 1.
+- Bloqueio do Mundo 2 até o Mundo 1 estar marcado como concluído.
 - Exercícios concluídos são pulados ao reiniciar o app, preservando os textos de aula.
 - XP dinâmico: começa em 10, perde 2 por erro e respeita mínimo de 2 XP.
 - Bloqueio de XP duplicado por exercício concluído.
@@ -64,6 +64,7 @@ CodeQuest/
 |-- data/
 |   |-- aulas.json
 |   |-- exercicios.json
+|   |-- mundos.json
 |   |-- cutscenes/
 |   |-- music/
 |   |-- hub_frames/
@@ -100,6 +101,7 @@ Conteúdo versionado:
 
 - `data/aulas.json`
 - `data/exercicios.json`
+- `data/mundos.json`
 
 Progresso local:
 
@@ -110,6 +112,7 @@ Tabelas principais:
 - `usuarios`: save ativo do jogador.
 - `exercicios_concluidos`: impede XP duplicado e permite pular exercícios já feitos.
 - `exercicio_erros`: registra erros por usuário, mundo e exercício para calcular XP potencial.
+- `mundos_concluidos`: registra conclusão de mundos por usuário e desbloqueia novos mundos.
 
 ## Testes
 

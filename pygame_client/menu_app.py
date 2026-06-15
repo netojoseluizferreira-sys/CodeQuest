@@ -5,6 +5,7 @@ import os
 
 import pygame
 
+from backend.worlds import listar_mundos
 from pygame_client.audio import AudioController
 from pygame_client.menu_buttons import ButtonMixin
 from pygame_client.menu_config import AULA_ATIVA, MUNDO_ATIVO
@@ -134,12 +135,19 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
             self.cutscene_bg = pygame.transform.scale(_cbg, (WINDOW.width, WINDOW.height))
         else:
             self.cutscene_bg = None
-        _mundo2_bg_path = os.path.join(_data_dir, "mundo_2_background.jpeg")
-        if os.path.exists(_mundo2_bg_path):
-            _m2bg = pygame.image.load(_mundo2_bg_path).convert()
-            self.mundo2_bg = pygame.transform.scale(_m2bg, (WINDOW.width, WINDOW.height))
-        else:
-            self.mundo2_bg = None
+        self.world_backgrounds = {}
+        self.world_overlays = {}
+        for _mundo in listar_mundos():
+            _background = _mundo.get("background")
+            if not _background:
+                continue
+            _bg_path = os.path.join(_data_dir, _background)
+            if os.path.exists(_bg_path):
+                _bg = pygame.image.load(_bg_path).convert()
+                self.world_backgrounds[_mundo["id"]] = pygame.transform.scale(_bg, (WINDOW.width, WINDOW.height))
+                _overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+                _overlay.fill((0, 0, 0, int(_mundo.get("overlay_alpha", 185))))
+                self.world_overlays[_mundo["id"]] = _overlay
         _perfil_frames_dir = os.path.join(_data_dir, "perfil_frames")
         self.perfil_frame_paths = sorted(glob.glob(os.path.join(_perfil_frames_dir, "*.jpg")))
         self.perfil_frame_index = 0
@@ -161,9 +169,6 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
         self.lesson_overlay = _less_ov
-        _m2_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
-        _m2_ov.fill((0, 0, 0, 185))
-        self.mundo2_overlay = _m2_ov
 
     def run(self):
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""

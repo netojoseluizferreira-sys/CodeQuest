@@ -145,7 +145,7 @@ def test_mundo_indisponivel_mostra_texto_em_breve_atualizado():
     assert app.status_message == (
         "EM BREVE!\n"
         "Os segredos deste mundo ainda não estão prontos para serem revelados. "
-        "Continue sua jornada pelo Mundo 1 ou Mundo 2 enquanto isso."
+        "Continue sua jornada pelos mundos disponíveis enquanto isso."
     )
 
 
@@ -212,7 +212,8 @@ def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
     aula = {"titulo": "Aula 2", "trilha": [{"tipo": "aula", "conteudo": ["Texto"]}]}
 
     monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
-    monkeypatch.setattr(menu_navigation, "exercicio_foi_concluido", lambda *_args: True)
+    monkeypatch.setattr(menu_navigation, "obter_status_mundo", lambda *_args: {"estado": menu_navigation.STATUS_DISPONIVEL})
+    monkeypatch.setattr(menu_navigation, "aula_inicial", lambda mundo: "aula_1")
     monkeypatch.setattr(menu_navigation, "carregar_aula_pygame", lambda mundo, aula_id: aula)
     monkeypatch.setattr(menu_navigation, "carregar_exercicios_pygame", lambda mundo: {"1": {"id": 1}})
 
@@ -239,8 +240,11 @@ def test_iniciar_mundo_2_bloqueia_quando_mundo_1_incompleto(monkeypatch):
     monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
     monkeypatch.setattr(
         menu_navigation,
-        "exercicio_foi_concluido",
-        lambda mundo, exercicio_id, usuario: int(exercicio_id) < 15,
+        "obter_status_mundo",
+        lambda *_args: {
+            "estado": menu_navigation.STATUS_BLOQUEADO,
+            "mensagem": "Conclua Mundo 1 antes de abrir Mundo 2.",
+        },
     )
     monkeypatch.setattr(menu_navigation, "carregar_aula_pygame", lambda mundo, aula_id: chamadas_aula.append((mundo, aula_id)))
 
@@ -255,7 +259,7 @@ def test_iniciar_mundo_2_bloqueia_quando_mundo_1_incompleto(monkeypatch):
     assert chamadas_aula == []
     assert app.screen_name == "worlds"
     assert app.status_kind == "error"
-    assert "15 exercícios do Mundo 1" in app.status_message
+    assert app.status_message == "Conclua Mundo 1 antes de abrir Mundo 2."
 
 
 def test_conclusao_do_mundo_2_aponta_para_mundo_3():
@@ -267,7 +271,7 @@ def test_conclusao_do_mundo_2_aponta_para_mundo_3():
     label, acao = app._proximo_mundo_conclusao()
 
     assert label == "Mundo 3"
-    assert acao.__name__ == "_mostrar_mundo_3_em_breve"
+    assert callable(acao)
     assert "Mundo 2" in app._texto_conclusao_mundo(label)
     assert "Mundo 3" in app._texto_conclusao_mundo(label)
 

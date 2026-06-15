@@ -56,7 +56,8 @@ class EventMixin:
 
             if self.link_rect and self.link_rect.collidepoint(event.pos):
                 url = segmento.get("video_url") if segmento else None
-                webbrowser.open(url or "https://www.youtube.com/watch?v=8mei6uVttho")
+                if url:
+                    webbrowser.open(url)
 
             exercicio = self._exercicio_atual() if segmento and segmento["tipo"] == "exercicios" else None
             if exercicio and exercicio["tipo"] == "completar":

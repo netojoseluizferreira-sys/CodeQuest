@@ -8,6 +8,7 @@ from utils.database import (
     marcar_exercicio_concluido,
     obter_erros_exercicio,
     registrar_erro_exercicio,
+    verificar_e_marcar_conclusao_mundo,
 )
 
 
@@ -130,6 +131,7 @@ def registrar_resposta(mundo, exercicio, resposta, usuario):
         xp_ganho = calcular_xp_potencial(erros_antes)
         adicionar_xp(usuario, xp_ganho)
         marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho, usuario)
+        verificar_e_marcar_conclusao_mundo(mundo, usuario)
         return {
             "acertou": True,
             "xp": xp_ganho,

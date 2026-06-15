@@ -1,0 +1,94 @@
+{
+  "mundo_1": {
+    "ordem": 1,
+    "numero": "Mundo 1",
+    "assunto": "Introdução",
+    "nome": "Cabana do Oráculo",
+    "implementado": true,
+    "requer": null,
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+  },
+  "mundo_2": {
+    "ordem": 2,
+    "numero": "Mundo 2",
+    "assunto": "Primeiros Passos",
+    "nome": "Tenda do Iniciado",
+    "implementado": true,
+    "requer": "mundo_1",
+    "aula_inicial": "aula_1",
+    "background": "mundo_2_background.jpeg",
+    "overlay_alpha": 185,
+    "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+  },
+  "mundo_3": {
+    "ordem": 3,
+    "numero": "Mundo 3",
+    "assunto": "Operadores",
+    "nome": "Forja das Runas",
+    "implementado": false,
+    "requer": "mundo_2",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  },
+  "mundo_4": {
+    "ordem": 4,
+    "numero": "Mundo 4",
+    "assunto": "Estruturas de Decisão",
+    "nome": "Torre dos Julgamentos",
+    "implementado": false,
+    "requer": "mundo_3",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  },
+  "mundo_5": {
+    "ordem": 5,
+    "numero": "Mundo 5",
+    "assunto": "Estruturas de Repetição",
+    "nome": "Moinho Eterno",
+    "implementado": false,
+    "requer": "mundo_4",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  },
+  "mundo_6": {
+    "ordem": 6,
+    "numero": "Mundo 6",
+    "assunto": "Funções",
+    "nome": "Santuário dos Invocadores",
+    "implementado": false,
+    "requer": "mundo_5",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  },
+  "mundo_7": {
+    "ordem": 7,
+    "numero": "Mundo 7",
+    "assunto": "Vetores / Listas",
+    "nome": "Biblioteca dos Pergaminhos",
+    "implementado": false,
+    "requer": "mundo_6",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  },
+  "mundo_8": {
+    "ordem": 8,
+    "numero": "Mundo 8",
+    "assunto": "Dicionários",
+    "nome": "Templo da Grade Sagrada",
+    "implementado": false,
+    "requer": "mundo_7",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  },
+  "mundo_9": {
+    "ordem": 9,
+    "numero": "Mundo 9",
+    "assunto": "Recursividade",
+    "nome": "Citadela do Espelho Infinito",
+    "implementado": false,
+    "requer": "mundo_8",
+    "aula_inicial": "aula_1",
+    "exercicios_obrigatorios": []
+  }
+}

@@ -1,9 +1,19 @@
 """Fluxos de navegação, mundos, usuário e respostas do menu Pygame."""
 
+from backend.worlds import MUNDO_2_ID, MUNDO_3_ID, MUNDO_INICIAL, aula_inicial, nome_mundo, proximo_mundo
 from pygame_client.content import carregar_aula_pygame, carregar_exercicios_pygame, obter_exercicio
 from pygame_client.learning_progress import registrar_resposta
 from pygame_client.menu_config import CUTSCENE_TEXTS
-from utils.database import carregar_usuario, criar_usuario, exercicio_foi_concluido, resetar_banco_de_dados
+from utils.database import (
+    STATUS_BLOQUEADO,
+    STATUS_DISPONIVEL,
+    STATUS_EM_BREVE,
+    carregar_usuario,
+    criar_usuario,
+    exercicio_foi_concluido,
+    obter_status_mundo,
+    resetar_banco_de_dados,
+)
 
 
 class NavigationMixin:
@@ -96,19 +106,38 @@ class NavigationMixin:
         self.screen_name = "worlds"
         self._definir_status("Escolha um destino para estudar.")
 
-    def _mostrar_mundo_em_breve(self):
+    def _selecionar_mundo(self, mundo_id):
+        """Consulta a regra de acesso do mundo e inicia, bloqueia ou mostra aviso."""
+        self.usuario = carregar_usuario()
+        if self.usuario is None:
+            self._definir_status("Crie um personagem antes de estudar.", "error")
+            self.screen_name = "create"
+            return
+
+        status = obter_status_mundo(mundo_id, self.usuario)
+        if status["estado"] == STATUS_DISPONIVEL:
+            self._iniciar_mundo(mundo_id, aula_inicial(mundo_id))
+            return
+        if status["estado"] == STATUS_BLOQUEADO:
+            self._definir_status(status["mensagem"], "error")
+            return
+        if status["estado"] == STATUS_EM_BREVE:
+            self._mostrar_mundo_em_breve(mundo_id)
+
+    def _mostrar_mundo_em_breve(self, mundo_id=None):
         """Mostra o aviso de mundo indisponível mantendo o jogador na seleção de mundos.
 
         Recebe:
-            Nenhum parâmetro.
+            mundo_id (str | None): Mundo indisponível, quando houver.
 
         Retorna:
             None: Atualiza apenas a mensagem de status exibida na tela de mundos.
         """
+        kind = "success" if getattr(self, "screen_name", None) == "complete" else "normal"
         self._definir_status(
             "EM BREVE!\nOs segredos deste mundo ainda não estão prontos para serem revelados. "
-            "Continue sua jornada pelo Mundo 1 ou Mundo 2 enquanto isso.",
-            "normal",
+            "Continue sua jornada pelos mundos disponíveis enquanto isso.",
+            kind,
         )
 
     def _mostrar_mundo_3_em_breve(self):
@@ -117,7 +146,7 @@ class NavigationMixin:
         Retorna:
             None: Atualiza a mensagem de status exibida na tela atual.
         """
-        self._definir_status("Mundo 3 em breve! Volte para o menu.", "success")
+        self._mostrar_mundo_em_breve(MUNDO_3_ID)
 
     def _proximo_mundo_conclusao(self):
         """Define o botão de próximo mundo exibido na tela de conclusão.
@@ -125,9 +154,10 @@ class NavigationMixin:
         Retorna:
             tuple[str, Callable]: Texto do botão e ação correspondente.
         """
-        if self.mundo_ativo == "mundo_2":
-            return "Mundo 3", self._mostrar_mundo_3_em_breve
-        return "Mundo 2", self._iniciar_mundo_2
+        proximo = proximo_mundo(self.mundo_ativo)
+        if proximo is None:
+            return "Mundos", self._abrir_mundos
+        return proximo["numero"], lambda mundo_id=proximo["id"]: self._selecionar_mundo(mundo_id)
 
     def _texto_conclusao_mundo(self, proximo_label):
         """Monta a mensagem de conclusão conforme o mundo recém-finalizado.
@@ -138,9 +168,8 @@ class NavigationMixin:
         Retorna:
             str: Texto orientando o jogador a ver o perfil ou seguir adiante.
         """
-        numero_atual = self.mundo_ativo.replace("mundo_", "")
         return (
-            f"Você completou o Mundo {numero_atual}. Agora pode visitar o perfil para ver seu progresso "
+            f"Você completou o {nome_mundo(self.mundo_ativo)}. Agora pode visitar o perfil para ver seu progresso "
             f"ou seguir para o {proximo_label} e continuar sua jornada."
         )
 
@@ -185,34 +214,11 @@ class NavigationMixin:
         Redireciona para criação de personagem se não houver save, ou exibe erro
         de status quando o arquivo de aula não puder ser carregado.
         """
-        self._iniciar_mundo("mundo_1", "aula_1")
+        self._selecionar_mundo(MUNDO_INICIAL)
 
     def _iniciar_mundo_2(self):
         """Carrega a aula e exercícios do Mundo 2 e inicia o fluxo de aprendizagem."""
-        self.usuario = carregar_usuario()
-        if self.usuario is None:
-            self._definir_status("Crie um personagem antes de estudar.", "error")
-            self.screen_name = "create"
-            return
-        if not self._mundo_1_foi_concluido():
-            self._definir_status("Conclua os 15 exercícios do Mundo 1 antes de abrir o Mundo 2.", "error")
-            return
-        self._iniciar_mundo("mundo_2", "aula_1")
-
-    def _mundo_1_foi_concluido(self):
-        """Verifica se o usuário concluiu todos os 15 exercícios do Mundo 1.
-
-        Retorna:
-            bool: True quando todos os exercícios de IDs 1 a 15 têm registro de
-            conclusão no SQLite para o usuário ativo; False caso contrário.
-        """
-        self.usuario = self.usuario or carregar_usuario()
-        if self.usuario is None:
-            return False
-        return all(
-            exercicio_foi_concluido("mundo_1", exercicio_id, self.usuario)
-            for exercicio_id in range(1, 16)
-        )
+        self._selecionar_mundo(MUNDO_2_ID)
 
     def _iniciar_mundo(self, mundo, aula_id):
         """Carrega uma aula de mundo e inicia o fluxo visual de aprendizagem.

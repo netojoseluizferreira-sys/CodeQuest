@@ -26,8 +26,8 @@ def conectar():
 def inicializar_banco():
     """Cria as tabelas do banco caso ainda não existam (CREATE TABLE IF NOT EXISTS).
 
-    Garante a existência de três tabelas: usuarios, exercicios_concluidos e
-    exercicio_erros, com suas respectivas chaves primárias e estrangeiras.
+    Garante a existência das tabelas de usuário, exercícios, mundos e erros,
+    com suas respectivas chaves primárias e estrangeiras.
     Seguro para chamadas repetidas; não destrói dados existentes.
     """
     with closing(conectar()) as conexao, conexao:
@@ -65,6 +65,18 @@ def inicializar_banco():
                 erros INTEGER NOT NULL DEFAULT 0,
                 atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (usuario_id, mundo, exercicio_id),
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            )
+            """
+        )
+        conexao.execute(
+            """
+            CREATE TABLE IF NOT EXISTS mundos_concluidos (
+                usuario_id INTEGER NOT NULL,
+                mundo_id TEXT NOT NULL,
+                concluido INTEGER NOT NULL DEFAULT 0,
+                data_conclusao TEXT,
+                PRIMARY KEY (usuario_id, mundo_id),
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
             )
             """

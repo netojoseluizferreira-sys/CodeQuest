@@ -1,19 +1,9 @@
-"""Constantes de mundos, cores locais e cutscene do menu Pygame."""
+"""Constantes de cores locais e cutscene do menu Pygame."""
 
-MUNDO_ATIVO = "mundo_1"
-AULA_ATIVA = "aula_1"
+from backend.worlds import MUNDO_INICIAL, aula_inicial
 
-MUNDOS_BYTHOS = [
-    ("Mundo 1", "Introdução", "Cabana do Oráculo", True),
-    ("Mundo 2", "Primeiros Passos", "Tenda do Iniciado", True),
-    ("Mundo 3", "Operadores", "Forja das Runas", False),
-    ("Mundo 4", "Estruturas de Decisão", "Torre dos Julgamentos", False),
-    ("Mundo 5", "Estruturas de Repetição", "Moinho Eterno", False),
-    ("Mundo 6", "Funções", "Santuário dos Invocadores", False),
-    ("Mundo 7", "Vetores / Listas", "Biblioteca dos Pergaminhos", False),
-    ("Mundo 8", "Dicionários", "Templo da Grade Sagrada", False),
-    ("Mundo 9", "Recursividade", "Citadela do Espelho Infinito", False),
-]
+MUNDO_ATIVO = MUNDO_INICIAL
+AULA_ATIVA = aula_inicial(MUNDO_INICIAL)
 
 _VERDE = (30, 100, 50)
 _BRANCO = (255, 255, 255)

@@ -2,7 +2,8 @@
 
 import pygame
 
-from pygame_client.menu_config import MUNDOS_BYTHOS, _KW_VERDE
+from backend.worlds import listar_mundos, titulo_botao_mundo
+from pygame_client.menu_config import _KW_VERDE
 from pygame_client.settings import WINDOW
 from pygame_client.ui import Button
 
@@ -110,18 +111,19 @@ class ButtonMixin:
         _start_x = (WINDOW.width - _grid_w) // 2
         _start_y = 300
         botoes = []
-        for indice, (numero, _assunto, nome, disponivel) in enumerate(MUNDOS_BYTHOS):
+        for indice, mundo in enumerate(listar_mundos()):
             col = indice % 3
             row = indice // 3
             x = _start_x + col * (_bw + _gap_x)
             y = _start_y + row * (_bh + _gap_y)
-            if numero == "Mundo 1":
-                acao = self._iniciar_mundo_1
-            elif numero == "Mundo 2":
-                acao = self._iniciar_mundo_2
-            else:
-                acao = self._mostrar_mundo_em_breve
-            botoes.append(Button(pygame.Rect(x, y, _bw, _bh), f"{numero} - {nome}", acao, **_KW_VERDE))
+            botoes.append(
+                Button(
+                    pygame.Rect(x, y, _bw, _bh),
+                    titulo_botao_mundo(mundo),
+                    lambda mundo_id=mundo["id"]: self._selecionar_mundo(mundo_id),
+                    **_KW_VERDE,
+                )
+            )
         botoes.append(Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE))
         return botoes
 

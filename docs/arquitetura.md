@@ -42,6 +42,7 @@ flowchart TD
 - `usuario.py`: dataclass `Usuario` e operações de domínio do usuário.
 - `xp_system.py`: cálculo de nível, XP para próximo nível e soma de XP.
 - `exercicio.py`: leitura bruta dos arquivos de aula e exercício.
+- `worlds.py`: leitura de `data/mundos.json` e helpers para metadados, ordem, requisito, aula inicial e exercícios obrigatórios.
 
 ### `utils/`
 
@@ -51,12 +52,13 @@ flowchart TD
 - `user_repository.py`: CRUD do usuário ativo e migração de JSON legado.
 - `user_mapper.py`: conversão entre SQLite, dicionários e dataclass `Usuario`.
 - `exercise_progress_repository.py`: progresso de exercícios, erros e bloqueio de recompensa duplicada.
+- `world_progress_repository.py`: progresso por mundo, marcação de conclusão e consulta usada para desbloquear mundos.
 
 ### `data/`
 
 Contém conteúdo e assets versionados:
 
-- `aulas.json` e `exercicios.json`.
+- `aulas.json`, `exercicios.json` e `mundos.json`.
 - fontes: PressStart2P, RammettoOne e WendyOne.
 - frames de fundo, imagens de cutscene, fundos de mundo e músicas.
 
@@ -78,6 +80,8 @@ O atributo `screen_name` define a tela ativa:
 
 ## Fluxo Pedagógico
 
+Os metadados de progressão ficam centralizados em `data/mundos.json`. Cada mundo define ID, rótulo, nome exibido, requisito de desbloqueio, aula inicial, implementação, exercícios obrigatórios e assets opcionais de fundo.
+
 Cada aula em `data/aulas.json` possui uma `trilha`, composta por segmentos:
 
 - `aula`: texto explicativo, com suporte opcional a link externo.
@@ -93,9 +97,13 @@ O Mundo 2 usa o mesmo padrão visual e começa com blocos menores de texto e pr�
 
 ## Progresso e Bloqueios
 
-Quando um exercício é concluído, o registro é salvo em `exercicios_concluidos`. Ao reiniciar o app, `NavigationMixin._pular_exercicios_concluidos()` ignora exercícios já feitos, mas preserva os textos de aula para revisão.
+Quando um exercício é concluído, o registro é salvo em `exercicios_concluidos`. Em seguida, `verificar_e_marcar_conclusao_mundo()` confere se todos os exercícios obrigatórios daquele mundo foram concluídos e, quando for o caso, grava a conclusão em `mundos_concluidos`.
 
-O Mundo 2 só abre quando os 15 exercícios do Mundo 1 constam como concluídos no banco.
+Ao reiniciar o app, `NavigationMixin._pular_exercicios_concluidos()` ignora exercícios já feitos, mas preserva os textos de aula para revisão.
+
+O desbloqueio de novos mundos consulta a camada de progresso por mundo e a configuração central em `data/mundos.json`. O Mundo 2, por exemplo, abre quando o requisito configurado para ele está concluído, sem checagens hardcoded de IDs de exercícios na navegação.
+
+A tabela `mundos_concluidos` usa a chave `(usuario_id, mundo_id)` para impedir duplicidade e armazena `concluido` e `data_conclusao`. Para compatibilidade com saves antigos, a consulta de mundo concluído consegue reconhecer mundos que já tenham todos os exercícios salvos em `exercicios_concluidos` e atualiza a nova tabela.
 
 ## Regras de XP
 
@@ -132,8 +140,8 @@ Para adicionar um novo mundo:
 
 1. Adicione textos em `data/aulas.json`.
 2. Adicione exercícios em `data/exercicios.json`.
-3. Inclua o mundo em `MUNDOS_BYTHOS`, em `pygame_client/menu_config.py`.
-4. Crie uma ação de início em `menu_navigation.py` caso o mundo tenha regras próprias de bloqueio.
+3. Inclua os metadados do mundo em `data/mundos.json`.
+4. Defina `requer`, `implementado`, `aula_inicial`, `background` e `exercicios_obrigatorios` conforme necessário.
 5. Adicione testes de carregamento de conteúdo e fluxo.
 
 Para mudar visual:
@@ -145,3 +153,4 @@ Para mudar persistência:
 
 1. Ajuste os repositórios em `utils/`.
 2. Exponha a função pela fachada `utils/database.py` quando outras camadas precisarem usar.
+3. Mantenha regras de progresso fora do Pygame; o cliente deve consultar funções de domínio/repositório.

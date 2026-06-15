@@ -7,6 +7,7 @@
           "tipo": "aula",
           "id": "texto_1",
           "titulo": "O que é programação?",
+          "video_url": "https://www.youtube.com/watch?v=8mei6uVttho",
           "conteudo": [
             "Programação é o ato de dar instruções a um computador para que ele execute tarefas. Essas instruções são escritas em uma linguagem que o computador consegue interpretar e seguir, passo a passo.",
             "Assim como uma receita de bolo guia um cozinheiro, um programa guia o computador, dizendo exatamente o que fazer, em qual ordem e em quais condições.",
