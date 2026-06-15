@@ -586,17 +586,17 @@ class RenderMixin:
     def _renderizar_creditos(self):
         """Renderiza os créditos com fundo e painel translúcido no padrão das aulas."""
         self.credit_link_rect = None
-        if self.cutscene_bg:
-            self.screen.blit(self.cutscene_bg, (0, 0))
-        elif self.creditos_frame_paths:
+        if self.creditos_frame_paths:
             self.creditos_frame_timer += 1
             if self.creditos_frame_timer >= 6:
                 self.creditos_frame_timer = 0
                 self.creditos_frame_index = (self.creditos_frame_index + 1) % len(self.creditos_frame_paths)
             self.screen.blit(self._obter_frame_animado(self.creditos_frame_paths, self.creditos_frame_index), (0, 0))
+            _cred_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+            _cred_ov.fill((0, 0, 0, 120))
+            self.screen.blit(_cred_ov, (0, 0))
         else:
             self.screen.fill((11, 25, 11))
-        self.screen.blit(self.lesson_overlay, (0, 0))
 
         _MARG = 118
         _CW = WINDOW.width - _MARG * 2
