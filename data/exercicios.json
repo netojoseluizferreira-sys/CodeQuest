@@ -223,5 +223,172 @@
       "resposta": 1,
       "xp": 10
     }
+  },
+  "mundo_2": {
+    "1": {
+      "id": 1,
+      "tipo": "multipla_escolha",
+      "titulo": "Função print",
+      "pergunta": "Qual função é usada para exibir informações na tela em Python?",
+      "opcoes": ["input()", "print()", "show()", "display()"],
+      "resposta": 1,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "tipo": "multipla_escolha",
+      "titulo": "Texto no print",
+      "pergunta": "Como deve ser escrito corretamente um texto dentro da função print?",
+      "opcoes": ["print(Olá, Mundo!)", "print[\"Olá, Mundo!\"]", "print(\"Olá, Mundo!\")", "print{\"Olá, Mundo!\"}"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "tipo": "multipla_escolha",
+      "titulo": "Comentários",
+      "pergunta": "Para que serve um comentário no código?",
+      "opcoes": [
+        "Para executar uma parte do código mais rapidamente",
+        "Para deixar anotações e explicações que o computador ignora",
+        "Para armazenar valores em variáveis",
+        "Para exibir mensagens na tela"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "4": {
+      "id": 4,
+      "tipo": "completar",
+      "titulo": "Símbolo de comentário",
+      "pergunta": "Em Python, o símbolo ___ transforma tudo que vem depois dele, na mesma linha, em um comentário.",
+      "placeholder": "Digite o símbolo",
+      "respostas_aceitas": ["#", "cerquilha", "hashtag", "jogo da velha"],
+      "xp": 10
+    },
+    "5": {
+      "id": 5,
+      "tipo": "multipla_escolha",
+      "titulo": "Variáveis",
+      "pergunta": "O que é uma variável?",
+      "opcoes": [
+        "Um comando que exibe informações na tela",
+        "Um erro encontrado no código",
+        "Um espaço na memória do computador onde se guarda uma informação",
+        "Um tipo de comentário no código"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "6": {
+      "id": 6,
+      "tipo": "multipla_escolha",
+      "titulo": "Criando variável",
+      "pergunta": "Qual das opções abaixo cria corretamente uma variável em Python?",
+      "opcoes": ["variavel == 10", "variavel : 10", "variavel => 10", "variavel = 10"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "7": {
+      "id": 7,
+      "tipo": "multipla_escolha",
+      "titulo": "Tipo inteiro",
+      "pergunta": "Qual tipo de dado representa números sem casas decimais?",
+      "opcoes": ["float", "str", "bool", "int"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "8": {
+      "id": 8,
+      "tipo": "completar",
+      "titulo": "Tipo texto",
+      "pergunta": "O tipo de dado ___ representa textos e deve sempre estar entre aspas.",
+      "placeholder": "Digite o tipo de dado",
+      "respostas_aceitas": ["str", "string", "texto"],
+      "xp": 10
+    },
+    "9": {
+      "id": 9,
+      "tipo": "multipla_escolha",
+      "titulo": "Função input",
+      "pergunta": "Qual função é usada para receber dados digitados pelo usuário?",
+      "opcoes": ["receive()", "read()", "input()", "get()"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "10": {
+      "id": 10,
+      "tipo": "multipla_escolha",
+      "titulo": "Execução do input",
+      "pergunta": "O que acontece quando a função input() é executada?",
+      "opcoes": [
+        "O programa exibe uma mensagem e encerra",
+        "O programa pausa e aguarda que o usuário digite algo",
+        "O programa armazena automaticamente um valor na variável",
+        "O programa reinicia do início"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "11": {
+      "id": 11,
+      "tipo": "multipla_escolha",
+      "titulo": "Booleanos",
+      "pergunta": "Qual das opções abaixo representa corretamente um valor do tipo booleano?",
+      "opcoes": ["\"True\"", "1.0", "True", "\"1\""],
+      "resposta": 2,
+      "xp": 10
+    },
+    "12": {
+      "id": 12,
+      "tipo": "multipla_escolha",
+      "titulo": "Input e print",
+      "pergunta": "Um programador escreveu: nome = input(\"Digite seu nome: \") e depois print(nome). O que esse programa faz?",
+      "opcoes": [
+        "Exibe a palavra \"nome\" na tela",
+        "Armazena o texto \"Digite seu nome:\" na variável e o exibe",
+        "Solicita que o usuário digite seu nome e exibe o que foi digitado",
+        "Gera um erro pois input e print não podem ser usados juntos"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "13": {
+      "id": 13,
+      "tipo": "completar",
+      "titulo": "Valor variável",
+      "pergunta": "Em Python, o valor de uma variável ___ ser alterado ao longo do programa, por isso ela se chama \"variável\".",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["pode", "consegue", "pode sim"],
+      "xp": 10
+    },
+    "14": {
+      "id": 14,
+      "tipo": "multipla_escolha",
+      "titulo": "Comentário no código",
+      "pergunta": "Observe: # print(\"Olá, Mundo!\") e depois print(\"Bem-vindo ao Python!\"). O que será exibido?",
+      "opcoes": [
+        "Olá, Mundo! e Bem-vindo ao Python!",
+        "Apenas: Bem-vindo ao Python!",
+        "Apenas: Olá, Mundo!",
+        "Nada, pois o código contém um comentário e será ignorado"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "15": {
+      "id": 15,
+      "tipo": "multipla_escolha",
+      "titulo": "Texto e número",
+      "pergunta": "Ana armazenou idade = \"15\" e tentou somar com o número 5. O programa gerou erro. Qual é o problema?",
+      "opcoes": [
+        "Não é possível armazenar números em variáveis",
+        "O valor \"15\" está armazenado como texto (str) e não como número inteiro (int)",
+        "A variável \"idade\" é uma palavra reservada do Python",
+        "A função print não foi utilizada antes da soma"
+      ],
+      "resposta": 1,
+      "xp": 10
+    }
   }
 }

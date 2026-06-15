@@ -59,5 +59,87 @@
         }
       ]
     }
+  },
+  "mundo_2": {
+    "aula_1": {
+      "titulo": "Aula 2: Primeiros passos em Python",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "Seu primeiro programa",
+          "video_url": "https://www.youtube.com/watch?v=31llNGKWDdo",
+          "conteudo": [
+            "A função print é a primeira ferramenta de um programador. Ela serve para exibir informações na tela, permitindo que o programa se comunique com quem o está usando. Para utilizá-la, basta escrever print() e colocar o que deseja exibir entre os parênteses; se for um texto, ele deve estar entre aspas, como em print(\"Olá, Mundo!\"). Simples assim: é com o print que você vê, pela primeira vez, o resultado do seu código funcionando."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Função print",
+          "exercicios": ["1", "2", "3"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Comentários no código",
+          "video_url": "https://www.youtube.com/watch?v=_IvNvs_fNkA",
+          "conteudo": [
+            "Comentários são trechos do código que o computador ignora completamente. Eles existem para que o programador deixe anotações, explicações ou lembretes dentro do próprio código, tornando-o mais fácil de entender. Em Python, o símbolo # transforma tudo que vem depois dele, na mesma linha, em um comentário; já três aspas permitem criar comentários com múltiplas linhas. Comentar bem é um hábito importante para revisar, corrigir e compartilhar código."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: Comentários e variáveis",
+          "exercicios": ["4", "5", "6"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Variáveis",
+          "video_url": "https://www.youtube.com/watch?v=hdDHg1p3YVc",
+          "conteudo": [
+            "Uma variável é um espaço na memória do computador onde você pode guardar uma informação para usar mais tarde. Pense nela como uma caixa com um nome, dentro da qual você coloca um valor. Para criar uma variável em Python, basta escolher um nome e atribuir um valor usando o sinal de igual, como idade = 15. O valor pode ser alterado ao longo do programa sempre que necessário, e por isso chamamos esse recurso de variável."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Variáveis e tipos",
+          "exercicios": ["7", "8", "9"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_4",
+          "titulo": "Tipos de dados",
+          "video_url": "https://www.youtube.com/watch?v=hdDHg1p3YVc",
+          "conteudo": [
+            "Todo valor armazenado em uma variável tem um tipo. O tipo define o que aquela informação representa e o que pode ser feito com ela. Em Python, os quatro tipos mais básicos são: inteiro, decimal, texto e booleano. int representa números sem casas decimais, float representa números com casas decimais, str representa textos entre aspas e bool representa verdadeiro ou falso. Entender tipos é essencial porque o computador trata cada tipo de forma diferente."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_4",
+          "titulo": "Prática 4: Entrada e saída",
+          "exercicios": ["10", "11", "12"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_5",
+          "titulo": "Entrada e saída de dados",
+          "video_url": "https://www.youtube.com/watch?v=hdDHg1p3YVc",
+          "conteudo": [
+            "Todo programa útil precisa se comunicar com o usuário. A saída de dados acontece quando o programa exibe algo na tela, como já fazemos com print. A entrada de dados é o caminho inverso: o usuário fornece uma informação para o programa. Em Python, a função input recebe dados digitados pelo usuário, pausa o programa e permite guardar o valor em uma variável. Juntos, input e print formam a base da comunicação entre programa e usuário."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_5",
+          "titulo": "Prática 5: Revisão dos primeiros passos",
+          "exercicios": ["13", "14", "15"]
+        }
+      ]
+    }
   }
 }
