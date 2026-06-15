@@ -481,8 +481,10 @@ class CodeQuestPygameMenu:
 
         if self.screen_name == "create":
             self._digitar_criacao(event)
-        elif self.screen_name == "lesson" and self.active_field == "resposta":
-            self._digitar_resposta(event)
+        elif self.screen_name == "lesson":
+            exercicio = self._exercicio_atual()
+            if exercicio and exercicio.get("tipo") != "multipla_escolha" and not self.exercicio_respondido:
+                self._digitar_resposta(event)
 
     def _digitar_criacao(self, event):
         """Processa teclas no formulário de criação de personagem.
@@ -1493,7 +1495,8 @@ class CodeQuestPygameMenu:
             placeholder = exercicio.get("placeholder", "Digite sua resposta")
             self._desenhar_input_verde(pygame.Rect(self.content_x, 350, self.content_width, 58), self.resposta_texto, "resposta", placeholder)
 
-        self._desenhar_status(WINDOW.height - 118)
+        _status_y = WINDOW.height // 2 if self.status_kind == "success" else WINDOW.height - 118
+        self._desenhar_status(_status_y)
 
     def _renderizar_conclusao(self):
         """Renderiza a tela de conclusão exibida ao final de todos os segmentos da aula."""
