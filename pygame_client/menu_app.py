@@ -181,7 +181,7 @@ class CodeQuestPygameMenu:
         self.lesson_glow_timer = 0
         self.font_lesson_title = pygame.font.Font(_pressstart, 28)
         self.font_lesson_content = pygame.font.Font(_wendyone, 20)
-        self.font_lesson_body = pygame.font.Font(_wendyone, 18)
+        self.font_lesson_body = pygame.font.Font(_wendyone, 20)
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
         self.lesson_overlay = _less_ov
@@ -1315,19 +1315,12 @@ class CodeQuestPygameMenu:
         self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
 
         # Corpo WendyOne em painel de leitura, com respiro e divisao em colunas quando necessario.
-        _MARG = 92
+        _MARG = 118
         _cw = WINDOW.width - _MARG * 2
         _fc = self.font_lesson_body
         _lh = _fc.get_linesize() + 2
-        _body_top = _sub_y + _fes.get_height() // 2 + 36
+        _body_top = _sub_y + _fes.get_height() // 2 + 32
         _has_cta = MUNDO_ATIVO == "mundo_1" and segmento.get("id") == "texto_1"
-        _body_bottom = WINDOW.height - (276 if _has_cta else 128)
-        _panel_rect = pygame.Rect(_MARG - 18, _body_top - 18, _cw + 36, _body_bottom - _body_top + 36)
-        _panel = pygame.Surface(_panel_rect.size, pygame.SRCALPHA)
-        pygame.draw.rect(_panel, (0, 0, 0, 118), _panel.get_rect(), border_radius=8)
-        pygame.draw.rect(_panel, (*_VERDE_CLARO, 130), _panel.get_rect(), width=2, border_radius=8)
-        self.screen.blit(_panel, _panel_rect.topleft)
-
         _conteudo = segmento["conteudo"]
         if len(_conteudo) > 4:
             _meio = math.ceil(len(_conteudo) / 2)
@@ -1337,6 +1330,21 @@ class CodeQuestPygameMenu:
 
         _gap_col = 38 if len(_colunas) > 1 else 0
         _col_w = (_cw - _gap_col) // len(_colunas)
+        _col_heights = []
+        for _paragrafos in _colunas:
+            _altura_coluna = 0
+            for _para in _paragrafos:
+                _altura_coluna += len(quebrar_texto(_para, _fc, _col_w - 18)) * _lh + 12
+            _col_heights.append(max(0, _altura_coluna - 12))
+
+        _panel_max_bottom = WINDOW.height - (250 if _has_cta else 118)
+        _panel_h = min(max(max(_col_heights, default=0) + 36, 300), _panel_max_bottom - (_body_top - 18))
+        _panel_rect = pygame.Rect(_MARG - 18, _body_top - 18, _cw + 36, _panel_h)
+        _panel = pygame.Surface(_panel_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(_panel, (0, 0, 0, 118), _panel.get_rect(), border_radius=8)
+        pygame.draw.rect(_panel, (*_VERDE_CLARO, 130), _panel.get_rect(), width=2, border_radius=8)
+        self.screen.blit(_panel, _panel_rect.topleft)
+
         _max_y = _panel_rect.bottom - 18
         for _col_idx, _paragrafos in enumerate(_colunas):
             _x = _MARG + _col_idx * (_col_w + _gap_col)
@@ -1359,14 +1367,18 @@ class CodeQuestPygameMenu:
 
         # Mensagem CTA e link YouTube (apenas mundo_1 / texto_1)
         if _has_cta:
-            _chamada = "Quer se aprofundar um pouco mais no tema? Clica no link abaixo e assista a uma aula completa!"
             _cta_font = self.font_status_success
-            _cta_lines = quebrar_texto(_chamada, _cta_font, _cw - 90)
+            _cta_lines = [
+                "Quer se aprofundar um pouco mais no tema?",
+                "Clica no link abaixo e assista a uma aula completa!",
+            ]
             _cta_lh = _cta_font.get_linesize() + 2
             _ltxt = "Assistir Aula Completa (YouTube)"
             _lsurf = self.font_lesson_content.render(_ltxt, True, _VERDE_CLARO)
-            _cta_h = len(_cta_lines) * _cta_lh + _lsurf.get_height() + 38
-            _cta_rect = pygame.Rect(_MARG - 18, _panel_rect.bottom + 18, _cw + 36, _cta_h)
+            _cta_h = len(_cta_lines) * _cta_lh + _lsurf.get_height() + 44
+            _cta_content_w = max([_cta_font.size(_linha)[0] for _linha in _cta_lines] + [_lsurf.get_width()])
+            _cta_w = min(_cw + 36, _cta_content_w + 92)
+            _cta_rect = pygame.Rect(WINDOW.width // 2 - _cta_w // 2, _panel_rect.bottom + 18, _cta_w, _cta_h)
             _cta = pygame.Surface(_cta_rect.size, pygame.SRCALPHA)
             pygame.draw.rect(_cta, (0, 0, 0, 112), _cta.get_rect(), border_radius=8)
             pygame.draw.rect(_cta, (*_VERDE_CLARO, 150), _cta.get_rect(), width=2, border_radius=8)
