@@ -584,28 +584,28 @@ class RenderMixin:
             self.screen.blit(_ov, (0, 0))
 
     def _renderizar_creditos(self):
-        """Renderiza os créditos com seções estilizadas, título CodeQuest com glow e fundo animado."""
+        """Renderiza os créditos com fundo e painel translúcido no padrão das aulas."""
         self.credit_link_rect = None
-        if self.creditos_frame_paths:
+        if self.cutscene_bg:
+            self.screen.blit(self.cutscene_bg, (0, 0))
+        elif self.creditos_frame_paths:
             self.creditos_frame_timer += 1
             if self.creditos_frame_timer >= 6:
                 self.creditos_frame_timer = 0
                 self.creditos_frame_index = (self.creditos_frame_index + 1) % len(self.creditos_frame_paths)
             self.screen.blit(self._obter_frame_animado(self.creditos_frame_paths, self.creditos_frame_index), (0, 0))
-            _cred_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
-            _cred_ov.fill((0, 0, 0, 120))
-            self.screen.blit(_cred_ov, (0, 0))
+        else:
+            self.screen.fill((11, 25, 11))
+        self.screen.blit(self.lesson_overlay, (0, 0))
 
-        _COR_BORDA = (100, 200, 120)
-        _COR_PLACA = (0, 0, 0, 178)
-        _MARG = 100
+        _MARG = 118
         _CW = WINDOW.width - _MARG * 2
         _ft_titulo = self.font_lesson_title
         _ft_sub = self.font_hub_subtitle
         _ft_body = self.font_lesson_content
         _LH_SUB = _ft_sub.get_linesize() + 2
         _LH_BODY = _ft_body.get_linesize() + 4
-        _ESPACO_SECAO = 40
+        _ESPACO_SECAO = 28
 
         _secoes = [
             ("EQUIPE DE DESENVOLVIMENTO", [
@@ -646,13 +646,9 @@ class RenderMixin:
             ]),
         ]
 
-        def _plate_h(titulo):
-            """Retorna a altura da placa de título de uma seção dos créditos."""
-            return _ft_titulo.get_height() + 16
-
         def _secao_h(linhas, titulo):
             """Calcula a altura total necessária para renderizar uma seção dos créditos."""
-            h = _plate_h(titulo) + 14
+            h = _ft_sub.get_linesize() + 14
             for style, text in linhas:
                 if style == "sub":
                     h += len(quebrar_texto(text, _ft_sub, _CW)) * _LH_SUB
@@ -662,45 +658,85 @@ class RenderMixin:
                     h += 14
             return h
 
-        def _desenhar_secao_titulo(ty, titulo):
-            """Desenha a placa centralizada de título da seção e retorna sua altura."""
-            _ts = _ft_titulo.render(titulo, True, _BRANCO)
-            _ph = _ft_titulo.get_height() + 16
-            _pw = _ts.get_width() + 48
-            _pr = pygame.Rect(0, 0, _pw, _ph)
-            _pr.center = (WINDOW.width // 2, ty + _ph // 2)
-            _pbg = pygame.Surface((_pw, _ph), pygame.SRCALPHA)
-            _pbg.fill(_COR_PLACA)
-            self.screen.blit(_pbg, _pr.topleft)
-            pygame.draw.rect(self.screen, _COR_BORDA, _pr, width=2, border_radius=8)
-            _shadow = _ft_titulo.render(titulo, True, (0, 0, 0))
-            self.screen.blit(_shadow, _shadow.get_rect(center=(_pr.centerx + 2, _pr.centery + 2)))
-            self.screen.blit(_ts, _ts.get_rect(center=_pr.center))
-            return _ph
+        _TITULO = "Créditos"
+        _GAP = 2
+        _char_w = [_ft_titulo.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = _ft_titulo.get_height()
+        _tcy = 52
 
-        _AREA_TOP = 112
-        _AREA_BOTTOM = WINDOW.height - 90
-        self.screen.set_clip(pygame.Rect(0, _AREA_TOP, WINDOW.width, _AREA_BOTTOM - _AREA_TOP))
+        self.lesson_glow_timer += 1
+        _ga = int(40 + 80 * abs(math.sin(self.lesson_glow_timer * 0.04)))
+        _gs = [_ft_titulo.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _gs:
+            _s.set_alpha(_ga)
+        for _sp in (8, 5, 2):
+            for _dx in (-_sp, 0, _sp):
+                for _dy in (-_sp, 0, _sp):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_gs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft_titulo.render(_c, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft_titulo.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
 
-        y = _AREA_TOP + 12 - self.credit_scroll
+        _sub = "CodeQuest"
+        _sub_y = _tcy + _char_h // 2 + 42
+        _ss = _ft_sub.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _sub_y + 2)))
+        _ss = _ft_sub.render(_sub, True, _BRANCO)
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
+
+        _AREA_TOP = _sub_y + _ft_sub.get_height() // 2 + 32
+        _AREA_BOTTOM = WINDOW.height - 118
+        _panel_rect = pygame.Rect(_MARG - 18, _AREA_TOP - 18, _CW + 36, _AREA_BOTTOM - _AREA_TOP + 36)
+        _panel = pygame.Surface(_panel_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(_panel, (0, 0, 0, 118), _panel.get_rect(), border_radius=8)
+        pygame.draw.rect(_panel, (*_VERDE_CLARO, 130), _panel.get_rect(), width=2, border_radius=8)
+        self.screen.blit(_panel, _panel_rect.topleft)
+
+        self.screen.set_clip(_panel_rect)
+
+        y = _AREA_TOP - self.credit_scroll
         for _titulo_sec, _linhas in _secoes:
             _sh = _secao_h(_linhas, _titulo_sec)
-            if y + _sh >= _AREA_TOP and y <= _AREA_BOTTOM:
-                _ph = _desenhar_secao_titulo(y, _titulo_sec)
-                _ty = y + _ph + 14
+            if y + _sh >= _panel_rect.top and y <= _panel_rect.bottom:
+                _ty = y
+                _titulo_sombra = _ft_sub.render(_titulo_sec, True, (0, 0, 0))
+                _titulo_surf = _ft_sub.render(_titulo_sec, True, _VERDE_CLARO)
+                pygame.draw.rect(
+                    self.screen,
+                    _VERDE_CLARO,
+                    pygame.Rect(_MARG, _ty + 8, 4, _ft_sub.get_linesize()),
+                    border_radius=2,
+                )
+                self.screen.blit(_titulo_sombra, (_MARG + 18 + 2, _ty + 2))
+                self.screen.blit(_titulo_surf, (_MARG + 18, _ty))
+                _ty += _ft_sub.get_linesize() + 14
                 for style, text in _linhas:
                     if style == "sub":
-                        for _sub in quebrar_texto(text, _ft_sub, _CW):
+                        for _sub in quebrar_texto(text, _ft_sub, _CW - 18):
                             _ss = _ft_sub.render(_sub, True, (0, 0, 0))
-                            self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _ty + _LH_SUB // 2 + 2)))
+                            self.screen.blit(_ss, (_MARG + 18 + 2, _ty + 2))
                             _ss = _ft_sub.render(_sub, True, _BRANCO)
-                            self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _ty + _LH_SUB // 2)))
+                            self.screen.blit(_ss, (_MARG + 18, _ty))
                             _ty += _LH_SUB
                     elif style in {"body", "link"}:
-                        for _sub in quebrar_texto(text, _ft_body, _CW):
+                        for _sub in quebrar_texto(text, _ft_body, _CW - 18):
                             _cor_texto = _VERDE_CLARO if style == "link" else _BRANCO
+                            _shadow = _ft_body.render(_sub, True, (0, 0, 0))
                             _surf = _ft_body.render(_sub, True, _cor_texto)
-                            _rect = self.screen.blit(_surf, (_MARG, _ty))
+                            self.screen.blit(_shadow, (_MARG + 18 + 2, _ty + 2))
+                            _rect = self.screen.blit(_surf, (_MARG + 18, _ty))
                             if style == "link":
                                 self.credit_link_rect = _rect if self.credit_link_rect is None else self.credit_link_rect.union(_rect)
                                 pygame.draw.line(
@@ -716,42 +752,3 @@ class RenderMixin:
             y += _sh + _ESPACO_SECAO
 
         self.screen.set_clip(None)
-
-        # Título "CodeQuest" com glow verde pulsante e nameplate — desenhado por cima das seções
-        _TITULO = "CodeQuest"
-        _GAP = 2
-        _char_w = [self.font_title_large.size(c)[0] for c in _TITULO]
-        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
-        _tx0 = WINDOW.width // 2 - _total_w // 2
-        _char_h = self.font_title_large.get_height()
-        _tcy = 52
-
-        _title_rect = pygame.Rect(0, 0, _total_w + 72, _char_h + 28)
-        _title_rect.center = (WINDOW.width // 2, _tcy)
-        _title_bg = pygame.Surface(_title_rect.size, pygame.SRCALPHA)
-        _title_bg.fill(_COR_PLACA)
-        self.screen.blit(_title_bg, _title_rect.topleft)
-        pygame.draw.rect(self.screen, _COR_BORDA, _title_rect, width=2, border_radius=10)
-
-        self.glow_timer += 1
-        _glow_alpha = int(40 + 80 * abs(math.sin(self.glow_timer * 0.04)))
-        _glow_surfs = [self.font_title_large.render(c, True, _VERDE_CLARO) for c in _TITULO]
-        for _s in _glow_surfs:
-            _s.set_alpha(_glow_alpha)
-        for _spread in (8, 5, 2):
-            for _dx in (-_spread, 0, _spread):
-                for _dy in (-_spread, 0, _spread):
-                    if _dx == 0 and _dy == 0:
-                        continue
-                    _x = _tx0
-                    for _i, _s in enumerate(_glow_surfs):
-                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
-                        _x += _char_w[_i] + _GAP
-        _x = _tx0
-        for _i, _c in enumerate(_TITULO):
-            self.screen.blit(self.font_title_large.render(_c, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
-            _x += _char_w[_i] + _GAP
-        _x = _tx0
-        for _i, _c in enumerate(_TITULO):
-            self.screen.blit(self.font_title_large.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
-            _x += _char_w[_i] + _GAP
