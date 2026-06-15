@@ -1,26 +1,46 @@
-"""Trilha e efeitos sonoros procedurais usados pela interface Pygame."""
+"""Trilhas de fundo e efeitos sonoros usados pela interface Pygame."""
 
 import math
+import os
 from array import array
 
 import pygame
 
 
-class AudioController:
-    """Controla trilha sonora e efeitos sonoros gerados proceduralmente em memória."""
+TRACK_FILES = {
+    "start": "terran_1.mp3",
+    "hub": "terran_2.mp3",
+    "cutscene": "zerg_1.mp3",
+    "worlds": "protoss_1.mp3",
+    "lesson": "terran_3.mp3",
+    "exercise": "terran_1.mp3",
+    "profile": "protoss_2.mp3",
+    "credits": "terran_victory.mp3",
+    "complete": "terran_victory.mp3",
+}
 
-    def __init__(self, sample_rate=44100):
+
+class AudioController:
+    """Controla trilhas MP3 de fundo e efeitos sonoros gerados em memória."""
+
+    def __init__(self, sample_rate=44100, music_dir=None):
         """Configura os atributos iniciais sem inicializar o mixer.
 
         Recebe:
             sample_rate (int): Taxa de amostragem em Hz usada na geração de áudio.
             O mixer só é aberto quando inicializar() for chamado.
+            music_dir (str | None): Diretório com os arquivos MP3. Quando None,
+            usa data/music na raiz do projeto.
         """
         self.sample_rate = sample_rate
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.music_dir = music_dir or os.path.join(base_dir, "data", "music")
         self.enabled = False
         self.music_channel = None
         self.button_sound = None
         self.credit_sound = None
+        self.current_track = None
+        self.fallback_track = None
 
     def inicializar(self):
         """Inicializa o mixer do Pygame e pré-gera os efeitos sonoros.
@@ -38,22 +58,52 @@ class AudioController:
             self.music_channel = pygame.mixer.Channel(0)
             self.button_sound = self._criar_tom(660, 0.08, 0.18)
             self.credit_sound = self._criar_tom(880, 0.14, 0.14)
+            self.fallback_track = self._criar_trilha()
             self.enabled = True
         except pygame.error:
             self.enabled = False
         return self.enabled
 
-    def tocar_trilha(self):
-        """Gera e toca a trilha de fundo em loop infinito no canal 0.
+    def tocar_trilha(self, contexto="start"):
+        """Toca em loop a trilha associada ao contexto informado.
 
-        Só executa quando o áudio estiver habilitado e o canal disponível.
-        O volume do canal é fixado em 0.28 para não cobrir os efeitos.
+        Recebe:
+            contexto (str): Chave de TRACK_FILES, como "start", "hub",
+            "lesson" ou "exercise". Contextos desconhecidos usam "start".
         """
-        if not self.enabled or self.music_channel is None:
+        if not self.enabled:
             return
-        trilha = self._criar_trilha()
+
+        track_key = contexto if contexto in TRACK_FILES else "start"
+        if self.current_track == track_key and pygame.mixer.music.get_busy():
+            return
+
+        caminho = os.path.join(self.music_dir, TRACK_FILES[track_key])
+        try:
+            pygame.mixer.music.load(caminho)
+            pygame.mixer.music.set_volume(0.28)
+            pygame.mixer.music.play(loops=-1)
+            if self.music_channel:
+                self.music_channel.stop()
+            self.current_track = track_key
+        except pygame.error:
+            self._tocar_trilha_fallback(track_key)
+
+    def _tocar_trilha_fallback(self, track_key):
+        """Toca a trilha procedural quando um MP3 não está disponível.
+
+        Recebe:
+            track_key (str): Contexto que deveria tocar; salvo em current_track
+            para evitar reiniciar o fallback a cada frame.
+        """
+        if not self.music_channel or not self.fallback_track:
+            return
+        if self.current_track == track_key and self.music_channel.get_busy():
+            return
+        pygame.mixer.music.stop()
         self.music_channel.set_volume(0.28)
-        self.music_channel.play(trilha, loops=-1)
+        self.music_channel.play(self.fallback_track, loops=-1)
+        self.current_track = track_key
 
     def tocar_botao(self):
         """Reproduz o efeito sonoro padrão de clique em botão.
@@ -74,6 +124,7 @@ class AudioController:
     def encerrar(self):
         """Finaliza o mixer do Pygame quando o áudio estiver ativo."""
         if self.enabled:
+            pygame.mixer.music.stop()
             pygame.mixer.quit()
 
     def _criar_tom(self, frequencia, duracao, volume):

@@ -173,3 +173,28 @@ def test_conclusao_do_mundo_2_aponta_para_mundo_3():
     assert acao.__name__ == "_mostrar_mundo_3_em_breve"
     assert "Mundo 2" in app._texto_conclusao_mundo(label)
     assert "Mundo 3" in app._texto_conclusao_mundo(label)
+
+
+def test_contexto_musical_diferencia_aula_e_exercicio():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.screen_name = "lesson"
+    app.aula = {
+        "trilha": [
+            {"tipo": "aula"},
+            {"tipo": "exercicios", "exercicios": ["1"]},
+        ]
+    }
+    app.trilha_indice = 0
+
+    assert app._contexto_musica_atual() == "lesson"
+
+    app.trilha_indice = 1
+
+    assert app._contexto_musica_atual() == "exercise"
+
+
+def test_contexto_musical_create_usa_tela_inicial():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.screen_name = "create"
+
+    assert app._contexto_musica_atual() == "start"

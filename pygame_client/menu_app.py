@@ -205,15 +205,33 @@ class CodeQuestPygameMenu:
 
     def run(self):
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
-        self.audio.tocar_trilha()
         while self.running:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)  # Resetando cursor para seta no inicio do frame
+            self.audio.tocar_trilha(self._contexto_musica_atual())
             self._processar_eventos()
             self._renderizar()
             self.clock.tick(WINDOW.fps)
 
         self.audio.encerrar()
         pygame.quit()
+
+    def _contexto_musica_atual(self):
+        """Retorna o contexto musical correspondente à tela atual.
+
+        Retorna:
+            str: Chave usada por AudioController.tocar_trilha para selecionar
+            a faixa MP3 adequada ao momento do jogo.
+        """
+        if self.screen_name == "lesson":
+            segmento = self._segmento_atual()
+            if segmento and segmento["tipo"] == "exercicios":
+                return "exercise"
+            return "lesson"
+        if self.screen_name in {"start", "hub", "cutscene", "worlds", "profile", "credits", "complete"}:
+            return self.screen_name
+        if self.screen_name == "create":
+            return "start"
+        return "start"
 
     def _obter_frame_animado(self, frame_paths, frame_index):
         """Carrega e retorna um frame de fundo sob demanda.
