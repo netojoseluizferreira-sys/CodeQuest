@@ -172,6 +172,12 @@ class CodeQuestPygameMenu:
             self.cutscene_bg = pygame.transform.scale(_cbg, (WINDOW.width, WINDOW.height))
         else:
             self.cutscene_bg = None
+        _mundo2_bg_path = os.path.join(_data_dir, "mundo_2_background.jpeg")
+        if os.path.exists(_mundo2_bg_path):
+            _m2bg = pygame.image.load(_mundo2_bg_path).convert()
+            self.mundo2_bg = pygame.transform.scale(_m2bg, (WINDOW.width, WINDOW.height))
+        else:
+            self.mundo2_bg = None
         _perfil_frames_dir = os.path.join(_data_dir, "perfil_frames")
         self.perfil_frame_paths = sorted(glob.glob(os.path.join(_perfil_frames_dir, "*.jpg")))
         self.perfil_frame_index = 0
@@ -193,6 +199,9 @@ class CodeQuestPygameMenu:
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
         self.lesson_overlay = _less_ov
+        _m2_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        _m2_ov.fill((0, 0, 0, 185))
+        self.mundo2_overlay = _m2_ov
 
     def run(self):
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
@@ -250,8 +259,9 @@ class CodeQuestPygameMenu:
         if self.screen_name == "lesson":
             return self._botoes_fluxo_aprendizado()
         if self.screen_name == "complete":
+            proximo_label, proximo_acao = self._proximo_mundo_conclusao()
             return [
-                Button(pygame.Rect(WINDOW.width // 2 - 125, WINDOW.height - 88, 250, 52), "Mundo 2", self._iniciar_mundo_2, **_KW_VERDE),
+                Button(pygame.Rect(WINDOW.width // 2 - 125, WINDOW.height - 88, 250, 52), proximo_label, proximo_acao, **_KW_VERDE),
                 Button(pygame.Rect(WINDOW.width - 310, WINDOW.height - 88, 250, 52), "Perfil", self._abrir_perfil, **_KW_VERDE),
                 self._botao_voltar_hub(**_KW_VERDE),
             ]
@@ -1281,14 +1291,22 @@ class CodeQuestPygameMenu:
         else:
             self._renderizar_segmento_exercicio(segmento)
 
-    def _renderizar_segmento_aula(self, segmento):
-        """Renderiza um segmento de aula sobre fundo imagem_cut com título glow, conteúdo e link YouTube."""
-        # Fundo: imagem_cut redimensionada + camada escura alpha 160
+    def _desenhar_fundo_aprendizado(self):
+        """Desenha o fundo das telas de aula, exercício e conclusão do mundo ativo."""
+        if self.mundo_ativo == "mundo_2" and self.mundo2_bg:
+            self.screen.blit(self.mundo2_bg, (0, 0))
+            self.screen.blit(self.mundo2_overlay, (0, 0))
+            return
+
         if self.cutscene_bg:
             self.screen.blit(self.cutscene_bg, (0, 0))
         else:
             self.screen.fill((11, 25, 11))
         self.screen.blit(self.lesson_overlay, (0, 0))
+
+    def _renderizar_segmento_aula(self, segmento):
+        """Renderiza um segmento de aula sobre fundo imagem_cut com título glow, conteúdo e link YouTube."""
+        self._desenhar_fundo_aprendizado()
 
         # Título PressStart2P com glow verde pulsante (igual à tela inicial)
         _TITULO = segmento["titulo"]
@@ -1356,7 +1374,7 @@ class CodeQuestPygameMenu:
             _col_heights.append(max(0, _altura_coluna - 12))
 
         _panel_max_bottom = WINDOW.height - (250 if _has_cta else 118)
-        _panel_h = min(max(max(_col_heights, default=0) + 36, 300), _panel_max_bottom - (_body_top - 18))
+        _panel_h = min(max(max(_col_heights, default=0) + 36, 150), _panel_max_bottom - (_body_top - 18))
         _panel_rect = pygame.Rect(_MARG - 18, _body_top - 18, _cw + 36, _panel_h)
         _panel = pygame.Surface(_panel_rect.size, pygame.SRCALPHA)
         pygame.draw.rect(_panel, (0, 0, 0, 118), _panel.get_rect(), border_radius=8)
@@ -1439,11 +1457,7 @@ class CodeQuestPygameMenu:
         numero = self.exercicio_indice + 1
         total = len(segmento["exercicios"])
 
-        if self.cutscene_bg:
-            self.screen.blit(self.cutscene_bg, (0, 0))
-        else:
-            self.screen.fill((11, 25, 11))
-        self.screen.blit(self.lesson_overlay, (0, 0))
+        self._desenhar_fundo_aprendizado()
 
         _TITULO = segmento["titulo"]
         _GAP = 2
@@ -1516,12 +1530,8 @@ class CodeQuestPygameMenu:
         self._desenhar_status(_status_y)
 
     def _renderizar_conclusao(self):
-        """Renderiza a conclusão do Mundo 1 usando a identidade visual da aula."""
-        if self.cutscene_bg:
-            self.screen.blit(self.cutscene_bg, (0, 0))
-        else:
-            self.screen.fill((11, 25, 11))
-        self.screen.blit(self.lesson_overlay, (0, 0))
+        """Renderiza a conclusão do mundo ativo usando a identidade visual da aula."""
+        self._desenhar_fundo_aprendizado()
 
         _TITULO = "Aula concluída"
         _GAP = 2
@@ -1556,17 +1566,16 @@ class CodeQuestPygameMenu:
             self.screen.blit(_ft.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
             _x += _char_w[_i] + _GAP
 
-        _sub = "A primeira rota de Bythos foi vencida"
+        proximo_label, _proximo_acao = self._proximo_mundo_conclusao()
+        numero_atual = self.mundo_ativo.replace("mundo_", "")
+        _sub = f"Mundo {numero_atual} concluído"
         _sub_y = _tcy + _char_h // 2 + 42
         _ss = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
         self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _sub_y + 2)))
         _ss = self.font_hub_subtitle.render(_sub, True, _BRANCO)
         self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
 
-        _texto = (
-            "Você completou o Mundo 1. Agora pode visitar o perfil para ver seu progresso "
-            "ou seguir para o Mundo 2 e continuar sua jornada."
-        )
+        _texto = self._texto_conclusao_mundo(proximo_label)
         _font = self.font_status_success
         _linhas = quebrar_texto(_texto, _font, 760)
         _lh = _font.get_linesize() + 4
@@ -1585,6 +1594,9 @@ class CodeQuestPygameMenu:
             _surface = _font.render(_linha, True, _BRANCO)
             self.screen.blit(_surface, _surface.get_rect(center=(_panel_rect.centerx, _y + _lh // 2)))
             _y += _lh
+
+        if self.status_message.startswith("Mundo 3 em breve"):
+            self._desenhar_status(525)
 
     def _desenhar_cabecalho(self, titulo, subtitulo):
         """Desenha o cabeçalho padrão de 170px com título e subtítulo centralizados.
@@ -1805,6 +1817,39 @@ class CodeQuestPygameMenu:
             "EM BREVE!\nOs segredos deste lugar ainda não estão prontos para ser revelados. "
             "Continue sua jornada pelo Módulo 1 enquanto isso.",
             "normal",
+        )
+
+    def _mostrar_mundo_3_em_breve(self):
+        """Mostra o aviso de indisponibilidade do Mundo 3 na tela de conclusão.
+
+        Retorna:
+            None: Atualiza a mensagem de status exibida na tela atual.
+        """
+        self._definir_status("Mundo 3 em breve! Volte para o menu.", "success")
+
+    def _proximo_mundo_conclusao(self):
+        """Define o botão de próximo mundo exibido na tela de conclusão.
+
+        Retorna:
+            tuple[str, Callable]: Texto do botão e ação correspondente.
+        """
+        if self.mundo_ativo == "mundo_2":
+            return "Mundo 3", self._mostrar_mundo_3_em_breve
+        return "Mundo 2", self._iniciar_mundo_2
+
+    def _texto_conclusao_mundo(self, proximo_label):
+        """Monta a mensagem de conclusão conforme o mundo recém-finalizado.
+
+        Recebe:
+            proximo_label (str): Nome do próximo mundo exibido no botão.
+
+        Retorna:
+            str: Texto orientando o jogador a ver o perfil ou seguir adiante.
+        """
+        numero_atual = self.mundo_ativo.replace("mundo_", "")
+        return (
+            f"Você completou o Mundo {numero_atual}. Agora pode visitar o perfil para ver seu progresso "
+            f"ou seguir para o {proximo_label} e continuar sua jornada."
         )
 
     def _abrir_perfil(self):

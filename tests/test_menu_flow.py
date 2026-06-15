@@ -132,3 +132,17 @@ def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
     assert app.trilha_indice == 0
     assert app.exercicio_indice == 0
     assert app.screen_name == "lesson"
+
+
+def test_conclusao_do_mundo_2_aponta_para_mundo_3():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.mundo_ativo = "mundo_2"
+    app.status_message = ""
+    app.status_kind = "normal"
+
+    label, acao = app._proximo_mundo_conclusao()
+
+    assert label == "Mundo 3"
+    assert acao.__name__ == "_mostrar_mundo_3_em_breve"
+    assert "Mundo 2" in app._texto_conclusao_mundo(label)
+    assert "Mundo 3" in app._texto_conclusao_mundo(label)
