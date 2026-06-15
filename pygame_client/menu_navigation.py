@@ -34,6 +34,18 @@ class NavigationMixin:
         self.status_message = mensagem
         self.status_kind = kind
 
+    def _mensagem_conquistas_desbloqueadas(self, conquistas):
+        """Monta o texto de aviso para conquistas recem-desbloqueadas."""
+        if len(conquistas) == 1:
+            return (
+                "Conquista desbloqueada!\n"
+                f"{conquistas[0]['nome']}\n"
+                "Vá ao perfil para visualizar."
+            )
+
+        nomes = ", ".join(conquista["nome"] for conquista in conquistas)
+        return f"Conquistas desbloqueadas!\n{nomes}\nVá ao perfil para visualizar."
+
     def _novo_jogo(self):
         """Reseta o banco de dados, limpa o estado do usuário e navega para a criação de personagem."""
         resetar_banco_de_dados()
@@ -85,7 +97,11 @@ class NavigationMixin:
             return
 
         self.usuario = criar_usuario(nome, idade)
-        self._definir_status("Personagem criado. Escolha seu próximo destino.", "success")
+        conquistas = getattr(self.usuario, "conquistas_desbloqueadas", [])
+        if conquistas:
+            self._definir_status(self._mensagem_conquistas_desbloqueadas(conquistas), "success")
+        else:
+            self._definir_status("Personagem criado. Escolha seu próximo destino.", "success")
         self._abrir_hub()
 
     def _abrir_hub(self):
@@ -355,7 +371,11 @@ class NavigationMixin:
             return
 
         resultado = registrar_resposta(self.mundo_ativo, exercicio, resposta, self.usuario)
-        self._definir_status(resultado["mensagem"], "success" if resultado["acertou"] else "error")
+        conquistas = resultado.get("conquistas_desbloqueadas", [])
+        if conquistas:
+            self._definir_status(self._mensagem_conquistas_desbloqueadas(conquistas), "success")
+        else:
+            self._definir_status(resultado["mensagem"], "success" if resultado["acertou"] else "error")
         if resultado["acertou"]:
             self.usuario = carregar_usuario()
             self.exercicio_respondido = True

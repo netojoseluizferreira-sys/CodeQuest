@@ -1,6 +1,7 @@
 """Renderização das telas gerais do CodeQuest em Pygame."""
 
 import math
+import os
 
 import pygame
 
@@ -9,7 +10,7 @@ from pygame_client.menu_config import CUTSCENE_TEXTS, _BRANCO, _VERDE, _VERDE_CL
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
 from pygame_client.ui import quebrar_texto
-from utils.database import carregar_usuario
+from utils.database import carregar_usuario, listar_conquistas_com_estado
 
 
 class RenderMixin:
@@ -446,13 +447,86 @@ class RenderMixin:
             self.screen.blit(_val_surf, _val_surf.get_rect(center=(cx + _CW // 2, cy + 96)))
 
         _sect_y = _GY + 2 * (_CH + _VGAP)
-        _sect_rect = pygame.Rect(_GX, _sect_y, _CW * 2 + _HGAP, 100)
+        _sect_rect = pygame.Rect(_GX, _sect_y, _CW * 2 + _HGAP, 130)
         pygame.draw.rect(self.screen, _COR_FUNDO, _sect_rect, border_radius=12)
         pygame.draw.rect(self.screen, _COR_BORDA, _sect_rect, width=2, border_radius=12)
         _conq_lbl = self.font_profile_label.render("Conquistas", True, _COR_BORDA)
         self.screen.blit(_conq_lbl, _conq_lbl.get_rect(center=(_sect_rect.centerx, _sect_rect.y + 28)))
-        _em_breve = self.font_profile_value.render("EM BREVE", True, _COR_BORDA)
-        self.screen.blit(_em_breve, _em_breve.get_rect(center=(_sect_rect.centerx, _sect_rect.y + 68)))
+        self._desenhar_conquistas_perfil(_sect_rect)
+
+    def _desenhar_conquistas_perfil(self, section_rect):
+        """Desenha os slots visuais de conquistas e seus tooltips."""
+        conquistas = listar_conquistas_com_estado(self.usuario)
+        mouse_pos = pygame.mouse.get_pos()
+        self.achievement_slot_rects = []
+
+        slot_size = 72
+        icon_size = 52
+        gap = 28
+        total_width = len(conquistas) * slot_size + max(0, len(conquistas) - 1) * gap
+        x = section_rect.centerx - total_width // 2
+        y = section_rect.y + 48
+        tooltip = None
+
+        for conquista in conquistas:
+            slot_rect = pygame.Rect(x, y, slot_size, slot_size)
+            hovered = slot_rect.collidepoint(mouse_pos)
+            self.achievement_slot_rects.append(slot_rect)
+
+            fundo = (14, 54, 25) if not hovered else (22, 78, 36)
+            borda = _VERDE_CLARO if hovered else (100, 200, 120)
+            pygame.draw.rect(self.screen, fundo, slot_rect, border_radius=8)
+            pygame.draw.rect(self.screen, borda, slot_rect, width=2, border_radius=8)
+            if hovered:
+                pygame.draw.rect(self.screen, _VERDE_CLARO, slot_rect.inflate(10, 10), width=2, border_radius=10)
+
+            imagem = self._carregar_imagem_conquista(conquista["imagem"], icon_size)
+            if imagem is not None:
+                self.screen.blit(imagem, imagem.get_rect(center=slot_rect.center))
+
+            if hovered:
+                tooltip = (conquista["tooltip_titulo"], conquista["tooltip_texto"], slot_rect)
+            x += slot_size + gap
+
+        if tooltip:
+            self._desenhar_tooltip_conquista(*tooltip)
+
+    def _carregar_imagem_conquista(self, caminho_relativo, tamanho):
+        """Carrega e escala um icone de conquista usando cache local."""
+        if not hasattr(self, "_achievement_image_cache"):
+            self._achievement_image_cache = {}
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        caminho = os.path.join(base_dir, caminho_relativo)
+        chave = (caminho, tamanho)
+        if chave in self._achievement_image_cache:
+            return self._achievement_image_cache[chave]
+        if not os.path.exists(caminho):
+            return None
+
+        imagem = pygame.image.load(caminho).convert_alpha()
+        imagem = pygame.transform.smoothscale(imagem, (tamanho, tamanho))
+        self._achievement_image_cache[chave] = imagem
+        return imagem
+
+    def _desenhar_tooltip_conquista(self, titulo, texto, slot_rect):
+        """Renderiza o tooltip textual de uma conquista."""
+        font_titulo = self.font_credit_small_bold
+        font_texto = self.font_small
+        linhas_texto = quebrar_texto(texto, font_texto, 300)
+        largura = max([font_titulo.size(titulo)[0]] + [font_texto.size(linha)[0] for linha in linhas_texto]) + 28
+        altura = font_titulo.get_linesize() + len(linhas_texto) * font_texto.get_linesize() + 24
+        x = min(slot_rect.centerx - largura // 2, WINDOW.width - largura - 20)
+        x = max(20, x)
+        y = max(20, slot_rect.y - altura - 10)
+        rect = pygame.Rect(x, y, largura, altura)
+
+        pygame.draw.rect(self.screen, (10, 32, 18), rect, border_radius=8)
+        pygame.draw.rect(self.screen, _VERDE_CLARO, rect, width=2, border_radius=8)
+        self.screen.blit(font_titulo.render(titulo, True, _VERDE_CLARO), (rect.x + 14, rect.y + 10))
+        texto_y = rect.y + 10 + font_titulo.get_linesize()
+        for linha in linhas_texto:
+            self.screen.blit(font_texto.render(linha, True, _BRANCO), (rect.x + 14, texto_y))
+            texto_y += font_texto.get_linesize()
 
     def _renderizar_cutscene(self):
         """Renderiza a cena atual da cutscene com três estados de fade.

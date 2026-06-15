@@ -3,6 +3,7 @@
 import unicodedata
 
 from backend.xp_system import adicionar_xp
+from backend.achievements import avaliar_progresso_usuario
 from utils.database import (
     exercicio_foi_concluido,
     marcar_exercicio_concluido,
@@ -132,11 +133,13 @@ def registrar_resposta(mundo, exercicio, resposta, usuario):
         adicionar_xp(usuario, xp_ganho)
         marcar_exercicio_concluido(mundo, exercicio_id, xp_ganho, usuario)
         verificar_e_marcar_conclusao_mundo(mundo, usuario)
+        conquistas_desbloqueadas = avaliar_progresso_usuario(usuario)
         return {
             "acertou": True,
             "xp": xp_ganho,
             "erros": erros_antes,
             "mensagem": frase_xp(xp_ganho),
+            "conquistas_desbloqueadas": conquistas_desbloqueadas,
         }
 
     erros_depois = registrar_erro_exercicio(mundo, exercicio_id, usuario)

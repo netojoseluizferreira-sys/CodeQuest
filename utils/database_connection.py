@@ -81,3 +81,14 @@ def inicializar_banco():
             )
             """
         )
+        conexao.execute(
+            """
+            CREATE TABLE IF NOT EXISTS usuario_conquistas (
+                usuario_id INTEGER NOT NULL,
+                conquista_id TEXT NOT NULL,
+                data_desbloqueio TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (usuario_id, conquista_id),
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            )
+            """
+        )

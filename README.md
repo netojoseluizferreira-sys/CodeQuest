@@ -12,7 +12,7 @@ O projeto está em versão jogável local, centralizado no Pygame. A antiga abor
 
 - Menu inicial com Novo jogo, Continuar, Créditos e Sair.
 - Criação de personagem e hub de jornada.
-- Tela de perfil com nome, idade, XP, nível e progresso.
+- Tela de perfil com nome, idade, XP, nível, progresso e conquistas visuais.
 - Cutscene inicial com imagens, texto e avanço manual.
 - Arquipélago de Bythos com seleção de mundos.
 - Mundo 1 completo com textos de aula e exercícios definidos na configuração.
@@ -21,6 +21,7 @@ O projeto está em versão jogável local, centralizado no Pygame. A antiga abor
 - Exercícios concluídos são pulados ao reiniciar o app, preservando os textos de aula.
 - XP dinâmico: começa em 10, perde 2 por erro e respeita mínimo de 2 XP.
 - Bloqueio de XP duplicado por exercício concluído.
+- Conquistas persistidas em SQLite, configuradas por `data/conquistas.json`.
 - Trilhas sonoras por contexto: menu, hub, cutscene, mundos, aula, exercícios, perfil e créditos.
 - Testes unitários em `tests/` cobrindo banco, XP, conteúdo, áudio, UI e fluxo de menu.
 - Documentação técnica em `docs/`.
@@ -29,7 +30,6 @@ O projeto está em versão jogável local, centralizado no Pygame. A antiga abor
 
 - Expansão dos mundos 3 a 9.
 - Mais exercícios e textos de revisão.
-- Conquistas no perfil.
 - Melhorias de acessibilidade visual e empacotamento para execução local mais simples.
 
 ## Como Rodar
@@ -58,13 +58,16 @@ python app.py
 CodeQuest/
 |-- app.py
 |-- backend/
+|   |-- achievements.py
 |   |-- exercicio.py
 |   |-- usuario.py
 |   `-- xp_system.py
 |-- data/
 |   |-- aulas.json
+|   |-- conquistas.json
 |   |-- exercicios.json
 |   |-- mundos.json
+|   |-- achievements/
 |   |-- cutscenes/
 |   |-- music/
 |   |-- hub_frames/
@@ -100,6 +103,7 @@ CodeQuest/
 Conteúdo versionado:
 
 - `data/aulas.json`
+- `data/conquistas.json`
 - `data/exercicios.json`
 - `data/mundos.json`
 
@@ -113,6 +117,17 @@ Tabelas principais:
 - `exercicios_concluidos`: impede XP duplicado e permite pular exercícios já feitos.
 - `exercicio_erros`: registra erros por usuário, mundo e exercício para calcular XP potencial.
 - `mundos_concluidos`: registra conclusão de mundos por usuário e desbloqueia novos mundos.
+- `usuario_conquistas`: registra conquistas desbloqueadas por usuário sem duplicidade.
+
+## Conquistas
+
+As conquistas iniciais são:
+
+- `melhor_professor_ufal`: desbloqueada ao criar usuário com variações normalizadas de Alexandre Barbosa, como `barbosa`, `alexandre`, `prof barbosa` e `alexandre barbosa`.
+- `fenomeno`: desbloqueada ao atingir o XP máximo do conteúdo implementado.
+- `quase_hexa`: desbloqueada ao concluir todo o conteúdo implementado com o XP mínimo possível.
+
+No perfil, conquistas bloqueadas usam `data/achievements/locked_question.png`; conquistas desbloqueadas mostram seu ícone real.
 
 ## Testes
 
@@ -128,7 +143,6 @@ Veja [docs/arquitetura.md](docs/arquitetura.md) para detalhes sobre módulos, fl
 
 - Implementar Mundo 3: Operadores.
 - Implementar mundos 4 a 9.
-- Criar tela de conquistas funcional.
 - Adicionar mais feedback visual de progresso.
 - Revisar licenciamento/autoria de assets externos.
 - Empacotar versão executável para distribuição local.

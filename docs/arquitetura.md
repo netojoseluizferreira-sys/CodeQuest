@@ -18,6 +18,8 @@ flowchart TD
     H --> I["utils/database.py"]
     H --> J["pygame_client/content.py"]
     H --> K["pygame_client/learning_progress.py"]
+    K --> L["backend/achievements.py"]
+    L --> M["utils/achievement_repository.py"]
 ```
 
 ## Camadas
@@ -40,6 +42,7 @@ flowchart TD
 ### `backend/`
 
 - `usuario.py`: dataclass `Usuario` e operações de domínio do usuário.
+- `achievements.py`: regras de desbloqueio de conquistas, normalização do nome secreto e cálculo de XP máximo/mínimo disponível.
 - `xp_system.py`: cálculo de nível, XP para próximo nível e soma de XP.
 - `exercicio.py`: leitura bruta dos arquivos de aula e exercício.
 - `worlds.py`: leitura de `data/mundos.json` e helpers para metadados, ordem, requisito, aula inicial e exercícios obrigatórios.
@@ -53,12 +56,14 @@ flowchart TD
 - `user_mapper.py`: conversão entre SQLite, dicionários e dataclass `Usuario`.
 - `exercise_progress_repository.py`: progresso de exercícios, erros e bloqueio de recompensa duplicada.
 - `world_progress_repository.py`: progresso por mundo, marcação de conclusão e consulta usada para desbloquear mundos.
+- `achievement_repository.py`: leitura de `data/conquistas.json`, desbloqueio idempotente e listagem de conquistas com estado para o perfil.
 
 ### `data/`
 
 Contém conteúdo e assets versionados:
 
-- `aulas.json`, `exercicios.json` e `mundos.json`.
+- `aulas.json`, `exercicios.json`, `mundos.json` e `conquistas.json`.
+- imagens de conquistas em `data/achievements/`.
 - fontes: PressStart2P, RammettoOne e WendyOne.
 - frames de fundo, imagens de cutscene, fundos de mundo e músicas.
 
@@ -119,6 +124,20 @@ Cada exercício começa valendo 10 XP. A cada erro, o ganho potencial cai 2 pont
 
 Exercícios já concluídos não concedem XP novamente.
 
+## Conquistas
+
+As conquistas são configuradas em `data/conquistas.json`. Cada entrada define `id`, `nome`, `dica`, descrição, imagem desbloqueada, imagem bloqueada e a condição conceitual. O Pygame não conhece as regras; ele chama `listar_conquistas_com_estado()` e apenas renderiza slots com a imagem bloqueada ou real.
+
+A persistência fica em `usuario_conquistas`, com chave primária `(usuario_id, conquista_id)` para impedir duplicidade. `desbloquear_conquista()` usa escrita idempotente e retorna sucesso apenas quando a conquista foi gravada pela primeira vez, o que alimenta a notificação temporária.
+
+Regras iniciais:
+
+- `melhor_professor_ufal`: avaliada na criação do usuário. O nome é normalizado com `strip()`, `lower()`, remoção de acentos e colapso de espaços. As variações aceitas incluem `barbosa`, `alexandre`, `alexandre barbosa`, `prof barbosa`, `professor barbosa`, `prof alexandre` e `professor alexandre`.
+- `fenomeno`: avaliada após ganho de XP; compara o XP do usuário com a soma do XP máximo dos exercícios obrigatórios dos mundos implementados.
+- `quase_hexa`: avaliada após conclusão de exercício; exige todos os exercícios obrigatórios dos mundos implementados concluídos com o XP mínimo.
+
+No perfil, `menu_rendering.py` desenha todos os slots em uma moldura verde. Conquistas bloqueadas mostram `locked_question.png` e tooltip com `???` mais a dica; desbloqueadas mostram o nome e a mensagem `Conquista desbloqueada.`.
+
 ## Áudio
 
 `AudioController` mapeia contexto de tela para música:
@@ -154,3 +173,11 @@ Para mudar persistência:
 1. Ajuste os repositórios em `utils/`.
 2. Exponha a função pela fachada `utils/database.py` quando outras camadas precisarem usar.
 3. Mantenha regras de progresso fora do Pygame; o cliente deve consultar funções de domínio/repositório.
+
+Para adicionar uma conquista:
+
+1. Adicione a entrada em `data/conquistas.json`.
+2. Coloque os PNGs em `data/achievements/`.
+3. Implemente a regra em `backend/achievements.py`.
+4. Use `utils/achievement_repository.py` para persistir o desbloqueio.
+5. Adicione testes em `tests/test_achievements.py`.

@@ -92,6 +92,8 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self._cursor_atual = None
         self.btn_continuar_y = None
         self._frame_cache = {}
+        self._achievement_image_cache = {}
+        self.achievement_slot_rects = []
         _frames_dir = os.path.join(_data_dir, "video_frames")
         self.video_frame_paths = sorted(glob.glob(os.path.join(_frames_dir, "*.jpg")))
         self.video_frame_index = 0

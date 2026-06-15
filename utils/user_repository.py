@@ -51,6 +51,8 @@ class UsuarioCRUD:
         usuario = Usuario.criar(nome, idade)
         usuario.id = self.usuario_ativo_id
         self.salvar(usuario)
+        with closing(conectar()) as conexao, conexao:
+            conexao.execute("DELETE FROM usuario_conquistas WHERE usuario_id = ?", (usuario.id,))
         return usuario
 
     def salvar(self, usuario):
@@ -139,7 +141,11 @@ def criar_usuario(nome, idade):
     Retorna:
         Usuario: Instância criada e salva no banco.
     """
-    return usuario_crud().criar(nome, idade)
+    usuario = usuario_crud().criar(nome, idade)
+    from backend.achievements import avaliar_nome_usuario
+
+    usuario.conquistas_desbloqueadas = avaliar_nome_usuario(usuario)
+    return usuario
 
 
 def salvar_usuario(usuario):

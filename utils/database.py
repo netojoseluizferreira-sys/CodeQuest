@@ -11,6 +11,14 @@ from utils.exercise_progress_repository import (
     obter_erros_exercicio,
     registrar_erro_exercicio,
 )
+from utils.achievement_repository import (
+    carregar_conquistas_config,
+    desbloquear_conquista,
+    listar_conquistas_com_estado,
+    listar_conquistas_usuario,
+    obter_conquista,
+    usuario_tem_conquista,
+)
 from utils.world_progress_repository import (
     STATUS_BLOQUEADO,
     STATUS_DISPONIVEL,
@@ -53,6 +61,7 @@ def resetar_banco_de_dados():
     inicializar_banco()
 
     with closing(conectar()) as conexao, conexao:
+        conexao.execute("DELETE FROM usuario_conquistas")
         conexao.execute("DELETE FROM mundos_concluidos")
         conexao.execute("DELETE FROM exercicios_concluidos")
         conexao.execute("DELETE FROM exercicio_erros")
