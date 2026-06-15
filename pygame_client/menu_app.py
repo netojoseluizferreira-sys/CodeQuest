@@ -181,6 +181,7 @@ class CodeQuestPygameMenu:
         self.lesson_glow_timer = 0
         self.font_lesson_title = pygame.font.Font(_pressstart, 28)
         self.font_lesson_content = pygame.font.Font(_wendyone, 20)
+        self.font_lesson_body = pygame.font.Font(_wendyone, 18)
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
         self.lesson_overlay = _less_ov
@@ -1306,55 +1307,87 @@ class CodeQuestPygameMenu:
 
         # Subtítulo "Aula X: [nome da aula]" em RammettoOne branco com sombra preta
         _sub = self.aula["titulo"]
-        _sub_y = _tcy + _char_h // 2 + 22
+        _sub_y = _tcy + _char_h // 2 + 42
         _fes = self.font_hub_subtitle
         _ss = _fes.render(_sub, True, (0, 0, 0))
         self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _sub_y + 2)))
         _ss = _fes.render(_sub, True, _BRANCO)
         self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
 
-        # Conteúdo WendyOne branco, margens 100px, espaçamento generoso entre parágrafos
-        _MARG = 100
+        # Corpo WendyOne em painel de leitura, com respiro e divisao em colunas quando necessario.
+        _MARG = 92
         _cw = WINDOW.width - _MARG * 2
-        _fc = self.font_lesson_content
-        _lh = _fc.get_linesize() + 4
-        _y = _sub_y + _fes.get_height() // 2 + 30
-        _max_y = WINDOW.height - 110
+        _fc = self.font_lesson_body
+        _lh = _fc.get_linesize() + 2
+        _body_top = _sub_y + _fes.get_height() // 2 + 36
+        _has_cta = MUNDO_ATIVO == "mundo_1" and segmento.get("id") == "texto_1"
+        _body_bottom = WINDOW.height - (276 if _has_cta else 128)
+        _panel_rect = pygame.Rect(_MARG - 18, _body_top - 18, _cw + 36, _body_bottom - _body_top + 36)
+        _panel = pygame.Surface(_panel_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(_panel, (0, 0, 0, 118), _panel.get_rect(), border_radius=8)
+        pygame.draw.rect(_panel, (*_VERDE_CLARO, 130), _panel.get_rect(), width=2, border_radius=8)
+        self.screen.blit(_panel, _panel_rect.topleft)
 
-        for para in segmento["conteudo"]:
-            for linha in quebrar_texto(para, _fc, _cw):
+        _conteudo = segmento["conteudo"]
+        if len(_conteudo) > 4:
+            _meio = math.ceil(len(_conteudo) / 2)
+            _colunas = [_conteudo[:_meio], _conteudo[_meio:]]
+        else:
+            _colunas = [_conteudo]
+
+        _gap_col = 38 if len(_colunas) > 1 else 0
+        _col_w = (_cw - _gap_col) // len(_colunas)
+        _max_y = _panel_rect.bottom - 18
+        for _col_idx, _paragrafos in enumerate(_colunas):
+            _x = _MARG + _col_idx * (_col_w + _gap_col)
+            _y = _body_top
+            for _para in _paragrafos:
+                _linhas = quebrar_texto(_para, _fc, _col_w - 18)
+                _accent_h = min(len(_linhas) * _lh - 4, _max_y - _y)
+                if _accent_h > 0:
+                    pygame.draw.rect(self.screen, _VERDE_CLARO, pygame.Rect(_x, _y + 4, 4, _accent_h), border_radius=2)
+                for _linha in _linhas:
+                    if _y + _lh > _max_y:
+                        break
+                    _shadow = _fc.render(_linha, True, (0, 0, 0))
+                    self.screen.blit(_shadow, (_x + 16 + 2, _y + 2))
+                    self.screen.blit(_fc.render(_linha, True, _BRANCO), (_x + 16, _y))
+                    _y += _lh
+                _y += 12
                 if _y >= _max_y:
                     break
-                self.screen.blit(_fc.render(linha, True, _BRANCO), (_MARG, _y))
-                _y += _lh
-            _y += 18
-            if _y >= _max_y:
-                break
 
         # Mensagem CTA e link YouTube (apenas mundo_1 / texto_1)
-        if MUNDO_ATIVO == "mundo_1" and segmento.get("id") == "texto_1":
+        if _has_cta:
             _chamada = "Quer se aprofundar um pouco mais no tema? Clica no link abaixo e assista a uma aula completa!"
-            _lhe = _fes.get_linesize() + 4
-            _y += 6
-            for _cl in quebrar_texto(_chamada, _fes, _cw):
-                if _y >= _max_y:
-                    break
-                self.screen.blit(_fes.render(_cl, True, _VERDE_CLARO), (_MARG, _y))
-                _y += _lhe
-            _y += 8
-            if _y < _max_y:
-                _ltxt = "Assistir Aula Completa (YouTube)"
-                _lsurf = self.font_lesson_content.render(_ltxt, True, _VERDE_CLARO)
-                self.link_rect = _lsurf.get_rect(topleft=(_MARG, _y))
-                self.screen.blit(_lsurf, self.link_rect)
-                pygame.draw.line(
-                    self.screen, _VERDE_CLARO,
-                    (_MARG, _y + _lsurf.get_height()),
-                    (_MARG + _lsurf.get_width(), _y + _lsurf.get_height()),
-                    2,
-                )
-            else:
-                self.link_rect = None
+            _cta_font = self.font_status_success
+            _cta_lines = quebrar_texto(_chamada, _cta_font, _cw - 90)
+            _cta_lh = _cta_font.get_linesize() + 2
+            _ltxt = "Assistir Aula Completa (YouTube)"
+            _lsurf = self.font_lesson_content.render(_ltxt, True, _VERDE_CLARO)
+            _cta_h = len(_cta_lines) * _cta_lh + _lsurf.get_height() + 38
+            _cta_rect = pygame.Rect(_MARG - 18, _panel_rect.bottom + 18, _cw + 36, _cta_h)
+            _cta = pygame.Surface(_cta_rect.size, pygame.SRCALPHA)
+            pygame.draw.rect(_cta, (0, 0, 0, 112), _cta.get_rect(), border_radius=8)
+            pygame.draw.rect(_cta, (*_VERDE_CLARO, 150), _cta.get_rect(), width=2, border_radius=8)
+            self.screen.blit(_cta, _cta_rect.topleft)
+
+            _cy = _cta_rect.y + 14
+            for _cl in _cta_lines:
+                _txt_shadow = _cta_font.render(_cl, True, (0, 0, 0))
+                _txt_surf = _cta_font.render(_cl, True, _VERDE_CLARO)
+                self.screen.blit(_txt_shadow, _txt_shadow.get_rect(center=(WINDOW.width // 2 + 2, _cy + _cta_lh // 2 + 2)))
+                self.screen.blit(_txt_surf, _txt_surf.get_rect(center=(WINDOW.width // 2, _cy + _cta_lh // 2)))
+                _cy += _cta_lh
+
+            self.link_rect = _lsurf.get_rect(center=(WINDOW.width // 2, _cy + _lsurf.get_height() // 2 + 4))
+            self.screen.blit(_lsurf, self.link_rect)
+            pygame.draw.line(
+                self.screen, _VERDE_CLARO,
+                (self.link_rect.left, self.link_rect.bottom),
+                (self.link_rect.right, self.link_rect.bottom),
+                2,
+            )
         else:
             self.link_rect = None
 
