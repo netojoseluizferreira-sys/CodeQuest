@@ -180,6 +180,7 @@ class CodeQuestPygameMenu:
         self.mundos_glow_timer = 0
         self.lesson_glow_timer = 0
         self.font_lesson_title = pygame.font.Font(_pressstart, 28)
+        self.font_lesson_practice_title = pygame.font.Font(_pressstart, 24)
         self.font_lesson_content = pygame.font.Font(_wendyone, 20)
         self.font_lesson_body = pygame.font.Font(_wendyone, 20)
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
@@ -1427,7 +1428,7 @@ class CodeQuestPygameMenu:
 
         _TITULO = segmento["titulo"]
         _GAP = 2
-        _ft = self.font_lesson_title
+        _ft = self.font_lesson_practice_title
         _char_w = [_ft.size(c)[0] for c in _TITULO]
         _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
         _tx0 = WINDOW.width // 2 - _total_w // 2
@@ -1468,20 +1469,24 @@ class CodeQuestPygameMenu:
             self._desenhar_paragrafo("Exercício não encontrado.", self.content_x, 250, self.content_width, self.font_body, _BRANCO)
             return
 
-        _question_rect = pygame.Rect(self.content_x - 24, 168, self.content_width + 48, 128)
+        _pergunta_font = self.font_status_success
+        _linhas = quebrar_texto(exercicio["pergunta"], _pergunta_font, 820)
+        _question_w = min(max(max(_pergunta_font.size(_linha)[0] for _linha in _linhas) + 96, 620), 900)
+        _question_h = max(96, len(_linhas) * (_pergunta_font.get_linesize() + 2) + 42)
+        _question_rect = pygame.Rect(WINDOW.width // 2 - _question_w // 2, 178, _question_w, _question_h)
         _question_panel = pygame.Surface(_question_rect.size, pygame.SRCALPHA)
         pygame.draw.rect(_question_panel, (0, 0, 0, 118), _question_panel.get_rect(), border_radius=8)
         pygame.draw.rect(_question_panel, (*_VERDE_CLARO, 150), _question_panel.get_rect(), width=2, border_radius=8)
         self.screen.blit(_question_panel, _question_rect.topleft)
 
-        _pergunta_font = self.font_status_success
-        _linhas = quebrar_texto(exercicio["pergunta"], _pergunta_font, self.content_width - 20)
         _lh = _pergunta_font.get_linesize() + 2
         _y = _question_rect.y + max(18, (_question_rect.height - len(_linhas) * _lh) // 2)
         for _linha in _linhas:
             _shadow = _pergunta_font.render(_linha, True, (0, 0, 0))
-            self.screen.blit(_shadow, (_question_rect.x + 26, _y + 2))
-            self.screen.blit(_pergunta_font.render(_linha, True, _BRANCO), (_question_rect.x + 24, _y))
+            _shadow_rect = _shadow.get_rect(center=(_question_rect.centerx + 2, _y + _lh // 2 + 2))
+            self.screen.blit(_shadow, _shadow_rect)
+            _surface = _pergunta_font.render(_linha, True, _BRANCO)
+            self.screen.blit(_surface, _surface.get_rect(center=(_question_rect.centerx, _y + _lh // 2)))
             _y += _lh
 
         if exercicio["tipo"] != "multipla_escolha":
@@ -1609,7 +1614,11 @@ class CodeQuestPygameMenu:
                 return
 
             altura = max(58, (len(linhas) * linha_altura) + 24)
-            rect = pygame.Rect(self.content_x, y - altura // 2, self.content_width, altura)
+            largura = min(
+                max(max(font.size(linha)[0] for linha in linhas) + 96, 420),
+                self.content_width,
+            )
+            rect = pygame.Rect(WINDOW.width // 2 - largura // 2, y - altura // 2, largura, altura)
             pygame.draw.rect(self.screen, PALETTE.surface, rect, border_radius=10)
             pygame.draw.rect(self.screen, color, rect, width=2, border_radius=10)
             texto_y = rect.y + 12
