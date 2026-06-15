@@ -243,7 +243,11 @@ class CodeQuestPygameMenu:
         if self.screen_name == "lesson":
             return self._botoes_fluxo_aprendizado()
         if self.screen_name == "complete":
-            return [self._botao_voltar_hub()]
+            return [
+                Button(pygame.Rect(WINDOW.width // 2 - 125, WINDOW.height - 88, 250, 52), "Mundo 2", self._mostrar_mundo_2_em_breve, **_KW_VERDE),
+                Button(pygame.Rect(WINDOW.width - 310, WINDOW.height - 88, 250, 52), "Perfil", self._abrir_perfil, **_KW_VERDE),
+                self._botao_voltar_hub(**_KW_VERDE),
+            ]
         return []
 
     def _botoes_inicio(self):
@@ -1499,16 +1503,78 @@ class CodeQuestPygameMenu:
         self._desenhar_status(_status_y)
 
     def _renderizar_conclusao(self):
-        """Renderiza a tela de conclusão exibida ao final de todos os segmentos da aula."""
-        self._desenhar_cabecalho("Aula concluída", "A primeira rota de Bythos foi vencida")
-        self._desenhar_paragrafo(
-            "Você completou o fluxo de texto, prática e revisão. Volte ao menu para ver seu perfil.",
-            300,
-            300,
-            680,
-            self.font_body,
-            PALETTE.text,
+        """Renderiza a conclusão do Mundo 1 usando a identidade visual da aula."""
+        if self.cutscene_bg:
+            self.screen.blit(self.cutscene_bg, (0, 0))
+        else:
+            self.screen.fill((11, 25, 11))
+        self.screen.blit(self.lesson_overlay, (0, 0))
+
+        _TITULO = "Aula concluída"
+        _GAP = 2
+        _ft = self.font_lesson_title
+        _char_w = [_ft.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = _ft.get_height()
+        _tcy = 72
+
+        self.lesson_glow_timer += 1
+        _ga = int(40 + 80 * abs(math.sin(self.lesson_glow_timer * 0.04)))
+        _gs = [_ft.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _gs:
+            _s.set_alpha(_ga)
+        for _sp in (8, 5, 2):
+            for _dx in (-_sp, 0, _sp):
+                for _dy in (-_sp, 0, _sp):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_gs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft.render(_c, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        _sub = "A primeira rota de Bythos foi vencida"
+        _sub_y = _tcy + _char_h // 2 + 42
+        _ss = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _sub_y + 2)))
+        _ss = self.font_hub_subtitle.render(_sub, True, _BRANCO)
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
+
+        _texto = (
+            "Você completou o Mundo 1. Agora pode visitar o perfil para ver seu progresso "
+            "ou tentar seguir para o Mundo 2 quando ele estiver disponível."
         )
+        _font = self.font_status_success
+        _linhas = quebrar_texto(_texto, _font, 760)
+        _lh = _font.get_linesize() + 4
+        _panel_w = 860
+        _panel_h = max(150, len(_linhas) * _lh + 58)
+        _panel_rect = pygame.Rect(WINDOW.width // 2 - _panel_w // 2, 235, _panel_w, _panel_h)
+        _panel = pygame.Surface(_panel_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(_panel, (0, 0, 0, 118), _panel.get_rect(), border_radius=8)
+        pygame.draw.rect(_panel, (*_VERDE_CLARO, 150), _panel.get_rect(), width=2, border_radius=8)
+        self.screen.blit(_panel, _panel_rect.topleft)
+
+        _y = _panel_rect.y + (_panel_rect.height - len(_linhas) * _lh) // 2
+        for _linha in _linhas:
+            _shadow = _font.render(_linha, True, (0, 0, 0))
+            self.screen.blit(_shadow, _shadow.get_rect(center=(_panel_rect.centerx + 2, _y + _lh // 2 + 2)))
+            _surface = _font.render(_linha, True, _BRANCO)
+            self.screen.blit(_surface, _surface.get_rect(center=(_panel_rect.centerx, _y + _lh // 2)))
+            _y += _lh
+
+        if self.status_message == "Em breve! Volte para o menu.":
+            self._desenhar_status(525)
 
     def _desenhar_cabecalho(self, titulo, subtitulo):
         """Desenha o cabeçalho padrão de 170px com título e subtítulo centralizados.
@@ -1730,6 +1796,14 @@ class CodeQuestPygameMenu:
             "Continue sua jornada pelo Módulo 1 enquanto isso.",
             "normal",
         )
+
+    def _mostrar_mundo_2_em_breve(self):
+        """Mostra o aviso temporário do Mundo 2 na tela de conclusão.
+
+        Retorna:
+            None: Atualiza apenas a mensagem de status exibida na tela atual.
+        """
+        self._definir_status("Em breve! Volte para o menu.", "success")
 
     def _abrir_perfil(self):
         """Navega para a tela de perfil do jogador."""
