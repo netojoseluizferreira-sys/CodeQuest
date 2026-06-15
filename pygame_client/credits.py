@@ -32,7 +32,7 @@ CREDIT_LINES = [
     ("quote", "Obrigado por embarcar nessa jornada pelo Arquipélago de Bythos."),
     ("quote", "Que o CodeQuest ajude a acender sua curiosidade por programação."),
     ("section", "Links"),
-    ("small", "GitHub: github.com/netojoseluizferreira-sys/CodeQuest"),
+    ("small", "GitHub: https://github.com/netojoseluizferreira-sys/CodeQuest"),
     ("footer", "2026 CodeQuest"),
 ]
 

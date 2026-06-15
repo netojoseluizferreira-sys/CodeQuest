@@ -63,6 +63,10 @@ class EventMixin:
                 if pygame.Rect(self.content_x, 350, self.content_width, 58).collidepoint(event.pos):
                     self.active_field = "resposta"
 
+        if self.screen_name == "credits":
+            if self.credit_link_rect and self.credit_link_rect.collidepoint(event.pos):
+                webbrowser.open("https://github.com/netojoseluizferreira-sys/CodeQuest")
+
         for button in self._botoes_tela():
             if button.handle_event(event):
                 self.audio.tocar_botao()

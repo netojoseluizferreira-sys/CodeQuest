@@ -1,7 +1,10 @@
 """Testes unitários de transições do menu principal sem abrir janela Pygame."""
 
+import pygame
+
 from backend.usuario import Usuario
-from pygame_client import menu_app, menu_navigation
+from pygame_client import menu_app, menu_events, menu_navigation
+from pygame_client.ui import Button
 
 
 def test_continuar_sem_save_abre_tela_de_criacao_sem_criar_usuario(monkeypatch):
@@ -78,6 +81,72 @@ def test_voltar_contextual_creditos_vai_para_inicio_mesmo_com_usuario():
 
     assert app.screen_name == "start"
     assert app.status_message == "Bem-vindo ao CodeQuest."
+
+
+def test_cursor_muda_apenas_quando_estado_clicavel_muda(monkeypatch):
+    chamadas = []
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.screen_name = "start"
+    app.link_rect = None
+    app.credit_link_rect = None
+    app._cursor_atual = None
+    botao = Button(pygame.Rect(10, 10, 100, 40), "Ok", lambda: None)
+
+    monkeypatch.setattr(menu_app.pygame.mouse, "set_cursor", chamadas.append)
+
+    app._atualizar_cursor((20, 20), [botao])
+    app._atualizar_cursor((25, 25), [botao])
+    app._atualizar_cursor((200, 200), [botao])
+
+    assert chamadas == [pygame.SYSTEM_CURSOR_HAND, pygame.SYSTEM_CURSOR_ARROW]
+
+
+def test_link_de_aula_abre_url_do_segmento(monkeypatch):
+    chamadas = []
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.screen_name = "lesson"
+    app.link_rect = pygame.Rect(10, 10, 120, 30)
+    app.content_x = 150
+    app.content_width = 980
+    app.active_field = "nome"
+    app._segmento_atual = lambda: {"tipo": "aula", "video_url": "https://www.youtube.com/watch?v=abc123"}
+    app._botoes_tela = lambda: []
+
+    monkeypatch.setattr(menu_events.webbrowser, "open", chamadas.append)
+
+    evento = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": (20, 20)})
+    app._processar_clique(evento)
+
+    assert chamadas == ["https://www.youtube.com/watch?v=abc123"]
+
+
+def test_link_dos_creditos_abre_github(monkeypatch):
+    chamadas = []
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.screen_name = "credits"
+    app.credit_link_rect = pygame.Rect(10, 10, 260, 30)
+    app._botoes_tela = lambda: []
+
+    monkeypatch.setattr(menu_events.webbrowser, "open", chamadas.append)
+
+    evento = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"button": 1, "pos": (20, 20)})
+    app._processar_clique(evento)
+
+    assert chamadas == ["https://github.com/netojoseluizferreira-sys/CodeQuest"]
+
+
+def test_mundo_indisponivel_mostra_texto_em_breve_atualizado():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.status_message = ""
+    app.status_kind = "normal"
+
+    app._mostrar_mundo_em_breve()
+
+    assert app.status_message == (
+        "EM BREVE!\n"
+        "Os segredos deste mundo ainda não estão prontos para serem revelados. "
+        "Continue sua jornada pelo Mundo 1 ou Mundo 2 enquanto isso."
+    )
 
 
 def test_pula_exercicios_concluidos_ate_proximo_pendente(monkeypatch):

@@ -55,8 +55,10 @@ class RenderMixin:
 
         mouse_pos = pygame.mouse.get_pos()
         _btn_font = self.font_start_btn if self.screen_name in {"start", "hub", "profile", "worlds"} else self.font_body
-        for button in self._botoes_tela():
+        botoes = self._botoes_tela()
+        for button in botoes:
             button.draw(self.screen, _btn_font, mouse_pos)
+        self._atualizar_cursor(mouse_pos, botoes)
         pygame.display.flip()
 
     def _renderizar_fundo_video(self):
@@ -583,6 +585,7 @@ class RenderMixin:
 
     def _renderizar_creditos(self):
         """Renderiza os créditos com seções estilizadas, título CodeQuest com glow e fundo animado."""
+        self.credit_link_rect = None
         if self.creditos_frame_paths:
             self.creditos_frame_timer += 1
             if self.creditos_frame_timer >= 6:
@@ -639,7 +642,7 @@ class RenderMixin:
                 ("body", "Maio — Junho de 2025"),
             ]),
             ("LINKS", [
-                ("body", "github.com/netojoseluizferreira-sys/CodeQuest"),
+                ("link", "https://github.com/netojoseluizferreira-sys/CodeQuest"),
             ]),
         ]
 
@@ -653,7 +656,7 @@ class RenderMixin:
             for style, text in linhas:
                 if style == "sub":
                     h += len(quebrar_texto(text, _ft_sub, _CW)) * _LH_SUB
-                elif style == "body":
+                elif style in {"body", "link"}:
                     h += len(quebrar_texto(text, _ft_body, _CW)) * _LH_BODY
                 elif style == "space":
                     h += 14
@@ -693,9 +696,20 @@ class RenderMixin:
                             _ss = _ft_sub.render(_sub, True, _BRANCO)
                             self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _ty + _LH_SUB // 2)))
                             _ty += _LH_SUB
-                    elif style == "body":
+                    elif style in {"body", "link"}:
                         for _sub in quebrar_texto(text, _ft_body, _CW):
-                            self.screen.blit(_ft_body.render(_sub, True, _BRANCO), (_MARG, _ty))
+                            _cor_texto = _VERDE_CLARO if style == "link" else _BRANCO
+                            _surf = _ft_body.render(_sub, True, _cor_texto)
+                            _rect = self.screen.blit(_surf, (_MARG, _ty))
+                            if style == "link":
+                                self.credit_link_rect = _rect if self.credit_link_rect is None else self.credit_link_rect.union(_rect)
+                                pygame.draw.line(
+                                    self.screen,
+                                    _VERDE_CLARO,
+                                    (_rect.left, _rect.bottom),
+                                    (_rect.right, _rect.bottom),
+                                    2,
+                                )
                             _ty += _LH_BODY
                     elif style == "space":
                         _ty += 14

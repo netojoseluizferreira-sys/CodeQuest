@@ -144,7 +144,7 @@ class LearningRenderMixin:
             _cta_font = self.font_status_success
             _cta_lines = [
                 "Quer se aprofundar um pouco mais no tema?",
-                "Clica no link abaixo e assista a uma aula completa!",
+                "Clique no link abaixo e assista a uma aula completa!",
             ]
             _cta_lh = _cta_font.get_linesize() + 2
             _ltxt = "Assistir Aula Completa (YouTube)"
@@ -264,8 +264,9 @@ class LearningRenderMixin:
             placeholder = exercicio.get("placeholder", "Digite sua resposta")
             self._desenhar_input_verde(pygame.Rect(self.content_x, 350, self.content_width, 58), self.resposta_texto, "resposta", placeholder)
 
-        _status_y = WINDOW.height // 2 if self.status_kind == "success" else WINDOW.height - 118
-        self._desenhar_status(_status_y)
+        if self.status_kind in {"success", "error"} or exercicio["tipo"] != "multipla_escolha":
+            _status_y = WINDOW.height // 2 if self.status_kind == "success" else WINDOW.height - 118
+            self._desenhar_status(_status_y)
 
     def _renderizar_conclusao(self):
         """Renderiza a conclusão do mundo ativo usando a identidade visual da aula."""

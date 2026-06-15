@@ -87,6 +87,8 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self.resposta_texto = ""
         self.exercicio_respondido = False
         self.link_rect = None
+        self.credit_link_rect = None
+        self._cursor_atual = None
         self.btn_continuar_y = None
         self._frame_cache = {}
         _frames_dir = os.path.join(_data_dir, "video_frames")
@@ -166,7 +168,6 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
     def run(self):
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
         while self.running:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)  # Resetando cursor para seta no inicio do frame
             self.audio.tocar_trilha(self._contexto_musica_atual())
             self._processar_eventos()
             self._renderizar()
@@ -212,6 +213,33 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
             image = pygame.image.load(frame_path).convert()
             self._frame_cache[frame_path] = pygame.transform.scale(image, (WINDOW.width, WINDOW.height))
         return self._frame_cache[frame_path]
+
+    def _atualizar_cursor(self, mouse_pos, botoes):
+        """Troca o cursor apenas quando muda entre seta e mão de clique."""
+        cursor = pygame.SYSTEM_CURSOR_HAND if self._deve_mostrar_cursor_mao(mouse_pos, botoes) else pygame.SYSTEM_CURSOR_ARROW
+        if cursor == self._cursor_atual:
+            return
+        pygame.mouse.set_cursor(cursor)
+        self._cursor_atual = cursor
+
+    def _deve_mostrar_cursor_mao(self, mouse_pos, botoes):
+        """Retorna True quando o mouse está sobre algo clicável."""
+        if any(button.rect.collidepoint(mouse_pos) for button in botoes):
+            return True
+        if self.screen_name == "lesson" and self.link_rect and self.link_rect.collidepoint(mouse_pos):
+            return True
+        if self.screen_name == "credits" and self.credit_link_rect and self.credit_link_rect.collidepoint(mouse_pos):
+            return True
+        if self.screen_name == "cutscene" and self.cutscene_fade_state == "visible":
+            btn_w, btn_h = 190, 45
+            btn_y = WINDOW.height - 65
+            btn2_x = WINDOW.width - 20 - btn_w
+            btn1_x = btn2_x - 10 - btn_w
+            return (
+                pygame.Rect(btn1_x, btn_y, btn_w, btn_h).collidepoint(mouse_pos)
+                or pygame.Rect(btn2_x, btn_y, btn_w, btn_h).collidepoint(mouse_pos)
+            )
+        return False
 
 def main():
     """Instancia CodeQuestPygameMenu e inicia o loop principal do jogo."""

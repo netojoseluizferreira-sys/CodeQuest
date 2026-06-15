@@ -106,8 +106,8 @@ class NavigationMixin:
             None: Atualiza apenas a mensagem de status exibida na tela de mundos.
         """
         self._definir_status(
-            "EM BREVE!\nOs segredos deste lugar ainda não estão prontos para ser revelados. "
-            "Continue sua jornada pelo Módulo 1 enquanto isso.",
+            "EM BREVE!\nOs segredos deste mundo ainda não estão prontos para serem revelados. "
+            "Continue sua jornada pelo Mundo 1 ou Mundo 2 enquanto isso.",
             "normal",
         )
 

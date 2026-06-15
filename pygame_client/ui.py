@@ -61,10 +61,6 @@ class Button:
             mouse_pos (tuple[int, int]): Posição atual do cursor em pixels.
         """
         hovered = self.rect.collidepoint(mouse_pos)
-        if hovered:
-            # Lógica do cursor de mãozinha
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-
         background = self.background or PALETTE.primary
         hover_background = self.hover_background or PALETTE.primary_hover
         color = hover_background if hovered else background
