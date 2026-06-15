@@ -50,20 +50,24 @@
     "numero": "Mundo 5",
     "assunto": "Estruturas de Repetição",
     "nome": "Moinho Eterno",
-    "implementado": false,
+    "implementado": true,
     "requer": "mundo_4",
     "aula_inicial": "aula_1",
-    "exercicios_obrigatorios": []
+    "background": "mundo_2_background.jpeg",
+    "overlay_alpha": 185,
+    "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_6": {
     "ordem": 6,
     "numero": "Mundo 6",
     "assunto": "Funções",
     "nome": "Santuário dos Invocadores",
-    "implementado": false,
+    "implementado": true,
     "requer": "mundo_5",
     "aula_inicial": "aula_1",
-    "exercicios_obrigatorios": []
+    "background": "mundo_2_background.jpeg",
+    "overlay_alpha": 185,
+    "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_7": {
     "ordem": 7,

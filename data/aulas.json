@@ -285,5 +285,189 @@
         }
       ]
     }
+  },
+  "mundo_5": {
+    "aula_1": {
+      "titulo": "Aula 5: Estruturas de Repetição",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "O que são loops",
+          "video_url": "https://www.youtube.com/watch?v=cL4YDtFnCt4",
+          "conteudo": [
+            "Loops são estruturas que permitem repetir um bloco de código várias vezes sem precisar reescrevê-lo. Eles existem porque muitas tarefas em programação envolvem repetição, como percorrer uma lista, contar números ou repetir uma ação até que uma condição seja satisfeita.",
+            "Sem loops, o programador seria obrigado a escrever a mesma instrução dezenas ou centenas de vezes. Com eles, é possível resolver esse problema com poucas linhas de código, tornando o programa muito mais eficiente e organizado.",
+            "Existem dois tipos principais de loop em Python: o while, que repete enquanto uma condição for verdadeira, e o for, que percorre uma sequência de valores. Cada um tem suas situações mais adequadas de uso."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Conceito de loops",
+          "exercicios": ["1", "9"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Loop while",
+          "video_url": "https://www.youtube.com/watch?v=LH6OIn2lBaI",
+          "conteudo": [
+            "O loop while repete um bloco de código enquanto uma condição for verdadeira. A cada repetição, a condição é verificada novamente. Quando ela se torna falsa, o loop encerra e o programa segue em frente.",
+            "É importante garantir que a condição do while eventualmente se torne falsa, caso contrário o loop nunca terminará, criando o que chamamos de loop infinito, um erro comum entre iniciantes.",
+            "O while é ideal para situações em que não se sabe previamente quantas repetições serão necessárias, como aguardar uma entrada válida do usuário ou repetir uma ação até que um objetivo seja atingido."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: while e loop infinito",
+          "exercicios": ["2", "3", "12"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Loop for",
+          "video_url": "https://www.youtube.com/watch?v=cL4YDtFnCt4",
+          "conteudo": [
+            "O loop for percorre uma sequência de valores, executando o bloco de código uma vez para cada elemento dessa sequência. Em Python, ele é frequentemente usado com a função range(), que gera uma sequência de números.",
+            "Diferente do while, o for já sabe de antemão quantas repetições serão feitas, pois depende do tamanho da sequência percorrida. Isso o torna mais previsível e seguro contra loops infinitos.",
+            "O for é ideal para situações em que se conhece a quantidade de repetições ou quando se deseja percorrer todos os elementos de uma lista, string ou outra sequência."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: for e range",
+          "exercicios": ["4", "11"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_4",
+          "titulo": "break, pass e continue",
+          "video_url": "https://www.youtube.com/watch?v=1OFp_-R2B2A",
+          "conteudo": [
+            "O break, o pass e o continue são comandos que controlam o comportamento de um loop. O break encerra o loop imediatamente, o continue pula a iteração atual e vai direto para a próxima, e o pass simplesmente não faz nada.",
+            "Esses três comandos oferecem maior controle sobre o fluxo de execução dentro de um loop, permitindo criar comportamentos mais precisos sem precisar de estruturas complexas.",
+            "O break é útil para encerrar uma busca assim que o resultado for encontrado. O continue é útil para pular valores indesejados. E o pass é útil durante o desenvolvimento do código, quando um bloco ainda não foi implementado."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_4",
+          "titulo": "Prática 4: Controle de loops",
+          "exercicios": ["5", "6", "7", "10", "14", "15"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_5",
+          "titulo": "Loops aninhados",
+          "video_url": "https://www.youtube.com/watch?v=5lMvLaOwFjQ",
+          "conteudo": [
+            "Loops aninhados são loops dentro de outros loops. Para cada repetição do loop externo, o loop interno executa todas as suas repetições completas. Isso permite trabalhar com estruturas bidimensionais, como tabelas e matrizes.",
+            "Por exemplo: para percorrer todas as células de uma tabela com linhas e colunas, usa-se um loop para as linhas e, dentro dele, outro loop para as colunas. A combinação dos dois percorre todas as posições da tabela.",
+            "Assim como condições aninhadas, loops aninhados devem ser usados com cuidado. Muitos níveis de aninhamento podem tornar o código lento e difícil de entender."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_5",
+          "titulo": "Prática 5: Loops aninhados",
+          "exercicios": ["8", "13"]
+        }
+      ]
+    }
+  },
+  "mundo_6": {
+    "aula_1": {
+      "titulo": "Aula 6: Funções",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "O que é uma função",
+          "video_url": "https://www.youtube.com/watch?v=ezfr9d7wd_k",
+          "conteudo": [
+            "Uma função é um bloco de código com um nome, que pode ser chamado sempre que necessário. Em vez de repetir o mesmo trecho de código várias vezes, o programador escreve uma função uma única vez e a utiliza quantas vezes precisar.",
+            "Funções tornam o código mais organizado, legível e fácil de manter. Quando algo precisa ser corrigido ou alterado, basta modificar a função em um único lugar, e a mudança reflete em todo o programa automaticamente.",
+            "Em Python, as funções nativas como print() e input() já são exemplos do que estudamos até agora. A partir de agora, aprenderemos a criar nossas próprias funções para resolver problemas específicos."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Conceito de funções",
+          "exercicios": ["1", "9"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Criando e chamando funções",
+          "video_url": "https://www.youtube.com/watch?v=ezfr9d7wd_k",
+          "conteudo": [
+            "Para criar uma função em Python, usamos a palavra-chave def, seguida do nome da função e de parênteses. O bloco de código da função fica indentado abaixo dessa linha.",
+            "Criar uma função não a executa automaticamente. Para que o código dentro dela seja executado, é necessário chamá-la pelo nome seguido de parênteses, como minha_funcao().",
+            "Uma função pode ser chamada quantas vezes for necessário ao longo do programa, sempre que aquele bloco de código precisar ser executado, sem precisar reescrever nenhuma linha."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: def e chamada",
+          "exercicios": ["2", "3", "10", "11"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Parâmetros e argumentos",
+          "video_url": "https://www.youtube.com/watch?v=QfcINemeFQ8",
+          "conteudo": [
+            "Parâmetros são as variáveis declaradas na definição de uma função, que representam as informações que ela espera receber. Argumentos são os valores reais passados para a função no momento em que ela é chamada.",
+            "Por exemplo: em def saudar(nome):, o nome é um parâmetro. Quando chamamos saudar(\"Ana\"), o valor \"Ana\" é o argumento. Dentro da função, o parâmetro nome assume o valor \"Ana\".",
+            "Uma função pode ter zero, um ou vários parâmetros. Eles tornam as funções muito mais flexíveis e reutilizáveis, pois permitem que o mesmo bloco de código produza resultados diferentes dependendo dos valores recebidos."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Parâmetros e argumentos",
+          "exercicios": ["4", "5"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_4",
+          "titulo": "Retorno de valores",
+          "video_url": "https://www.youtube.com/watch?v=T0j68JbeGJg",
+          "conteudo": [
+            "O comando return encerra a execução de uma função e devolve um valor para quem a chamou. Esse valor pode ser armazenado em uma variável ou usado diretamente em uma expressão.",
+            "Nem toda função precisa retornar um valor. Funções que apenas executam ações, como exibir algo na tela, podem não ter return. Mas funções que calculam ou processam informações geralmente retornam um resultado.",
+            "Quando o return é executado, a função encerra imediatamente, mesmo que ainda haja código depois dele. Tudo que vier após o return dentro da mesma função será ignorado."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_4",
+          "titulo": "Prática 4: return",
+          "exercicios": ["6", "12", "13", "15"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_5",
+          "titulo": "Escopo de variáveis",
+          "video_url": "https://www.youtube.com/watch?v=OPXBv6NnO6k",
+          "conteudo": [
+            "O escopo de uma variável define em quais partes do código ela pode ser acessada. Variáveis criadas dentro de uma função são chamadas de locais e só existem enquanto a função está sendo executada.",
+            "Variáveis criadas fora de qualquer função são chamadas de globais e podem ser acessadas em qualquer parte do programa. Tentar acessar uma variável local fora da função onde ela foi criada gera um erro.",
+            "Entender o escopo é fundamental para escrever funções corretas e previsíveis. Como regra geral, prefira usar parâmetros e return para trocar informações entre funções, em vez de depender de variáveis globais."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_5",
+          "titulo": "Prática 5: Escopo local e global",
+          "exercicios": ["7", "8", "14"]
+        }
+      ]
+    }
   }
 }

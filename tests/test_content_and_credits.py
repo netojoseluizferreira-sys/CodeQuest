@@ -129,6 +129,80 @@ def test_carregar_exercicios_mundo_4():
     assert obter_exercicio(exercicios, 15)["resposta"] == 3
 
 
+def test_carregar_aula_mundo_5_organiza_repeticao_por_blocos():
+    aula = carregar_aula_pygame("mundo_5", "aula_1")
+
+    assert aula is not None
+    assert aula["titulo"] == "Aula 5: Estruturas de Repetição"
+    assert len(aula["trilha"]) == 10
+
+    textos = [bloco for bloco in aula["trilha"] if bloco["tipo"] == "aula"]
+    blocos_exercicios = [bloco for bloco in aula["trilha"] if bloco["tipo"] == "exercicios"]
+
+    assert [bloco["titulo"] for bloco in textos] == [
+        "O que são loops",
+        "Loop while",
+        "Loop for",
+        "break, pass e continue",
+        "Loops aninhados",
+    ]
+    assert all(len(bloco["conteudo"]) == 3 for bloco in textos)
+    assert all(bloco.get("video_url", "").startswith("https://www.youtube.com/") for bloco in textos)
+    assert [bloco["exercicios"] for bloco in blocos_exercicios] == [
+        ["1", "9"],
+        ["2", "3", "12"],
+        ["4", "11"],
+        ["5", "6", "7", "10", "14", "15"],
+        ["8", "13"],
+    ]
+
+
+def test_carregar_exercicios_mundo_5():
+    exercicios = carregar_exercicios_pygame("mundo_5")
+
+    assert len(exercicios) == 15
+    assert obter_exercicio(exercicios, 4)["tipo"] == "completar"
+    assert obter_exercicio(exercicios, 14)["resposta"] == 2
+    assert obter_exercicio(exercicios, 15)["resposta"] == 1
+
+
+def test_carregar_aula_mundo_6_organiza_funcoes_por_blocos():
+    aula = carregar_aula_pygame("mundo_6", "aula_1")
+
+    assert aula is not None
+    assert aula["titulo"] == "Aula 6: Funções"
+    assert len(aula["trilha"]) == 10
+
+    textos = [bloco for bloco in aula["trilha"] if bloco["tipo"] == "aula"]
+    blocos_exercicios = [bloco for bloco in aula["trilha"] if bloco["tipo"] == "exercicios"]
+
+    assert [bloco["titulo"] for bloco in textos] == [
+        "O que é uma função",
+        "Criando e chamando funções",
+        "Parâmetros e argumentos",
+        "Retorno de valores",
+        "Escopo de variáveis",
+    ]
+    assert all(len(bloco["conteudo"]) == 3 for bloco in textos)
+    assert all(bloco.get("video_url", "").startswith("https://www.youtube.com/") for bloco in textos)
+    assert [bloco["exercicios"] for bloco in blocos_exercicios] == [
+        ["1", "9"],
+        ["2", "3", "10", "11"],
+        ["4", "5"],
+        ["6", "12", "13", "15"],
+        ["7", "8", "14"],
+    ]
+
+
+def test_carregar_exercicios_mundo_6():
+    exercicios = carregar_exercicios_pygame("mundo_6")
+
+    assert len(exercicios) == 15
+    assert obter_exercicio(exercicios, 3)["tipo"] == "completar"
+    assert obter_exercicio(exercicios, 12)["resposta"] == 3
+    assert obter_exercicio(exercicios, 15)["resposta"] == 3
+
+
 def test_corrigir_conteudo_preserva_tipos_e_corrige_recursivamente():
     valor = {"texto": "OlÃ¡", "itens": ["programaÃ§Ã£o", 3]}
 
