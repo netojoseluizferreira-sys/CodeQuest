@@ -276,6 +276,34 @@ def test_conclusao_do_mundo_2_aponta_para_mundo_3():
     assert "Mundo 3" in app._texto_conclusao_mundo(label)
 
 
+def test_conclusao_do_mundo_3_aponta_para_mundo_4():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.mundo_ativo = "mundo_3"
+    app.status_message = ""
+    app.status_kind = "normal"
+
+    label, acao = app._proximo_mundo_conclusao()
+
+    assert label == "Mundo 4"
+    assert callable(acao)
+    assert "Mundo 3" in app._texto_conclusao_mundo(label)
+    assert "Mundo 4" in app._texto_conclusao_mundo(label)
+
+
+def test_conclusao_do_mundo_4_aponta_para_mundo_5():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.mundo_ativo = "mundo_4"
+    app.status_message = ""
+    app.status_kind = "normal"
+
+    label, acao = app._proximo_mundo_conclusao()
+
+    assert label == "Mundo 5"
+    assert callable(acao)
+    assert "Mundo 4" in app._texto_conclusao_mundo(label)
+    assert "Mundo 5" in app._texto_conclusao_mundo(label)
+
+
 def test_contexto_musical_diferencia_aula_e_exercicio():
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.screen_name = "lesson"

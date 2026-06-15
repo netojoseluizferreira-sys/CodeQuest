@@ -26,20 +26,24 @@
     "numero": "Mundo 3",
     "assunto": "Operadores",
     "nome": "Forja das Runas",
-    "implementado": false,
+    "implementado": true,
     "requer": "mundo_2",
     "aula_inicial": "aula_1",
-    "exercicios_obrigatorios": []
+    "background": "mundo_2_background.jpeg",
+    "overlay_alpha": 185,
+    "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_4": {
     "ordem": 4,
     "numero": "Mundo 4",
     "assunto": "Estruturas de Decisão",
     "nome": "Torre dos Julgamentos",
-    "implementado": false,
+    "implementado": true,
     "requer": "mundo_3",
     "aula_inicial": "aula_1",
-    "exercicios_obrigatorios": []
+    "background": "mundo_2_background.jpeg",
+    "overlay_alpha": 185,
+    "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_5": {
     "ordem": 5,

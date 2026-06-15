@@ -129,9 +129,9 @@ def test_status_de_mundos_respeita_configuracao_de_desbloqueio(banco_temporario)
 
 def test_mundo_nao_implementado_aparece_em_breve(banco_temporario):
     usuario = database.criar_usuario("Teste", 12)
-    database.marcar_mundo_concluido("mundo_2", usuario)
+    database.marcar_mundo_concluido("mundo_4", usuario)
 
-    status = database.obter_status_mundo("mundo_3", usuario)
+    status = database.obter_status_mundo("mundo_5", usuario)
 
     assert status["estado"] == database.STATUS_EM_BREVE
 

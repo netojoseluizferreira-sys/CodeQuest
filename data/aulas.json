@@ -152,5 +152,138 @@
         }
       ]
     }
+  },
+  "mundo_3": {
+    "aula_1": {
+      "titulo": "Aula 3: Operadores",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "Operadores aritméticos",
+          "video_url": "https://www.youtube.com/watch?v=Vw6gLypRKmY",
+          "conteudo": [
+            "Os operadores aritméticos são símbolos usados para realizar cálculos matemáticos em Python. Os principais são: adição (+), subtração (-), multiplicação (*), divisão (/), divisão inteira (//) e módulo (%), que retorna o resto de uma divisão.",
+            "A diferença entre / e // é importante: a divisão comum sempre retorna um número decimal, enquanto a divisão inteira retorna apenas a parte inteira do resultado, descartando o resto. Já o % é útil para descobrir se um número é par ou ímpar, por exemplo.",
+            "Esses operadores funcionam com variáveis e valores diretamente, tornando possível criar desde cálculos simples até operações mais complexas dentro de um programa."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Operadores aritméticos",
+          "exercicios": ["1", "2", "10", "14"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Operadores relacionais",
+          "video_url": "https://www.youtube.com/watch?v=1MAPLDgFRe8",
+          "conteudo": [
+            "Os operadores relacionais são usados para comparar dois valores. O resultado de uma comparação é sempre um valor booleano: verdadeiro (True) ou falso (False). São eles: igual (==), diferente (!=), maior que (>), menor que (<), maior ou igual (>=) e menor ou igual (<=).",
+            "É importante não confundir o operador de igualdade (==) com o operador de atribuição (=). O primeiro compara dois valores, enquanto o segundo armazena um valor em uma variável.",
+            "Os operadores relacionais são a base das estruturas de decisão em programação. Sem eles, não seria possível criar condições do tipo: se a idade for maior que 18, faça isso."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: Operadores relacionais",
+          "exercicios": ["3", "4", "8", "9"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Operadores lógicos",
+          "video_url": "https://www.youtube.com/watch?v=GdoQKHdiCFc",
+          "conteudo": [
+            "Os operadores lógicos permitem combinar ou inverter condições. Em Python, os três operadores lógicos são: and, or e not. Eles trabalham com valores booleanos e são muito utilizados junto aos operadores relacionais.",
+            "O and retorna verdadeiro somente quando ambas as condições são verdadeiras. O or retorna verdadeiro quando pelo menos uma das condições é verdadeira. Já o not inverte o resultado de uma condição, transformando verdadeiro em falso e vice-versa.",
+            "Combinando operadores lógicos e relacionais, é possível criar condições muito mais precisas e completas dentro de um programa, como permitir o acesso apenas quando a idade for maior que 18 e o cadastro estiver ativo."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Operadores lógicos",
+          "exercicios": ["5", "6", "11", "13", "15"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_4",
+          "titulo": "Precedência de operadores",
+          "video_url": "https://www.youtube.com/watch?v=Vw6gLypRKmY",
+          "conteudo": [
+            "Assim como na matemática, Python segue uma ordem de prioridade na hora de executar as operações. Isso significa que, em uma expressão com múltiplos operadores, alguns são calculados antes de outros, independentemente da ordem em que aparecem.",
+            "A ordem geral de precedência vai dos operadores aritméticos, com multiplicação e divisão tendo prioridade sobre adição e subtração, passando pelos relacionais e, por último, os lógicos. Parênteses sempre têm a maior prioridade e podem ser usados para forçar a ordem desejada.",
+            "Entender a precedência é essencial para evitar erros de lógica. Um cálculo simples como 2 + 3 * 4 resulta em 14, e não 20, pois a multiplicação é calculada antes da adição."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_4",
+          "titulo": "Prática 4: Precedência de operadores",
+          "exercicios": ["7", "12"]
+        }
+      ]
+    }
+  },
+  "mundo_4": {
+    "aula_1": {
+      "titulo": "Aula 4: Estruturas de Decisão",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "if / else",
+          "video_url": "https://www.youtube.com/watch?v=K10u3XIf1-Q",
+          "conteudo": [
+            "A estrutura if é usada para tomar decisões no código. Ela avalia uma condição e, se essa condição for verdadeira, executa um bloco de instruções. Caso contrário, o programa ignora aquele bloco e segue em frente.",
+            "O else complementa o if, definindo o que deve acontecer quando a condição é falsa. Juntos, eles formam uma estrutura de decisão completa: se isso for verdade, faça isso; caso contrário, faça aquilo.",
+            "Essa é uma das estruturas mais utilizadas em programação. Com ela, é possível criar programas que reagem de formas diferentes dependendo das informações recebidas, tornando o código muito mais dinâmico."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: if, else e fluxo básico",
+          "exercicios": ["1", "2", "6", "7", "10", "11"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "elif",
+          "video_url": "https://www.youtube.com/watch?v=K10u3XIf1-Q",
+          "conteudo": [
+            "O elif é uma abreviação de else if e permite verificar múltiplas condições em sequência. Quando a condição do if é falsa, o Python verifica a condição do elif. Se ela for verdadeira, executa o bloco correspondente.",
+            "A diferença entre usar vários if e usar elif é importante: com vários if, todas as condições são verificadas independentemente. Com elif, assim que uma condição verdadeira é encontrada, as demais são ignoradas.",
+            "O elif é ideal para situações com múltiplas possibilidades excludentes, como classificar uma nota em A, B, C ou D, onde apenas uma das opções pode ser verdadeira por vez."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: elif e múltiplas decisões",
+          "exercicios": ["3", "4", "8", "9", "13", "14"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Condições aninhadas",
+          "video_url": "https://www.youtube.com/watch?v=j9bYDjaAYzw",
+          "conteudo": [
+            "Condições aninhadas são estruturas if dentro de outras estruturas if. Elas permitem verificar condições mais específicas depois que uma condição mais geral já foi satisfeita, criando uma hierarquia de decisões.",
+            "Por exemplo: primeiro verificar se o usuário está logado e, só depois, verificar se ele tem permissão de administrador. A segunda verificação só faz sentido se a primeira já for verdadeira.",
+            "Apesar de poderosas, condições aninhadas devem ser usadas com moderação. Muitos níveis de aninhamento tornam o código difícil de ler e manter. Sempre que possível, é melhor simplificar usando elif ou operadores lógicos."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Condições aninhadas",
+          "exercicios": ["5", "12", "15"]
+        }
+      ]
+    }
   }
 }

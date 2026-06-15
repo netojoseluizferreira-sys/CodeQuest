@@ -390,5 +390,326 @@
       "resposta": 1,
       "xp": 10
     }
+  },
+  "mundo_3": {
+    "1": {
+      "id": 1,
+      "tipo": "multipla_escolha",
+      "titulo": "Resto da divisão",
+      "pergunta": "Qual operador é usado para calcular o resto de uma divisão em Python?",
+      "opcoes": ["/", "//", "%", "*"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "tipo": "multipla_escolha",
+      "titulo": "Divisão inteira",
+      "pergunta": "Qual é o resultado de 10 // 3 em Python?",
+      "opcoes": ["3.33", "1", "3", "0"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "tipo": "multipla_escolha",
+      "titulo": "Resultado relacional",
+      "pergunta": "O que os operadores relacionais retornam como resultado?",
+      "opcoes": ["Um número inteiro", "Um texto", "Um valor booleano (True ou False)", "Um número decimal"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "4": {
+      "id": 4,
+      "tipo": "completar",
+      "titulo": "Igualdade e atribuição",
+      "pergunta": "O operador ___ verifica se dois valores são iguais, enquanto o operador ___ armazena um valor em uma variável.",
+      "placeholder": "Digite os dois operadores na ordem correta",
+      "respostas_aceitas": ["== =", "== e =", "==, =", "igual igual", "igualdade atribuição", "igualdade atribuicao"],
+      "xp": 10
+    },
+    "5": {
+      "id": 5,
+      "tipo": "multipla_escolha",
+      "titulo": "Operador and",
+      "pergunta": "Qual operador lógico retorna verdadeiro somente quando ambas as condições são verdadeiras?",
+      "opcoes": ["or", "not", "and", "if"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "6": {
+      "id": 6,
+      "tipo": "multipla_escolha",
+      "titulo": "Operador not",
+      "pergunta": "O que o operador not faz?",
+      "opcoes": [
+        "Combina duas condições verdadeiras",
+        "Inverte o resultado de uma condição",
+        "Verifica se dois valores são diferentes",
+        "Retorna o resto de uma divisão"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "7": {
+      "id": 7,
+      "tipo": "completar",
+      "titulo": "Prioridade dos parênteses",
+      "pergunta": "Em Python, parênteses têm a ___ prioridade na ordem de precedência dos operadores.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["maior", "mais alta", "alta", "primeira"],
+      "xp": 10
+    },
+    "8": {
+      "id": 8,
+      "tipo": "multipla_escolha",
+      "titulo": "Comparação maior que",
+      "pergunta": "Qual é o resultado de 5 > 3 em Python?",
+      "opcoes": ["5", "3", "False", "True"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "9": {
+      "id": 9,
+      "tipo": "multipla_escolha",
+      "titulo": "Expressão relacional",
+      "pergunta": "Qual das expressões abaixo utiliza corretamente um operador relacional?",
+      "opcoes": ["idade = 18", "idade == 18", "idade and 18", "idade not 18"],
+      "resposta": 1,
+      "xp": 10
+    },
+    "10": {
+      "id": 10,
+      "tipo": "multipla_escolha",
+      "titulo": "Símbolo da divisão inteira",
+      "pergunta": "Qual operador representa a divisão inteira em Python?",
+      "opcoes": ["/", "%", "*", "//"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "11": {
+      "id": 11,
+      "tipo": "multipla_escolha",
+      "titulo": "True and False",
+      "pergunta": "Qual é o resultado da expressão True and False em Python?",
+      "opcoes": ["True", "False", "1", "0"],
+      "resposta": 1,
+      "xp": 10
+    },
+    "12": {
+      "id": 12,
+      "tipo": "multipla_escolha",
+      "titulo": "Ordem de cálculo",
+      "pergunta": "Qual é o resultado de 2 + 3 * 4 em Python?",
+      "opcoes": ["20", "24", "14", "10"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "13": {
+      "id": 13,
+      "tipo": "completar",
+      "titulo": "Operador or",
+      "pergunta": "O operador or retorna verdadeiro quando ___ das condições é verdadeira.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["pelo menos uma", "uma", "ao menos uma", "qualquer uma"],
+      "xp": 10
+    },
+    "14": {
+      "id": 14,
+      "tipo": "multipla_escolha",
+      "titulo": "Módulo na prática",
+      "pergunta": "Observe: x = 10, y = 3 e print(x % y). O que será exibido?",
+      "opcoes": ["3", "3.33", "1", "0"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "15": {
+      "id": 15,
+      "tipo": "multipla_escolha",
+      "titulo": "Condição com and",
+      "pergunta": "Analise: idade = 20, tem_carteira = True e print(idade >= 18 and tem_carteira). O que será exibido?",
+      "opcoes": ["False", "20", "True", "Erro, pois não é possível usar and com variáveis"],
+      "resposta": 2,
+      "xp": 10
+    }
+  },
+  "mundo_4": {
+    "1": {
+      "id": 1,
+      "tipo": "multipla_escolha",
+      "titulo": "Uso do if",
+      "pergunta": "Para que serve a estrutura if em Python?",
+      "opcoes": [
+        "Para repetir um bloco de código várias vezes",
+        "Para avaliar uma condição e executar um bloco se ela for verdadeira",
+        "Para armazenar valores em variáveis",
+        "Para exibir informações na tela"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "tipo": "multipla_escolha",
+      "titulo": "Papel do else",
+      "pergunta": "O que o else define em uma estrutura de decisão?",
+      "opcoes": [
+        "Uma condição adicional a ser verificada",
+        "O que deve acontecer quando a condição do if é verdadeira",
+        "O que deve acontecer quando a condição do if é falsa",
+        "O fim do programa"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "tipo": "completar",
+      "titulo": "Significado de elif",
+      "pergunta": "O elif é uma abreviação de ___ e permite verificar ___ condições em sequência.",
+      "placeholder": "Complete com as duas partes",
+      "respostas_aceitas": [
+        "else if múltiplas",
+        "else if multiplas",
+        "else if varias",
+        "else if várias",
+        "else if múltiplas condições",
+        "else if multiplas condicoes"
+      ],
+      "xp": 10
+    },
+    "4": {
+      "id": 4,
+      "tipo": "multipla_escolha",
+      "titulo": "Vários if ou elif",
+      "pergunta": "Qual é a diferença entre usar vários if e usar elif?",
+      "opcoes": [
+        "Não há diferença, os dois funcionam da mesma forma",
+        "Com elif, assim que uma condição verdadeira é encontrada, as demais são ignoradas",
+        "Com vários if, apenas a primeira condição é verificada",
+        "O elif só funciona sem o else"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "5": {
+      "id": 5,
+      "tipo": "multipla_escolha",
+      "titulo": "Condições aninhadas",
+      "pergunta": "O que são condições aninhadas?",
+      "opcoes": [
+        "Condições que sempre retornam False",
+        "Estruturas if dentro de outras estruturas if",
+        "Condições que usam apenas operadores lógicos",
+        "Estruturas que substituem o elif"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "6": {
+      "id": 6,
+      "tipo": "multipla_escolha",
+      "titulo": "Sintaxe do if",
+      "pergunta": "Qual das opções abaixo representa corretamente uma estrutura if em Python?",
+      "opcoes": ["if x > 10 then:", "if (x > 10)", "if x > 10:", "if x > 10;"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "7": {
+      "id": 7,
+      "tipo": "completar",
+      "titulo": "Quando o else executa",
+      "pergunta": "Em uma estrutura de decisão, se a condição do if for ___, o bloco do else será executado.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["falsa", "false"],
+      "xp": 10
+    },
+    "8": {
+      "id": 8,
+      "tipo": "multipla_escolha",
+      "titulo": "Quantidade de elif",
+      "pergunta": "Quantos elif podem ser usados em uma estrutura de decisão?",
+      "opcoes": ["Apenas um", "No máximo dois", "Não é possível usar elif", "Quantos forem necessários"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "9": {
+      "id": 9,
+      "tipo": "multipla_escolha",
+      "titulo": "Classificação por nota",
+      "pergunta": "Qual estrutura é mais indicada para classificar uma nota em A, B, C ou D?",
+      "opcoes": ["Vários if independentes", "if com condições aninhadas", "if, elif e else", "Apenas else"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "10": {
+      "id": 10,
+      "tipo": "multipla_escolha",
+      "titulo": "If sem else",
+      "pergunta": "O que acontece se a condição do if for falsa e não houver else ou elif?",
+      "opcoes": [
+        "O programa gera um erro",
+        "O programa repete a condição até ela ser verdadeira",
+        "O programa simplesmente ignora o bloco e segue em frente",
+        "O programa encerra imediatamente"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "11": {
+      "id": 11,
+      "tipo": "multipla_escolha",
+      "titulo": "Leitura de if e else",
+      "pergunta": "Observe: x = 10; if x > 5: print(\"Maior\") else: print(\"Menor\"). O que será exibido?",
+      "opcoes": ["Menor", "Maior", "Nada", "Erro"],
+      "resposta": 1,
+      "xp": 10
+    },
+    "12": {
+      "id": 12,
+      "tipo": "multipla_escolha",
+      "titulo": "Cuidado com aninhamento",
+      "pergunta": "Por que condições aninhadas devem ser usadas com moderação?",
+      "opcoes": [
+        "Porque tornam o programa mais lento",
+        "Porque muitos níveis de aninhamento tornam o código difícil de ler e manter",
+        "Porque o Python não suporta mais de dois níveis de aninhamento",
+        "Porque substituem desnecessariamente o elif"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "13": {
+      "id": 13,
+      "tipo": "completar",
+      "titulo": "Fluxo do elif",
+      "pergunta": "Com elif, assim que uma condição ___ é encontrada, as condições seguintes são ___.",
+      "placeholder": "Complete com as duas palavras",
+      "respostas_aceitas": [
+        "verdadeira ignoradas",
+        "verdadeira são ignoradas",
+        "verdadeira sao ignoradas",
+        "true ignoradas"
+      ],
+      "xp": 10
+    },
+    "14": {
+      "id": 14,
+      "tipo": "multipla_escolha",
+      "titulo": "Classificando nota",
+      "pergunta": "Analise: nota = 75; if nota >= 90 imprime A; elif nota >= 70 imprime B; elif nota >= 50 imprime C; else imprime D. O que será exibido?",
+      "opcoes": ["A", "C", "D", "B"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "15": {
+      "id": 15,
+      "tipo": "multipla_escolha",
+      "titulo": "Acesso aninhado",
+      "pergunta": "Analise: logado = True e admin = False. Se logado, o código verifica admin e imprime Acesso total ou Acesso limitado. Caso contrário, imprime Sem acesso. O que será exibido?",
+      "opcoes": ["Acesso total", "Sem acesso", "Nada", "Acesso limitado"],
+      "resposta": 3,
+      "xp": 10
+    }
   }
 }
