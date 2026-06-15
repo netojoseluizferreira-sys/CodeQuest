@@ -1,4 +1,4 @@
-"""Testes da fachada publica de persistencia SQLite."""
+"""Testes da fachada pública de persistência SQLite."""
 
 import json
 import os

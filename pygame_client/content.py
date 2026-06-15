@@ -1,4 +1,4 @@
-"""Adaptadores de conteudo usados pelo fluxo de aula no Pygame."""
+"""Adaptadores de conteúdo usados pelo fluxo de aula no Pygame."""
 
 from backend.exercicio import carregar_aula, carregar_exercicios
 

@@ -1,1 +1,1 @@
-"""Pacote com regras de dominio e carregamento de conteudo do CodeQuest."""
+"""Pacote com regras de domínio e carregamento de conteúdo do CodeQuest."""

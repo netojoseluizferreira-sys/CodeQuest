@@ -1,4 +1,4 @@
-"""Regras de nivel e persistencia de XP do jogador."""
+"""Regras de nível e persistência de XP do jogador."""
 
 from utils.database import salvar_usuario
 

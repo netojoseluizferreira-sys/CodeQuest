@@ -261,7 +261,7 @@ class CodeQuestPygameMenu:
             Button(pygame.Rect(x, y_inicial, largura, altura), "Novo jogo", self._novo_jogo, **_KW_VERDE),
             Button(pygame.Rect(x, y_inicial + _esp, largura, altura), "Continuar", self._continuar, **_KW_VERDE),
             Button(pygame.Rect(x, y_inicial + _esp * 2, largura, altura), "Sair", self._sair, **_KW_VERDE),
-            Button(pygame.Rect(WINDOW.width - 190, WINDOW.height - 75, 160, 45), "Creditos", self._abrir_creditos, **_KW_VERDE),
+            Button(pygame.Rect(WINDOW.width - 190, WINDOW.height - 75, 160, 45), "Créditos", self._abrir_creditos, **_KW_VERDE),
         ]
 
     def _botoes_criacao(self):
@@ -288,7 +288,7 @@ class CodeQuestPygameMenu:
         y_inicial = 385
         _esp = 65
         return [
-            Button(pygame.Rect(x, y_inicial, largura, altura), "Arquipelago de Bythos", self._abrir_cutscene, **_KW_VERDE),
+            Button(pygame.Rect(x, y_inicial, largura, altura), "Arquipélago de Bythos", self._abrir_cutscene, **_KW_VERDE),
             Button(pygame.Rect(x, y_inicial + _esp, largura, altura), "Tela inicial", self._voltar_inicio, **_KW_VERDE),
             Button(pygame.Rect(x, y_inicial + _esp * 2, largura, altura), "Sair", self._sair, **_KW_VERDE),
             Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Perfil", self._abrir_perfil, **_KW_VERDE),
@@ -341,7 +341,7 @@ class CodeQuestPygameMenu:
 
         if self.exercicio_respondido:
             return [
-                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Proximo", self._avancar_exercicio),
+                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Próximo", self._avancar_exercicio),
                 self._botao_voltar_mundos(),
             ]
 
@@ -773,7 +773,7 @@ class CodeQuestPygameMenu:
             self._desenhar_status_hub(665)
 
     def _desenhar_status_hub(self, y):
-        """Desenha feedback centralizado para telas de hub e criacao.
+        """Desenha feedback centralizado para telas de hub e criação.
 
         Usa banner verde para sucesso e texto vermelho com sombra para erro,
         mantendo o aviso de erro visualmente separado dos botoes.
@@ -813,7 +813,7 @@ class CodeQuestPygameMenu:
         """Renderiza a tela de seleção de mundos com fundo animado, título com glow e caixa de aviso."""
         self.screen.blit(self.mundos_overlay, (0, 0))
 
-        _TITULO = "Arquipelago de Bythos"
+        _TITULO = "Arquipélago de Bythos"
         _GAP = 2
         _char_w = [self.font_title.size(c)[0] for c in _TITULO]
         _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
@@ -1420,9 +1420,9 @@ class CodeQuestPygameMenu:
         exercicio = self._exercicio_atual()
         numero = self.exercicio_indice + 1
         total = len(segmento["exercicios"])
-        self._desenhar_cabecalho(segmento["titulo"], f"Exercicio {numero} de {total}")
+        self._desenhar_cabecalho(segmento["titulo"], f"Exercício {numero} de {total}")
         if exercicio is None:
-            self._desenhar_paragrafo("Exercicio nao encontrado.", self.content_x, 250, self.content_width, self.font_body, PALETTE.text)
+            self._desenhar_paragrafo("Exercício não encontrado.", self.content_x, 250, self.content_width, self.font_body, PALETTE.text)
             return
 
         self._desenhar_paragrafo(exercicio["pergunta"], self.content_x, 205, self.content_width, self.font_body, PALETTE.text)
@@ -1434,9 +1434,9 @@ class CodeQuestPygameMenu:
 
     def _renderizar_conclusao(self):
         """Renderiza a tela de conclusão exibida ao final de todos os segmentos da aula."""
-        self._desenhar_cabecalho("Aula concluida", "A primeira rota de Bythos foi vencida")
+        self._desenhar_cabecalho("Aula concluída", "A primeira rota de Bythos foi vencida")
         self._desenhar_paragrafo(
-            "Voce completou o fluxo de texto, pratica e revisao. Volte ao menu para ver seu perfil.",
+            "Você completou o fluxo de texto, prática e revisão. Volte ao menu para ver seu perfil.",
             300,
             300,
             680,
@@ -1581,14 +1581,14 @@ class CodeQuestPygameMenu:
         self.nome_input = ""
         self.idade_input = ""
         self.active_field = "nome"
-        self._definir_status("Crie seu personagem para comecar uma nova jornada.")
+        self._definir_status("Crie seu personagem para começar uma nova jornada.")
         self.screen_name = "create"
 
     def _continuar(self):
         """Carrega o save existente ou direciona o jogador para criar perfil.
 
         Recebe:
-            Nenhum parametro.
+            Nenhum parâmetro.
 
         Retorna:
             None: Atualiza self.usuario, status_message e screen_name como efeito colateral.
@@ -1618,14 +1618,14 @@ class CodeQuestPygameMenu:
         try:
             idade = int(self.idade_input)
         except ValueError:
-            self._definir_status("Informe uma idade numerica.", "error")
+            self._definir_status("Informe uma idade numérica.", "error")
             return
         if idade < 1 or idade > 120:
             self._definir_status("A idade precisa estar entre 1 e 120.", "error")
             return
 
         self.usuario = criar_usuario(nome, idade)
-        self._definir_status("Personagem criado. Escolha seu proximo destino.", "success")
+        self._definir_status("Personagem criado. Escolha seu próximo destino.", "success")
         self._abrir_hub()
 
     def _abrir_hub(self):
@@ -1650,7 +1650,7 @@ class CodeQuestPygameMenu:
         """Mostra o aviso de mundo indisponível mantendo o jogador na seleção de mundos.
 
         Recebe:
-            Nenhum parametro.
+            Nenhum parâmetro.
 
         Retorna:
             None: Atualiza apenas a mensagem de status exibida na tela de mundos.
@@ -1711,7 +1711,7 @@ class CodeQuestPygameMenu:
         self.aula = carregar_aula_pygame(MUNDO_ATIVO, AULA_ATIVA)
         self.exercicios = carregar_exercicios_pygame(MUNDO_ATIVO)
         if not self.aula:
-            self._definir_status("Nao foi possivel carregar a aula.", "error")
+            self._definir_status("Não foi possível carregar a aula.", "error")
             return
         self.trilha_indice = 0
         self.exercicio_indice = 0
@@ -1769,7 +1769,7 @@ class CodeQuestPygameMenu:
         else:
             self.resposta_texto = ""
             self.exercicio_respondido = False
-            self._definir_status("Proximo desafio.")
+            self._definir_status("Próximo desafio.")
 
     def _responder_texto_livre(self):
         """Valida que o campo de resposta não está vazio e encaminha para _responder_exercicio."""
@@ -1788,7 +1788,7 @@ class CodeQuestPygameMenu:
         exercicio = self._exercicio_atual()
         self.usuario = carregar_usuario()
         if exercicio is None or self.usuario is None:
-            self._definir_status("Nao foi possivel responder agora.", "error")
+            self._definir_status("Não foi possível responder agora.", "error")
             return
 
         resultado = registrar_resposta(MUNDO_ATIVO, exercicio, resposta, self.usuario)

@@ -1,4 +1,4 @@
-"""Testes de carregamento de conteudo pedagogico e creditos."""
+"""Testes de carregamento de conteúdo pedagógico e créditos."""
 
 from pygame_client.content import (
     carregar_aula_pygame,

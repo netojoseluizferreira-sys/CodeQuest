@@ -1,4 +1,4 @@
-"""Abertura da conexao SQLite e criacao das tabelas necessarias."""
+"""Abertura da conexão SQLite e criação das tabelas necessárias."""
 
 import os
 import sqlite3

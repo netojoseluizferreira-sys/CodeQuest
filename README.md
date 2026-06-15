@@ -1,25 +1,25 @@
 # CodeQuest
 
-CodeQuest e um jogo educacional em Pygame para ensinar logica de programacao e Python por meio de aulas curtas, exercicios, XP, niveis e progressao por mundos.
+CodeQuest é um jogo educacional em Pygame para ensinar lógica de programação e Python por meio de aulas curtas, exercícios, XP, níveis e progressão por mundos.
 
 ## Status
 
-Versao atual: beta 0.9.
+Versão atual: beta 0.9.
 
-O projeto esta centralizado no Pygame. O fluxo principal roda em janela local, com persistencia em SQLite e conteudo versionado em JSON.
+O projeto está centralizado no Pygame. O fluxo principal roda em janela local, com persistência em SQLite e conteúdo versionado em JSON.
 
 Fluxo implementado:
 
-- menu inicial com Novo jogo, Continuar, Creditos e Sair;
-- criacao de personagem;
-- hub principal apos existir usuario;
-- tela de perfil com nome, idade, XP e nivel;
-- tela Arquipelago de Bythos com Mundo 1;
-- Aula 1 no formato texto -> 5 exercicios -> texto -> 5 exercicios -> texto -> 5 exercicios;
-- persistencia local em SQLite;
-- bloqueio de XP duplicado para exercicios ja concluidos;
-- XP dinamico: comeca em 10, perde 2 por erro e respeita piso minimo de 2;
-- creditos atualizados para a versao Pygame.
+- menu inicial com Novo jogo, Continuar, Créditos e Sair;
+- criação de personagem;
+- hub principal após existir usuário;
+- tela de perfil com nome, idade, XP e nível;
+- tela Arquipélago de Bythos com Mundo 1;
+- Aula 1 no formato texto -> 5 exercícios -> texto -> 5 exercícios -> texto -> 5 exercícios;
+- persistência local em SQLite;
+- bloqueio de XP duplicado para exercícios já concluídos;
+- XP dinâmico: começa em 10, perde 2 por erro e respeita piso mínimo de 2;
+- créditos atualizados para a versão Pygame.
 
 ## Estrutura
 
@@ -76,7 +76,7 @@ Crie e ative um ambiente virtual:
 python -m venv venv
 ```
 
-Instale as dependencias:
+Instale as dependências:
 
 ```bash
 pip install -r requirements.txt
@@ -88,19 +88,19 @@ Execute o jogo:
 python app.py
 ```
 
-## Dados e Persistencia
+## Dados e Persistência
 
-Os conteudos versionados ficam em:
+Os conteúdos versionados ficam em:
 
 - `data/aulas.json`
 - `data/exercicios.json`
 
-O progresso local usa SQLite em `data/codequest.db`. Esse arquivo e gerado automaticamente durante a execucao.
+O progresso local usa SQLite em `data/codequest.db`. Esse arquivo é gerado automaticamente durante a execução.
 
 Tabelas principais:
 
 - `usuarios`: guarda o save ativo.
-- `exercicios_concluidos`: impede XP duplicado em exercicios ja finalizados.
+- `exercicios_concluidos`: impede XP duplicado em exercícios já finalizados.
 - `exercicio_erros`: registra erros para calcular o XP potencial.
 
 ## Testes
@@ -111,22 +111,22 @@ Execute a suite com:
 python -m pytest tests
 ```
 
-Os testes cobrem persistencia, regras de XP, validacao de respostas, carregamento de conteudo, creditos e componentes basicos de UI em modo headless.
+Os testes cobrem persistência, regras de XP, validação de respostas, carregamento de conteúdo, créditos e componentes básicos de UI em modo headless.
 
-## Documentacao Tecnica
+## Documentação Técnica
 
-A documentacao detalhada da arquitetura esta em:
+A documentação detalhada da arquitetura está em:
 
 - [docs/arquitetura.md](docs/arquitetura.md)
 
-Ela explica o fluxo interno, as camadas do projeto, a chamada entre modulos, as tabelas SQLite e os pontos de extensao.
+Ela explica o fluxo interno, as camadas do projeto, a chamada entre módulos, as tabelas SQLite e os pontos de extensão.
 
 ## Roadmap
 
-- expandir o mapa do Arquipelago de Bythos;
-- adicionar novos mundos e modulos de Python;
+- expandir o mapa do Arquipélago de Bythos;
+- adicionar novos mundos e módulos de Python;
 - criar novas cutscenes entre mundos;
 - melhorar acessibilidade de leitura e contraste;
-- adicionar conquistas e itens cosmeticos;
+- adicionar conquistas e itens cosméticos;
 - revisar trilha sonora e efeitos de interface;
-- empacotar o jogo para execucao local mais simples.
+- empacotar o jogo para execução local mais simples.

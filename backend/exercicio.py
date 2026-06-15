@@ -1,4 +1,4 @@
-"""Leitura dos arquivos JSON de aulas e exercicios do CodeQuest."""
+"""Leitura dos arquivos JSON de aulas e exercícios do CodeQuest."""
 
 import json
 import os
@@ -26,10 +26,10 @@ def carregar_aula(mundo, aula_id):
             dados = json.load(arquivo)
             return dados[mundo][aula_id]
     except FileNotFoundError:
-        print(f"ERRO: Arquivo nao encontrado em: {os.path.abspath(caminho_aula)}")
+        print(f"ERRO: Arquivo não encontrado em: {os.path.abspath(caminho_aula)}")
         return None
     except KeyError:
-        print(f"ERRO: Mundo '{mundo}' ou aula '{aula_id}' nao encontrado")
+        print(f"ERRO: Mundo '{mundo}' ou aula '{aula_id}' não encontrado")
         return None
 
 
@@ -51,8 +51,8 @@ def carregar_exercicios(mundo):
             dados = json.load(arquivo)
             return dados.get(mundo, {})
     except FileNotFoundError:
-        print(f"ERRO: Arquivo nao encontrado em: {os.path.abspath(caminho_exercicios)}")
+        print(f"ERRO: Arquivo não encontrado em: {os.path.abspath(caminho_exercicios)}")
         return {}
     except json.JSONDecodeError:
-        print(f"ERRO: Arquivo JSON invalido em: {caminho_exercicios}")
+        print(f"ERRO: Arquivo JSON inválido em: {caminho_exercicios}")
         return {}

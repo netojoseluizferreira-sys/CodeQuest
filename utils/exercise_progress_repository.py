@@ -1,4 +1,4 @@
-"""Repositorio SQLite para conclusoes e erros por exercicio."""
+"""Repositório SQLite para conclusões e erros por exercício."""
 
 from contextlib import closing
 

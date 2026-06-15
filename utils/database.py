@@ -1,4 +1,4 @@
-"""Fachada publica das operacoes de persistencia SQLite do CodeQuest."""
+"""Fachada pública das operações de persistência SQLite do CodeQuest."""
 
 import os
 from contextlib import closing

@@ -1,4 +1,4 @@
-"""Validacao de respostas, calculo de XP e registro de progresso."""
+"""Validação de respostas, cálculo de XP e registro de progresso."""
 
 import unicodedata
 
@@ -40,14 +40,14 @@ def frase_xp(xp):
         para valores não mapeados.
     """
     frases = {
-        10: "Perfeito! Voce garantiu 10 XP.",
-        8: "Muito bom! Um tropeco pequeno, 8 XP.",
-        6: "Boa recuperacao! Voce levou 6 XP.",
-        4: "Persistencia conta: 4 XP.",
-        2: "Conseguiu no limite minimo: 2 XP.",
-        0: "Exercicio ja concluido antes. Sem XP extra.",
+        10: "Perfeito! Você garantiu 10 XP.",
+        8: "Muito bom! Um tropeço pequeno, 8 XP.",
+        6: "Boa recuperação! Você levou 6 XP.",
+        4: "Persistência conta: 4 XP.",
+        2: "Conseguiu no limite mínimo: 2 XP.",
+        0: "Exercício já concluído antes. Sem XP extra.",
     }
-    return frases.get(xp, f"Voce recebeu {xp} XP.")
+    return frases.get(xp, f"Você recebeu {xp} XP.")
 
 
 def normalizar_resposta(resposta):
@@ -143,5 +143,5 @@ def registrar_resposta(mundo, exercicio, resposta, usuario):
         "acertou": False,
         "xp": 0,
         "erros": erros_depois,
-        "mensagem": f"Quase. Agora este exercicio vale ate {xp_potencial} XP.",
+        "mensagem": f"Quase. Agora este exercício vale até {xp_potencial} XP.",
     }

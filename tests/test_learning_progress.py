@@ -1,4 +1,4 @@
-"""Testes de validacao de respostas e progresso dos exercicios."""
+"""Testes de validação de respostas e progresso dos exercícios."""
 
 from backend.usuario import Usuario
 from pygame_client.learning_progress import (
