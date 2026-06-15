@@ -219,7 +219,10 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         cursor = pygame.SYSTEM_CURSOR_HAND if self._deve_mostrar_cursor_mao(mouse_pos, botoes) else pygame.SYSTEM_CURSOR_ARROW
         if cursor == self._cursor_atual:
             return
-        pygame.mouse.set_cursor(cursor)
+        try:
+            pygame.mouse.set_cursor(cursor)
+        except pygame.error:
+            return
         self._cursor_atual = cursor
 
     def _deve_mostrar_cursor_mao(self, mouse_pos, botoes):

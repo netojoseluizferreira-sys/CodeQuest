@@ -4,7 +4,7 @@ import math
 
 import pygame
 
-from pygame_client.menu_config import _BRANCO, _VERDE_CLARO
+from pygame_client.menu_config import _BRANCO, _VERDE, _VERDE_CLARO
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
 from pygame_client.ui import desenhar_texto_centralizado, quebrar_texto

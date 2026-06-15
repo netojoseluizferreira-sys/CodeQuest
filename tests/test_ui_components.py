@@ -7,6 +7,11 @@ os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 import pygame
 
 from pygame_client.ui import Button, quebrar_texto
+from pygame_client.menu_learning_rendering import LearningRenderMixin
+
+
+class _DummyLearningRenderer(LearningRenderMixin):
+    pass
 
 
 def setup_module():
@@ -59,3 +64,14 @@ def test_button_draw_nao_altera_o_rect():
     botao.draw(tela, fonte, (0, 0))
 
     assert botao.rect == rect
+
+
+def test_desenhar_input_verde_renderiza_campo_inativo_sem_name_error():
+    renderer = _DummyLearningRenderer()
+    renderer.screen = pygame.Surface((260, 90))
+    renderer.font_body = pygame.font.Font(None, 24)
+    renderer.active_field = "nome"
+
+    renderer._desenhar_input_verde(pygame.Rect(10, 10, 180, 42), "", "idade", "18")
+
+    assert renderer.screen.get_bounding_rect().width > 0
