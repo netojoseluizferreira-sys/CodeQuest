@@ -1,109 +1,105 @@
 # Arquitetura Interna do CodeQuest
 
-Este documento descreve como o CodeQuest está organizado na versão Pygame, quais módulos conversam entre si e onde mexer para evoluir o jogo.
+Este documento descreve a organização interna do CodeQuest na versão 1.5, com foco no fluxo Pygame, persistência SQLite e separação do menu em módulos menores.
 
 ## Visão Geral
 
-O ponto de entrada é `app.py`. Ele chama `pygame_client.menu_app.main()`, que inicializa o Pygame, cria a classe `CodeQuestPygameMenu` e entra no loop principal do jogo.
+`app.py` é o ponto de entrada. Ele chama `pygame_client.menu_app.main()`, que cria `CodeQuestPygameMenu` e inicia o loop principal. A classe principal ficou responsável por inicializar Pygame, fontes, imagens, áudio e estado compartilhado; comportamento de tela foi separado em mixins.
 
 ```mermaid
 flowchart TD
     A["app.py"] --> B["pygame_client.menu_app.main"]
-    B --> C["CodeQuestPygameMenu.run"]
-    C --> D["Eventos do Pygame"]
-    C --> E["Renderização da tela atual"]
-    D --> F["Ações dos botões e formulários"]
-    F --> G["utils/database.py"]
-    F --> H["pygame_client/content.py"]
-    F --> I["pygame_client/learning_progress.py"]
+    B --> C["CodeQuestPygameMenu"]
+    C --> D["menu_events.EventMixin"]
+    C --> E["menu_buttons.ButtonMixin"]
+    C --> F["menu_rendering.RenderMixin"]
+    C --> G["menu_learning_rendering.LearningRenderMixin"]
+    C --> H["menu_navigation.NavigationMixin"]
+    H --> I["utils/database.py"]
+    H --> J["pygame_client/content.py"]
+    H --> K["pygame_client/learning_progress.py"]
 ```
 
-## Camadas do Projeto
+## Camadas
 
 ### `pygame_client/`
 
-Contém a interface jogável:
-
-- `menu_app.py`: orquestra telas, eventos, estado de navegação, aulas, exercícios, perfil e créditos.
-- `ui.py`: componentes reutilizáveis de interface, como `Button`, quebra de texto e texto centralizado.
-- `content.py`: adapta os JSONs de aula e exercícios para o Pygame, corrigindo textos quando necessário.
-- `learning_progress.py`: valida respostas, calcula XP potencial e registra conclusão de exercícios.
-- `audio.py`: inicializa trilha e efeitos sonoros gerados em tempo de execução.
-- `credits.py`: define o conteúdo estruturado da tela de créditos.
-- `palette.py` e `settings.py`: concentram cores, tamanhos, FPS e caminhos visuais.
+- `menu_app.py`: inicializa Pygame, carrega assets, cria fontes, mantém estado compartilhado e executa o loop principal.
+- `menu_buttons.py`: monta botões por tela.
+- `menu_events.py`: processa teclado, mouse, campos de texto e links externos.
+- `menu_navigation.py`: controla transições de tela, criação de usuário, início de mundos, respostas e conclusão de aulas.
+- `menu_rendering.py`: desenha telas gerais, como início, hub, mundos, perfil, cutscene e créditos.
+- `menu_learning_rendering.py`: desenha aulas, exercícios e tela de conclusão.
+- `menu_config.py`: concentra constantes do menu, lista de mundos, cores locais e textos da cutscene.
+- `audio.py`: controla trilhas MP3 por contexto e efeitos de interface.
+- `content.py`: lê e normaliza conteúdo pedagógico vindo dos JSONs.
+- `learning_progress.py`: valida respostas, calcula XP potencial e registra progresso.
+- `ui.py`: contém `Button`, quebra de texto e helpers de desenho.
+- `palette.py` e `settings.py`: centralizam cores, janela, FPS e título.
 
 ### `backend/`
 
-Contém regras de domínio independentes da tela:
-
-- `usuario.py`: dataclass `Usuario`, criação, carregamento a partir de dicionário e soma de XP.
-- `xp_system.py`: regras de nível, XP para próximo nível e persistência após ganhar XP.
-- `exercicio.py`: leitura bruta dos arquivos `data/aulas.json` e `data/exercicios.json`.
+- `usuario.py`: dataclass `Usuario` e operações de domínio do usuário.
+- `xp_system.py`: cálculo de nível, XP para próximo nível e soma de XP.
+- `exercicio.py`: leitura bruta dos arquivos de aula e exercício.
 
 ### `utils/`
 
-Contém persistência SQLite:
-
-- `database.py`: fachada pública usada pelo resto do projeto.
-- `database_config.py`: caminhos, constantes e ID do usuário ativo.
-- `database_connection.py`: conexão e criação de tabelas.
-- `user_repository.py`: CRUD do usuário ativo e migração do JSON legado.
-- `user_mapper.py`: conversão entre linhas SQLite, dicionários e `Usuario`.
-- `exercise_progress_repository.py`: erros por exercício e bloqueio de XP duplicado.
+- `database.py`: fachada pública de persistência.
+- `database_connection.py`: conexão SQLite e criação de tabelas.
+- `database_config.py`: caminhos e constantes do banco.
+- `user_repository.py`: CRUD do usuário ativo e migração de JSON legado.
+- `user_mapper.py`: conversão entre SQLite, dicionários e dataclass `Usuario`.
+- `exercise_progress_repository.py`: progresso de exercícios, erros e bloqueio de recompensa duplicada.
 
 ### `data/`
 
-Guarda conteúdo e assets versionados:
+Contém conteúdo e assets versionados:
 
-- `aulas.json`: textos e trilhas pedagógicas.
-- `exercicios.json`: perguntas, alternativas, respostas e respostas aceitas.
-- fontes, imagens, cutscenes e frames animados.
+- `aulas.json` e `exercicios.json`.
+- fontes: PressStart2P, RammettoOne e WendyOne.
+- frames de fundo, imagens de cutscene, fundos de mundo e músicas.
 
-O save local fica em `data/codequest.db`, gerado em execução e ignorado pelo Git.
+O save local `data/codequest.db` é gerado em execução e ignorado pelo Git.
 
 ## Fluxo de Telas
 
-O atributo `screen_name` em `CodeQuestPygameMenu` decide qual tela é renderizada.
+O atributo `screen_name` define a tela ativa:
 
-Fluxo principal:
+- `start`: menu inicial.
+- `create`: criação de personagem.
+- `hub`: menu de jornada.
+- `cutscene`: narrativa inicial.
+- `worlds`: Arquipélago de Bythos.
+- `lesson`: aula ou exercício.
+- `profile`: perfil do jogador.
+- `credits`: créditos.
+- `complete`: conclusão do mundo ativo.
 
-1. `start`: menu inicial com novo jogo, continuar, créditos e sair.
-2. `create`: criação do personagem quando um novo save é necessário.
-3. `hub`: menu principal após existir usuário.
-4. `worlds`: seleção do Arquipélago de Bythos.
-5. `learning`: aula e exercícios em sequência.
-6. `profile`: visualização de nome, idade, XP e nível.
-7. `credits`: créditos do projeto.
-8. `complete`: encerramento temporário do conteúdo disponível.
+## Fluxo Pedagógico
 
-## Novo Jogo e Continuar
+Cada aula em `data/aulas.json` possui uma `trilha`, composta por segmentos:
 
-`_novo_jogo()` limpa o banco com `resetar_banco_de_dados()` e leva para a tela de criação de personagem.
+- `aula`: texto explicativo, com suporte opcional a link externo.
+- `exercicios`: lista de IDs carregados de `data/exercicios.json`.
 
-`_continuar()` tenta carregar o usuário ativo com `carregar_usuario()`. Se houver usuário, segue para o `hub`; se não houver, exibe uma mensagem pedindo criação de personagem.
-
-`_criar_usuario()` valida nome e idade, chama `criar_usuario()` e avança para o `hub`.
-
-## Fluxo de Aula e Exercícios
-
-O Mundo 1 começa em `_iniciar_mundo_1()`. A função carrega a aula com `carregar_aula_pygame("mundo_1", "aula_1")` e os exercícios com `carregar_exercicios_pygame("mundo_1")`.
-
-A trilha pedagógica é lida em blocos. Cada bloco pode ser:
-
-- `aula`: renderiza um trecho de explicação.
-- `exercicios`: mostra um exercício por vez.
-
-O fluxo planejado é:
+O Mundo 1 segue o formato:
 
 ```text
-texto da aula -> 5 exercícios -> texto da aula -> 5 exercícios -> texto da aula -> 5 exercícios
+texto -> 5 exercícios -> texto -> 5 exercícios -> texto -> 5 exercícios
 ```
 
-Quando o jogador responde, `_responder_exercicio()` chama `registrar_resposta()`.
+O Mundo 2 usa o mesmo padrão visual e começa com blocos menores de texto e prática.
+
+## Progresso e Bloqueios
+
+Quando um exercício é concluído, o registro é salvo em `exercicios_concluidos`. Ao reiniciar o app, `NavigationMixin._pular_exercicios_concluidos()` ignora exercícios já feitos, mas preserva os textos de aula para revisão.
+
+O Mundo 2 só abre quando os 15 exercícios do Mundo 1 constam como concluídos no banco.
 
 ## Regras de XP
 
-Cada exercício começa valendo 10 XP. A cada erro, o XP potencial cai 2 pontos:
+Cada exercício começa valendo 10 XP. A cada erro, o ganho potencial cai 2 pontos, até o mínimo de 2 XP.
 
 ```text
 0 erros: 10 XP
@@ -113,27 +109,39 @@ Cada exercício começa valendo 10 XP. A cada erro, o XP potencial cai 2 pontos:
 4 ou mais erros: 2 XP
 ```
 
-Depois que um exercício foi concluído, ele continua podendo ser respondido, mas não concede XP de novo. Esse bloqueio vem da tabela `exercicios_concluidos`.
+Exercícios já concluídos não concedem XP novamente.
 
-## SQLite
+## Áudio
 
-As tabelas são criadas por `inicializar_banco()`:
+`AudioController` mapeia contexto de tela para música:
 
-- `usuarios`: save do jogador ativo.
-- `exercicios_concluidos`: exercícios que já deram XP.
-- `exercicio_erros`: contador de erros por usuário, mundo e exercício.
+- `start`: Tela Inicial.
+- `hub`: Menu de Jornada.
+- `cutscene`: Cutscene.
+- `worlds`: Arquipélago.
+- `lesson`: Aula.
+- `exercise`: Exercícios.
+- `profile`: Perfil.
+- `credits`: Créditos.
 
-O repositório usa `INSERT ... ON CONFLICT` para atualizar o usuário ativo sem duplicar registros.
+Se uma faixa MP3 não puder ser carregada, o controlador usa fallback sintético simples.
 
 ## Pontos de Extensão
 
-Para adicionar uma nova aula:
+Para adicionar um novo mundo:
 
-1. Inclua os textos em `data/aulas.json`.
-2. Inclua os exercícios em `data/exercicios.json`.
-3. Atualize o fluxo em `menu_app.py` para iniciar o novo mundo ou aula.
-4. Adicione testes cobrindo carregamento de conteúdo e regras novas.
+1. Adicione textos em `data/aulas.json`.
+2. Adicione exercícios em `data/exercicios.json`.
+3. Inclua o mundo em `MUNDOS_BYTHOS`, em `pygame_client/menu_config.py`.
+4. Crie uma ação de início em `menu_navigation.py` caso o mundo tenha regras próprias de bloqueio.
+5. Adicione testes de carregamento de conteúdo e fluxo.
 
-Para alterar regras de XP, mexa em `pygame_client/learning_progress.py` e, se necessário, em `backend/xp_system.py`.
+Para mudar visual:
 
-Para mudar o visual, prefira `pygame_client/palette.py`, `pygame_client/settings.py` e componentes de `pygame_client/ui.py`.
+1. Prefira `palette.py`, `settings.py`, `ui.py` e os módulos de renderização.
+2. Mantenha fontes padronizadas: PressStart2P para títulos, RammettoOne para subtítulos e WendyOne para corpo.
+
+Para mudar persistência:
+
+1. Ajuste os repositórios em `utils/`.
+2. Exponha a função pela fachada `utils/database.py` quando outras camadas precisarem usar.

@@ -1,18 +1,18 @@
-"""Testes unitarios de transicoes do menu principal sem abrir janela Pygame."""
+"""Testes unitários de transições do menu principal sem abrir janela Pygame."""
 
 from backend.usuario import Usuario
-from pygame_client import menu_app
+from pygame_client import menu_app, menu_navigation
 
 
 def test_continuar_sem_save_abre_tela_de_criacao_sem_criar_usuario(monkeypatch):
     chamadas_criar = []
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: None)
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: None)
 
     def criar_usuario_indevido(nome, idade):
         chamadas_criar.append((nome, idade))
 
-    monkeypatch.setattr(menu_app, "criar_usuario", criar_usuario_indevido)
+    monkeypatch.setattr(menu_navigation, "criar_usuario", criar_usuario_indevido)
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.status_message = ""
     app.status_kind = "normal"
@@ -36,8 +36,8 @@ def test_continuar_carrega_save_existente_sem_criar_usuario(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
     chamadas_criar = []
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
-    monkeypatch.setattr(menu_app, "criar_usuario", lambda nome, idade: chamadas_criar.append((nome, idade)))
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_navigation, "criar_usuario", lambda nome, idade: chamadas_criar.append((nome, idade)))
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.status_message = ""
     app.status_kind = "normal"
@@ -84,9 +84,9 @@ def test_pula_exercicios_concluidos_ate_proximo_pendente(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
     concluidos = {"1", "2"}
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
     monkeypatch.setattr(
-        menu_app,
+        menu_navigation,
         "exercicio_foi_concluido",
         lambda mundo, exercicio_id, usuario: str(exercicio_id) in concluidos,
     )
@@ -111,8 +111,8 @@ def test_pula_exercicios_concluidos_ate_proximo_pendente(monkeypatch):
 def test_pula_bloco_concluido_mas_preserva_texto_de_aula(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
-    monkeypatch.setattr(menu_app, "exercicio_foi_concluido", lambda *_args: True)
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_navigation, "exercicio_foi_concluido", lambda *_args: True)
 
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.usuario = usuario
@@ -142,10 +142,10 @@ def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
     aula = {"titulo": "Aula 2", "trilha": [{"tipo": "aula", "conteudo": ["Texto"]}]}
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
-    monkeypatch.setattr(menu_app, "exercicio_foi_concluido", lambda *_args: True)
-    monkeypatch.setattr(menu_app, "carregar_aula_pygame", lambda mundo, aula_id: aula)
-    monkeypatch.setattr(menu_app, "carregar_exercicios_pygame", lambda mundo: {"1": {"id": 1}})
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_navigation, "exercicio_foi_concluido", lambda *_args: True)
+    monkeypatch.setattr(menu_navigation, "carregar_aula_pygame", lambda mundo, aula_id: aula)
+    monkeypatch.setattr(menu_navigation, "carregar_exercicios_pygame", lambda mundo: {"1": {"id": 1}})
 
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.status_message = ""
@@ -167,13 +167,13 @@ def test_iniciar_mundo_2_bloqueia_quando_mundo_1_incompleto(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
     chamadas_aula = []
 
-    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
     monkeypatch.setattr(
-        menu_app,
+        menu_navigation,
         "exercicio_foi_concluido",
         lambda mundo, exercicio_id, usuario: int(exercicio_id) < 15,
     )
-    monkeypatch.setattr(menu_app, "carregar_aula_pygame", lambda mundo, aula_id: chamadas_aula.append((mundo, aula_id)))
+    monkeypatch.setattr(menu_navigation, "carregar_aula_pygame", lambda mundo, aula_id: chamadas_aula.append((mundo, aula_id)))
 
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.usuario = usuario

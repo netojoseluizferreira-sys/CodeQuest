@@ -1,6 +1,5 @@
 # Runtime
-pygame-ce
+pygame-ce>=2.5.0
 
-# Development
+# Tests
 pytest>=7.4.0
-black>=23.0.0

@@ -1,6 +1,10 @@
 **/__pycache__/
 data/*.json
 data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.sqlite
+data/*.sqlite3
 data/*.log
 
 !data/.gitkeep
@@ -16,10 +20,17 @@ env/
 venv/
 ENV/
 .env
+.coverage
+.mypy_cache/
+.ruff_cache/
 .vscode/
+.pytest_cache/
+htmlcov/
+build/
+dist/
+*.egg-info/
 api/
 app_streamlit.py
 frontend/
-.pytest_cache/
 pygame_menu_local.py
 pygame_client/api_client.py
