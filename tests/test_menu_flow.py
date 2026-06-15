@@ -65,6 +65,7 @@ def test_pula_exercicios_concluidos_ate_proximo_pendente(monkeypatch):
 
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.usuario = usuario
+    app.mundo_ativo = "mundo_1"
     app.aula = {"trilha": [{"tipo": "exercicios", "exercicios": ["1", "2", "3"]}]}
     app.trilha_indice = 0
     app.exercicio_indice = 0
@@ -87,6 +88,7 @@ def test_pula_bloco_concluido_mas_preserva_texto_de_aula(monkeypatch):
 
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.usuario = usuario
+    app.mundo_ativo = "mundo_1"
     app.aula = {
         "trilha": [
             {"tipo": "exercicios", "exercicios": ["1", "2"]},
@@ -105,4 +107,28 @@ def test_pula_bloco_concluido_mas_preserva_texto_de_aula(monkeypatch):
     assert app.exercicio_indice == 0
     assert app.resposta_texto == ""
     assert app.exercicio_respondido is False
+    assert app.screen_name == "lesson"
+
+
+def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
+    usuario = Usuario(nome="Ada", idade=12)
+    aula = {"titulo": "Aula 2", "trilha": [{"tipo": "aula", "conteudo": ["Texto"]}]}
+
+    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_app, "carregar_aula_pygame", lambda mundo, aula_id: aula)
+    monkeypatch.setattr(menu_app, "carregar_exercicios_pygame", lambda mundo: {"1": {"id": 1}})
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.status_message = ""
+    app.status_kind = "normal"
+    app.screen_name = "worlds"
+
+    app._iniciar_mundo_2()
+
+    assert app.mundo_ativo == "mundo_2"
+    assert app.aula_ativa == "aula_1"
+    assert app.aula == aula
+    assert app.exercicios == {"1": {"id": 1}}
+    assert app.trilha_indice == 0
+    assert app.exercicio_indice == 0
     assert app.screen_name == "lesson"
