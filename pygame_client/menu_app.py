@@ -14,7 +14,12 @@ from pygame_client.learning_progress import registrar_resposta
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
 from pygame_client.ui import Button, desenhar_texto_centralizado, quebrar_texto
-from utils.database import carregar_usuario, criar_usuario, resetar_banco_de_dados
+from utils.database import (
+    carregar_usuario,
+    criar_usuario,
+    exercicio_foi_concluido,
+    resetar_banco_de_dados,
+)
 
 
 MUNDO_ATIVO = "mundo_1"
@@ -1863,6 +1868,7 @@ class CodeQuestPygameMenu:
         self.exercicio_respondido = False
         self._definir_status("Leia com calma e avance no seu ritmo.")
         self.screen_name = "lesson"
+        self._pular_exercicios_concluidos()
 
     def _segmento_atual(self):
         """Retorna o segmento na posição trilha_indice da trilha da aula carregada.
@@ -1877,6 +1883,39 @@ class CodeQuestPygameMenu:
         if self.trilha_indice >= len(trilha):
             return None
         return trilha[self.trilha_indice]
+
+    def _pular_exercicios_concluidos(self):
+        """Avança pelos exercícios já concluídos no banco sem pular textos de aula.
+
+        Consulta o SQLite para o usuário ativo. Enquanto o segmento atual for
+        de prática, incrementa exercicio_indice para ignorar exercícios já
+        concluídos; ao terminar um bloco inteiro, avança para o próximo segmento
+        da trilha, que pode ser um texto de aula ou outro bloco de prática.
+
+        Retorna:
+            None: Atualiza trilha_indice, exercicio_indice e screen_name como
+            efeito colateral.
+        """
+        self.usuario = carregar_usuario()
+        while self.usuario is not None:
+            segmento = self._segmento_atual()
+            if segmento is None:
+                self.screen_name = "complete"
+                return
+            if segmento["tipo"] != "exercicios":
+                return
+
+            exercicios_ids = segmento["exercicios"]
+            while self.exercicio_indice < len(exercicios_ids):
+                exercicio_id = exercicios_ids[self.exercicio_indice]
+                if not exercicio_foi_concluido(MUNDO_ATIVO, exercicio_id, self.usuario):
+                    return
+                self.exercicio_indice += 1
+
+            self.trilha_indice += 1
+            self.exercicio_indice = 0
+            self.resposta_texto = ""
+            self.exercicio_respondido = False
 
     def _exercicio_atual(self):
         """Retorna o exercício na posição exercicio_indice do segmento de prática atual.
@@ -1897,6 +1936,7 @@ class CodeQuestPygameMenu:
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
+        self._pular_exercicios_concluidos()
         self._definir_status("Continue sua jornada.")
         if self._segmento_atual() is None:
             self.screen_name = "complete"
@@ -1913,6 +1953,7 @@ class CodeQuestPygameMenu:
         else:
             self.resposta_texto = ""
             self.exercicio_respondido = False
+            self._pular_exercicios_concluidos()
             self._definir_status("Próximo desafio.")
 
     def _responder_texto_livre(self):

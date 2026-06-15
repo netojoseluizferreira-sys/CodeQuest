@@ -50,3 +50,59 @@ def test_continuar_carrega_save_existente_sem_criar_usuario(monkeypatch):
     assert app.usuario == usuario
     assert app.status_kind == "success"
     assert app.screen_name == "hub"
+
+
+def test_pula_exercicios_concluidos_ate_proximo_pendente(monkeypatch):
+    usuario = Usuario(nome="Ada", idade=12)
+    concluidos = {"1", "2"}
+
+    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(
+        menu_app,
+        "exercicio_foi_concluido",
+        lambda mundo, exercicio_id, usuario: str(exercicio_id) in concluidos,
+    )
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = usuario
+    app.aula = {"trilha": [{"tipo": "exercicios", "exercicios": ["1", "2", "3"]}]}
+    app.trilha_indice = 0
+    app.exercicio_indice = 0
+    app.resposta_texto = "resposta antiga"
+    app.exercicio_respondido = True
+    app.screen_name = "lesson"
+
+    app._pular_exercicios_concluidos()
+
+    assert app.trilha_indice == 0
+    assert app.exercicio_indice == 2
+    assert app.screen_name == "lesson"
+
+
+def test_pula_bloco_concluido_mas_preserva_texto_de_aula(monkeypatch):
+    usuario = Usuario(nome="Ada", idade=12)
+
+    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_app, "exercicio_foi_concluido", lambda *_args: True)
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = usuario
+    app.aula = {
+        "trilha": [
+            {"tipo": "exercicios", "exercicios": ["1", "2"]},
+            {"tipo": "aula", "conteudo": ["Texto seguinte"]},
+        ]
+    }
+    app.trilha_indice = 0
+    app.exercicio_indice = 0
+    app.resposta_texto = "resposta antiga"
+    app.exercicio_respondido = True
+    app.screen_name = "lesson"
+
+    app._pular_exercicios_concluidos()
+
+    assert app.trilha_indice == 1
+    assert app.exercicio_indice == 0
+    assert app.resposta_texto == ""
+    assert app.exercicio_respondido is False
+    assert app.screen_name == "lesson"
