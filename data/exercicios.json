@@ -1052,5 +1052,314 @@
       "resposta": 3,
       "xp": 10
     }
+  },
+  "mundo_7": {
+    "1": {
+      "id": 1,
+      "tipo": "multipla_escolha",
+      "titulo": "Definição de lista",
+      "pergunta": "O que é uma lista em Python?",
+      "opcoes": [
+        "Um comando para repetir blocos de código",
+        "Uma variável que armazena apenas um valor por vez",
+        "Uma estrutura que armazena vários valores em uma única variável",
+        "Um tipo de função que retorna múltiplos valores"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "tipo": "multipla_escolha",
+      "titulo": "Criando lista",
+      "pergunta": "Como se cria corretamente uma lista em Python?",
+      "opcoes": [
+        "frutas = (\"maçã\", \"banana\", \"uva\")",
+        "frutas = [\"maçã\", \"banana\", \"uva\"]",
+        "frutas = {\"maçã\", \"banana\", \"uva\"}",
+        "frutas = \"maçã\", \"banana\", \"uva\""
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "tipo": "multipla_escolha",
+      "titulo": "Primeiro índice",
+      "pergunta": "Qual é o índice do primeiro elemento de uma lista em Python?",
+      "opcoes": ["1", "-1", "0", "Depende do tamanho da lista"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "4": {
+      "id": 4,
+      "tipo": "completar",
+      "titulo": "Último elemento",
+      "pergunta": "Para acessar o último elemento de uma lista usando índice negativo, utiliza-se o índice ___.",
+      "placeholder": "Digite o índice",
+      "respostas_aceitas": ["-1", "menos 1", "menos um"],
+      "xp": 10
+    },
+    "5": {
+      "id": 5,
+      "tipo": "multipla_escolha",
+      "titulo": "Tamanho da lista",
+      "pergunta": "Qual função retorna o tamanho de uma lista em Python?",
+      "opcoes": ["size()", "count()", "length()", "len()"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "6": {
+      "id": 6,
+      "tipo": "multipla_escolha",
+      "titulo": "Adicionar elemento",
+      "pergunta": "Qual método adiciona um elemento ao final de uma lista?",
+      "opcoes": ["add()", "insert()", "append()", "push()"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "7": {
+      "id": 7,
+      "tipo": "completar",
+      "titulo": "Remover por valor",
+      "pergunta": "Para remover um elemento de uma lista pelo seu valor, utiliza-se o método ___.",
+      "placeholder": "Digite o método",
+      "respostas_aceitas": ["remove", "remove()", "método remove", "metodo remove"],
+      "xp": 10
+    },
+    "8": {
+      "id": 8,
+      "tipo": "multipla_escolha",
+      "titulo": "Alterar elemento",
+      "pergunta": "Como se altera o primeiro elemento de uma lista chamada numeros?",
+      "opcoes": ["numeros.change(0, 99)", "numeros[0] = 99", "numeros[1] = 99", "numeros.set(0, 99)"],
+      "resposta": 1,
+      "xp": 10
+    },
+    "9": {
+      "id": 9,
+      "tipo": "multipla_escolha",
+      "titulo": "Percorrer lista",
+      "pergunta": "Qual é a forma mais comum de percorrer todos os elementos de uma lista em Python?",
+      "opcoes": [
+        "Usando o comando while com índice manual",
+        "Usando o loop for diretamente sobre a lista",
+        "Usando a função range() sem o for",
+        "Usando o comando print() com a lista inteira"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "10": {
+      "id": 10,
+      "tipo": "multipla_escolha",
+      "titulo": "Índice inexistente",
+      "pergunta": "O que acontece se tentarmos acessar um índice que não existe na lista?",
+      "opcoes": [
+        "O Python retorna None automaticamente",
+        "O Python retorna o último elemento da lista",
+        "O programa gera um erro",
+        "O Python cria um novo elemento naquela posição"
+      ],
+      "resposta": 2,
+      "xp": 10
+    },
+    "11": {
+      "id": 11,
+      "tipo": "multipla_escolha",
+      "titulo": "Acesso por índice",
+      "pergunta": "Analise: numeros = [10, 20, 30, 40] e print(numeros[2]). O que será exibido?",
+      "opcoes": ["10", "20", "40", "30"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "12": {
+      "id": 12,
+      "tipo": "multipla_escolha",
+      "titulo": "For em lista",
+      "pergunta": "Analise: frutas = [\"maçã\", \"banana\", \"uva\"]; for fruta in frutas: print(fruta). O que será exibido?",
+      "opcoes": [
+        "frutas",
+        "maçã banana uva na mesma linha",
+        "maçã, banana, uva",
+        "maçã, banana e uva, cada um em uma linha separada"
+      ],
+      "resposta": 3,
+      "xp": 10
+    },
+    "13": {
+      "id": 13,
+      "tipo": "completar",
+      "titulo": "Listas mutáveis",
+      "pergunta": "Listas em Python são ___, ou seja, seus elementos podem ser modificados após a criação.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["mutáveis", "mutaveis", "mutável", "mutavel"],
+      "xp": 10
+    },
+    "14": {
+      "id": 14,
+      "tipo": "multipla_escolha",
+      "titulo": "Append e remove",
+      "pergunta": "Analise: numeros = [5, 10, 15, 20]; numeros.append(25); numeros.remove(10); print(numeros). O que será exibido?",
+      "opcoes": ["[5, 10, 15, 20, 25]", "[5, 15, 20, 25]", "[5, 15, 20]", "[10, 15, 20, 25]"],
+      "resposta": 1,
+      "xp": 10
+    },
+    "15": {
+      "id": 15,
+      "tipo": "multipla_escolha",
+      "titulo": "Somando lista",
+      "pergunta": "Analise: numeros = [1, 2, 3, 4, 5]; total = 0; para cada n em numeros, total += n; print(total). O que será exibido?",
+      "opcoes": ["10", "12", "15", "54321"],
+      "resposta": 2,
+      "xp": 10
+    }
+  },
+  "mundo_8": {
+    "1": {
+      "id": 1,
+      "tipo": "multipla_escolha",
+      "titulo": "Definição de matriz",
+      "pergunta": "O que é uma matriz em Python?",
+      "opcoes": [
+        "Uma lista que armazena apenas números inteiros",
+        "Uma lista de listas que organiza dados em linhas e colunas",
+        "Uma função que realiza cálculos matemáticos",
+        "Um tipo de loop especial para estruturas bidimensionais"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "2": {
+      "id": 2,
+      "tipo": "multipla_escolha",
+      "titulo": "Acesso em matriz",
+      "pergunta": "Como se acessa o elemento da primeira linha e segunda coluna de uma matriz em Python?",
+      "opcoes": ["matriz[1][2]", "matriz[2][1]", "matriz[0][1]", "matriz[1][0]"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "3": {
+      "id": 3,
+      "tipo": "completar",
+      "titulo": "Lista de listas",
+      "pergunta": "Em Python, matrizes são representadas como listas de ___, onde cada elemento é também uma lista.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["listas", "lista"],
+      "xp": 10
+    },
+    "4": {
+      "id": 4,
+      "tipo": "multipla_escolha",
+      "titulo": "Percorrer matriz",
+      "pergunta": "Qual estrutura é usada para percorrer todos os elementos de uma matriz?",
+      "opcoes": ["Um único loop for", "Um loop while com dois contadores", "Loops aninhados", "A função range() sem loops"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "5": {
+      "id": 5,
+      "tipo": "multipla_escolha",
+      "titulo": "Formato da matriz",
+      "pergunta": "Uma matriz em Python precisa obrigatoriamente ter o mesmo número de linhas e colunas?",
+      "opcoes": [
+        "Sim, matrizes sempre são quadradas",
+        "Não, é possível ter números diferentes de linhas e colunas",
+        "Sim, caso contrário gera um erro",
+        "Não, mas o Python ajusta automaticamente"
+      ],
+      "resposta": 1,
+      "xp": 10
+    },
+    "6": {
+      "id": 6,
+      "tipo": "multipla_escolha",
+      "titulo": "Matriz 2x2",
+      "pergunta": "Qual das opções abaixo representa corretamente uma matriz 2x2 em Python?",
+      "opcoes": ["matriz = [1, 2, 3, 4]", "matriz = [(1, 2), (3, 4)]", "matriz = {[1, 2], [3, 4]}", "matriz = [[1, 2], [3, 4]]"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "7": {
+      "id": 7,
+      "tipo": "completar",
+      "titulo": "Loop externo e interno",
+      "pergunta": "Para percorrer uma matriz, usa-se um loop externo para as ___ e um loop interno para as ___.",
+      "placeholder": "Complete com os dois termos",
+      "respostas_aceitas": ["linhas colunas", "linhas e colunas", "linhas, colunas"],
+      "xp": 10
+    },
+    "8": {
+      "id": 8,
+      "tipo": "multipla_escolha",
+      "titulo": "Aplicação de matriz",
+      "pergunta": "Qual das seguintes estruturas pode ser representada por uma matriz?",
+      "opcoes": ["Um único valor numérico", "Uma sequência de letras", "Um tabuleiro de jogo da velha", "Uma função com parâmetros"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "9": {
+      "id": 9,
+      "tipo": "multipla_escolha",
+      "titulo": "Dois índices",
+      "pergunta": "Quantos índices são necessários para acessar um elemento de uma matriz?",
+      "opcoes": ["Nenhum", "Um", "Três", "Dois"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "10": {
+      "id": 10,
+      "tipo": "multipla_escolha",
+      "titulo": "len em matriz",
+      "pergunta": "O que len(matriz) retorna quando matriz é uma lista de listas?",
+      "opcoes": ["O número total de elementos da matriz", "O número de colunas", "O número de linhas", "O valor do maior elemento"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "11": {
+      "id": 11,
+      "tipo": "multipla_escolha",
+      "titulo": "Elemento matriz[1][2]",
+      "pergunta": "Analise: matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]; print(matriz[1][2]). O que será exibido?",
+      "opcoes": ["4", "3", "8", "6"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "12": {
+      "id": 12,
+      "tipo": "multipla_escolha",
+      "titulo": "Percorrer todos os elementos",
+      "pergunta": "Analise uma matriz [[1, 2], [3, 4], [5, 6]] percorrida com dois for aninhados imprimindo cada elemento. Quantos números serão exibidos?",
+      "opcoes": ["2", "3", "4", "6"],
+      "resposta": 3,
+      "xp": 10
+    },
+    "13": {
+      "id": 13,
+      "tipo": "completar",
+      "titulo": "Imagem digital",
+      "pergunta": "Imagens digitais podem ser representadas como matrizes, onde cada ___ corresponde a uma posição da matriz.",
+      "placeholder": "Complete a frase",
+      "respostas_aceitas": ["pixel", "píxel"],
+      "xp": 10
+    },
+    "14": {
+      "id": 14,
+      "tipo": "multipla_escolha",
+      "titulo": "Alterando matriz",
+      "pergunta": "Analise: matriz = [[10, 20], [30, 40]]; matriz[0][1] = 99; print(matriz). O que será exibido?",
+      "opcoes": ["[[10, 20], [30, 40]]", "[[99, 20], [30, 40]]", "[[10, 99], [30, 40]]", "[[10, 20], [99, 40]]"],
+      "resposta": 2,
+      "xp": 10
+    },
+    "15": {
+      "id": 15,
+      "tipo": "multipla_escolha",
+      "titulo": "Somando matriz",
+      "pergunta": "Analise: matriz = [[1, 2, 3], [4, 5, 6]]; total começa em 0 e soma todos os números com loops aninhados. O que será exibido?",
+      "opcoes": ["6", "15", "21", "12"],
+      "resposta": 2,
+      "xp": 10
+    }
   }
 }

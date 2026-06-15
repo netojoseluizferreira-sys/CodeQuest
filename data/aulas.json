@@ -469,5 +469,155 @@
         }
       ]
     }
+  },
+  "mundo_7": {
+    "aula_1": {
+      "titulo": "Aula 7: Vetores / Listas",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "O que são listas",
+          "video_url": "https://www.youtube.com/watch?v=N1hTsbW50eM",
+          "conteudo": [
+            "Uma lista é uma variável capaz de armazenar vários valores ao mesmo tempo, em uma única estrutura. Em vez de criar diversas variáveis separadas para guardar informações relacionadas, é possível agrupá-las todas dentro de uma lista.",
+            "Em Python, listas são criadas com colchetes e os valores são separados por vírgulas. Por exemplo: frutas = [\"maçã\", \"banana\", \"uva\"] cria uma lista com três elementos. Uma lista pode conter valores de tipos diferentes.",
+            "As listas são uma das estruturas de dados mais utilizadas em programação. Elas permitem organizar, armazenar e manipular conjuntos de informações de forma prática e eficiente."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Conceito e criação de listas",
+          "exercicios": ["1", "2"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Criando e acessando elementos",
+          "video_url": "https://www.youtube.com/watch?v=N1hTsbW50eM",
+          "conteudo": [
+            "Cada elemento de uma lista ocupa uma posição chamada índice. Em Python, os índices começam sempre em zero. Isso significa que o primeiro elemento está na posição 0, o segundo na posição 1, e assim por diante.",
+            "Para acessar um elemento específico, basta informar o nome da lista seguido do índice entre colchetes. Também é possível usar índices negativos para acessar elementos a partir do final, onde -1 representa o último elemento.",
+            "Tentar acessar um índice que não existe na lista gera um erro. Por isso, é importante conhecer o tamanho da lista antes de acessar seus elementos, o que pode ser feito com a função len()."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: Índices e acesso",
+          "exercicios": ["3", "4", "5", "10", "11"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Percorrendo listas com loops",
+          "video_url": "https://www.youtube.com/watch?v=YV_JQmZNFsk",
+          "conteudo": [
+            "Percorrer uma lista significa acessar cada um dos seus elementos, um por um. Em Python, a forma mais comum de fazer isso é com o loop for, que itera automaticamente sobre cada elemento da lista.",
+            "Por exemplo: for fruta in frutas: print(fruta) exibe cada elemento da lista frutas em uma linha separada. O Python cuida de passar de um elemento para o próximo a cada repetição do loop.",
+            "Também é possível percorrer uma lista usando range(len(lista)) quando se precisa do índice durante a iteração. Cada abordagem tem suas vantagens dependendo do que se deseja fazer."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Percorrendo listas",
+          "exercicios": ["9", "12", "15"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_4",
+          "titulo": "Adicionando, removendo e alterando",
+          "video_url": "https://www.youtube.com/watch?v=YV_JQmZNFsk",
+          "conteudo": [
+            "Listas em Python são mutáveis, ou seja, seus elementos podem ser modificados após a criação. Para adicionar um elemento ao final da lista, usa-se append(). Para remover um elemento específico pelo valor, usa-se remove(). Para remover pelo índice, usa-se pop().",
+            "Alterar um elemento é simples: basta acessar o índice desejado e atribuir um novo valor, como frutas[0] = \"melão\". Isso substitui o valor antigo pelo novo sem alterar o restante da lista.",
+            "Essas operações tornam as listas versáteis, permitindo que o programa adicione, remova e atualize informações dinamicamente durante a execução."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_4",
+          "titulo": "Prática 4: Manipulando listas",
+          "exercicios": ["6", "7", "8", "13", "14"]
+        }
+      ]
+    }
+  },
+  "mundo_8": {
+    "aula_1": {
+      "titulo": "Aula 8: Matrizes",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "O que são matrizes",
+          "video_url": "https://www.youtube.com/watch?v=hkE9WrjpAAk",
+          "conteudo": [
+            "Uma matriz é uma estrutura de dados que organiza informações em linhas e colunas, como uma tabela. Em Python, matrizes são representadas como listas de listas, ou seja, uma lista em que cada elemento também é uma lista.",
+            "Por exemplo: matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] cria uma matriz 3x3, onde cada lista interna representa uma linha. Esse formato é usado para tabelas, grades, tabuleiros de jogos e estruturas bidimensionais.",
+            "Entender matrizes é um passo importante na programação, pois muitos problemas do mundo real envolvem dados organizados em duas dimensões, como planilhas, mapas e imagens digitais."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_1",
+          "titulo": "Prática 1: Conceito de matrizes",
+          "exercicios": ["1", "3", "6"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_2",
+          "titulo": "Criando e acessando matrizes",
+          "video_url": "https://www.youtube.com/watch?v=hkE9WrjpAAk",
+          "conteudo": [
+            "Para acessar um elemento de uma matriz, é necessário informar dois índices: o primeiro indica a linha e o segundo indica a coluna. Por exemplo: matriz[1][2] acessa o elemento da segunda linha e terceira coluna.",
+            "Criar uma matriz em Python é simples: basta criar uma lista e preencher cada elemento com outra lista. Os elementos podem ser acessados e alterados da mesma forma que em listas comuns, usando dois índices entre colchetes.",
+            "O tamanho de uma matriz é definido pelo número de listas internas, que são as linhas, e pelo número de elementos em cada lista interna, que são as colunas. Matrizes não precisam ser quadradas."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_2",
+          "titulo": "Prática 2: Linhas, colunas e índices",
+          "exercicios": ["2", "5", "9", "10", "11", "14"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_3",
+          "titulo": "Percorrendo matrizes",
+          "video_url": "https://www.youtube.com/watch?v=_XLHD1XfK7w",
+          "conteudo": [
+            "Para percorrer todos os elementos de uma matriz, utiliza-se loops aninhados: um loop externo para percorrer as linhas e um loop interno para percorrer as colunas de cada linha.",
+            "Por exemplo: for linha in matriz: for elemento in linha: print(elemento) exibe todos os valores da matriz, um por um. O loop externo acessa cada lista interna e o interno acessa cada elemento dentro dela.",
+            "Também é possível usar range(len(matriz)) e range(len(matriz[0])) para percorrer com controle dos índices, o que é útil quando se precisa saber a posição exata de cada elemento."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_3",
+          "titulo": "Prática 3: Loops aninhados em matrizes",
+          "exercicios": ["4", "7", "12", "15"]
+        },
+        {
+          "tipo": "aula",
+          "id": "texto_4",
+          "titulo": "Aplicações práticas",
+          "video_url": "https://www.youtube.com/watch?v=_XLHD1XfK7w",
+          "conteudo": [
+            "Matrizes são amplamente utilizadas em aplicações práticas. Um tabuleiro de xadrez ou jogo da velha pode ser representado como uma matriz, onde cada posição armazena o estado daquela casa.",
+            "Outra aplicação comum é a representação de imagens digitais, onde cada pixel corresponde a uma posição da matriz e armazena informações de cor. Mapas de jogos e grades de simulação também podem ser modelados com matrizes.",
+            "Compreender matrizes abre portas para resolver problemas mais complexos em programação, sendo uma base importante para áreas como ciência de dados, inteligência artificial e desenvolvimento de jogos."
+          ]
+        },
+        {
+          "tipo": "exercicios",
+          "id": "exercicios_4",
+          "titulo": "Prática 4: Aplicações de matrizes",
+          "exercicios": ["8", "13"]
+        }
+      ]
+    }
   }
 }
