@@ -1,0 +1,32 @@
+{
+  "melhor_professor_ufal": {
+    "id": "melhor_professor_ufal",
+    "nome": "Melhor professor da UFAL",
+    "dica": "Quem é o melhor professor da UFAL?",
+    "descricao": "Desbloqueada ao criar um perfil com uma variação relacionada ao professor Alexandre Barbosa.",
+    "imagem_desbloqueada": "data/achievements/melhor_professor_ufal.png",
+    "imagem_bloqueada": "data/achievements/locked_question.png",
+    "secreta": true,
+    "condicao": "Nome do usuário normalizado corresponde a variações relacionadas ao professor Alexandre Barbosa."
+  },
+  "fenomeno": {
+    "id": "fenomeno",
+    "nome": "E é o Fenômeno é?",
+    "dica": "Faça história.",
+    "descricao": "Desbloqueada ao atingir o XP máximo possível do conteúdo disponível.",
+    "imagem_desbloqueada": "data/achievements/fenomeno.png",
+    "imagem_bloqueada": "data/achievements/locked_question.png",
+    "secreta": false,
+    "condicao": "XP do usuário atinge a soma máxima dos exercícios obrigatórios dos mundos implementados."
+  },
+  "quase_hexa": {
+    "id": "quase_hexa",
+    "nome": "Faltou isso aqui 🤏 pro Hexa",
+    "dica": "Seja persistente.",
+    "descricao": "Desbloqueada ao concluir todo o conteúdo disponível com o menor XP possível.",
+    "imagem_desbloqueada": "data/achievements/quase_hexa.png",
+    "imagem_bloqueada": "data/achievements/locked_question.png",
+    "secreta": false,
+    "condicao": "Todos os exercícios obrigatórios dos mundos implementados concluídos com XP mínimo."
+  }
+}

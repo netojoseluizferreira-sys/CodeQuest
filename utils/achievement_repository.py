@@ -15,7 +15,10 @@ CONQUISTAS_CONFIG_PATH = os.path.join(BASE_DIR, "data", "conquistas.json")
 def carregar_conquistas_config():
     """Carrega a lista de conquistas configuradas em JSON."""
     with open(CONQUISTAS_CONFIG_PATH, "r", encoding="utf-8") as arquivo:
-        return json.load(arquivo)
+        dados = json.load(arquivo)
+    if isinstance(dados, dict):
+        return list(dados.values())
+    return dados
 
 
 def obter_conquista(conquista_id):

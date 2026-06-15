@@ -9,7 +9,10 @@ data/*.log
 
 !data/.gitkeep
 !data/aulas.json
+!data/conquistas.json
 !data/exercicios.json
+!data/achievements/
+!data/achievements/*.png
 
 __pycache__/
 *.py[cod]
