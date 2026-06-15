@@ -341,31 +341,29 @@ class CodeQuestPygameMenu:
 
         if self.exercicio_respondido:
             return [
-                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Próximo", self._avancar_exercicio),
-                self._botao_voltar_mundos(),
+                Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Próximo", self._avancar_exercicio, **_KW_VERDE),
+                self._botao_voltar_mundos(**_KW_VERDE),
             ]
 
         exercicio = self._exercicio_atual()
         if exercicio and exercicio["tipo"] == "multipla_escolha":
             botoes = []
             for indice, opcao in enumerate(exercicio["opcoes"]):
-                y = 285 + (indice * 86)
+                y = 330 + (indice * 82)
                 botoes.append(
                     Button(
                         pygame.Rect(self.content_x, y, self.content_width, 72),
                         f"{chr(65 + indice)}) {opcao}",
                         lambda escolha=indice: self._responder_exercicio(escolha),
-                        background=PALETTE.surface,
-                        hover_background=PALETTE.surface_hover,
-                        text_color=PALETTE.text,
+                        **_KW_VERDE,
                     )
                 )
-            botoes.append(self._botao_voltar_mundos())
+            botoes.append(self._botao_voltar_mundos(**_KW_VERDE))
             return botoes
 
         return [
-            Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Responder", self._responder_texto_livre),
-            self._botao_voltar_mundos(),
+            Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Responder", self._responder_texto_livre, **_KW_VERDE),
+            self._botao_voltar_mundos(**_KW_VERDE),
         ]
 
     def _botao_voltar_inicio(self, **kw):
@@ -1408,9 +1406,9 @@ class CodeQuestPygameMenu:
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercício atual dentro de um bloco de prática.
 
-        Exibe cabeçalho com contador "X de Y", pergunta do exercício, campo de
-        resposta ou alternativas (via botões em _botoes_fluxo_aprendizado) e
-        banner de status.
+        Usa o mesmo fundo e a mesma paleta visual da tela de aula, exibindo
+        título, contador, pergunta, campo de resposta ou alternativas e banner
+        de status.
 
         Recebe:
             segmento (dict): Segmento de tipo "exercicios" com chaves "titulo"
@@ -1420,15 +1418,75 @@ class CodeQuestPygameMenu:
         exercicio = self._exercicio_atual()
         numero = self.exercicio_indice + 1
         total = len(segmento["exercicios"])
-        self._desenhar_cabecalho(segmento["titulo"], f"Exercício {numero} de {total}")
+
+        if self.cutscene_bg:
+            self.screen.blit(self.cutscene_bg, (0, 0))
+        else:
+            self.screen.fill((11, 25, 11))
+        self.screen.blit(self.lesson_overlay, (0, 0))
+
+        _TITULO = segmento["titulo"]
+        _GAP = 2
+        _ft = self.font_lesson_title
+        _char_w = [_ft.size(c)[0] for c in _TITULO]
+        _total_w = sum(_char_w) + _GAP * (len(_TITULO) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = _ft.get_height()
+        _tcy = 58
+
+        self.lesson_glow_timer += 1
+        _ga = int(40 + 80 * abs(math.sin(self.lesson_glow_timer * 0.04)))
+        _gs = [_ft.render(c, True, _VERDE_CLARO) for c in _TITULO]
+        for _s in _gs:
+            _s.set_alpha(_ga)
+        for _sp in (8, 5, 2):
+            for _dx in (-_sp, 0, _sp):
+                for _dy in (-_sp, 0, _sp):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _i, _s in enumerate(_gs):
+                        self.screen.blit(_s, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft.render(_c, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_i] + _GAP
+        _x = _tx0
+        for _i, _c in enumerate(_TITULO):
+            self.screen.blit(_ft.render(_c, True, _BRANCO), (_x, _tcy - _char_h // 2))
+            _x += _char_w[_i] + _GAP
+
+        _sub = f"Exercício {numero} de {total}"
+        _sub_y = _tcy + _char_h // 2 + 42
+        _ss = self.font_hub_subtitle.render(_sub, True, (0, 0, 0))
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2 + 2, _sub_y + 2)))
+        _ss = self.font_hub_subtitle.render(_sub, True, _BRANCO)
+        self.screen.blit(_ss, _ss.get_rect(center=(WINDOW.width // 2, _sub_y)))
+
         if exercicio is None:
-            self._desenhar_paragrafo("Exercício não encontrado.", self.content_x, 250, self.content_width, self.font_body, PALETTE.text)
+            self._desenhar_paragrafo("Exercício não encontrado.", self.content_x, 250, self.content_width, self.font_body, _BRANCO)
             return
 
-        self._desenhar_paragrafo(exercicio["pergunta"], self.content_x, 205, self.content_width, self.font_body, PALETTE.text)
+        _question_rect = pygame.Rect(self.content_x - 24, 168, self.content_width + 48, 128)
+        _question_panel = pygame.Surface(_question_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(_question_panel, (0, 0, 0, 118), _question_panel.get_rect(), border_radius=8)
+        pygame.draw.rect(_question_panel, (*_VERDE_CLARO, 150), _question_panel.get_rect(), width=2, border_radius=8)
+        self.screen.blit(_question_panel, _question_rect.topleft)
+
+        _pergunta_font = self.font_status_success
+        _linhas = quebrar_texto(exercicio["pergunta"], _pergunta_font, self.content_width - 20)
+        _lh = _pergunta_font.get_linesize() + 2
+        _y = _question_rect.y + max(18, (_question_rect.height - len(_linhas) * _lh) // 2)
+        for _linha in _linhas:
+            _shadow = _pergunta_font.render(_linha, True, (0, 0, 0))
+            self.screen.blit(_shadow, (_question_rect.x + 26, _y + 2))
+            self.screen.blit(_pergunta_font.render(_linha, True, _BRANCO), (_question_rect.x + 24, _y))
+            _y += _lh
+
         if exercicio["tipo"] != "multipla_escolha":
             placeholder = exercicio.get("placeholder", "Digite sua resposta")
-            self._desenhar_input(pygame.Rect(self.content_x, 455, self.content_width, 52), self.resposta_texto, "resposta", placeholder)
+            self._desenhar_input_verde(pygame.Rect(self.content_x, 350, self.content_width, 58), self.resposta_texto, "resposta", placeholder)
 
         self._desenhar_status(WINDOW.height - 118)
 
