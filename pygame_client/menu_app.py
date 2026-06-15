@@ -1897,7 +1897,30 @@ class CodeQuestPygameMenu:
 
     def _iniciar_mundo_2(self):
         """Carrega a aula e exercícios do Mundo 2 e inicia o fluxo de aprendizagem."""
+        self.usuario = carregar_usuario()
+        if self.usuario is None:
+            self._definir_status("Crie um personagem antes de estudar.", "error")
+            self.screen_name = "create"
+            return
+        if not self._mundo_1_foi_concluido():
+            self._definir_status("Conclua os 15 exercícios do Mundo 1 antes de abrir o Mundo 2.", "error")
+            return
         self._iniciar_mundo("mundo_2", "aula_1")
+
+    def _mundo_1_foi_concluido(self):
+        """Verifica se o usuário concluiu todos os 15 exercícios do Mundo 1.
+
+        Retorna:
+            bool: True quando todos os exercícios de IDs 1 a 15 têm registro de
+            conclusão no SQLite para o usuário ativo; False caso contrário.
+        """
+        self.usuario = self.usuario or carregar_usuario()
+        if self.usuario is None:
+            return False
+        return all(
+            exercicio_foi_concluido("mundo_1", exercicio_id, self.usuario)
+            for exercicio_id in range(1, 16)
+        )
 
     def _iniciar_mundo(self, mundo, aula_id):
         """Carrega uma aula de mundo e inicia o fluxo visual de aprendizagem.

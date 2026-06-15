@@ -115,6 +115,7 @@ def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
     aula = {"titulo": "Aula 2", "trilha": [{"tipo": "aula", "conteudo": ["Texto"]}]}
 
     monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_app, "exercicio_foi_concluido", lambda *_args: True)
     monkeypatch.setattr(menu_app, "carregar_aula_pygame", lambda mundo, aula_id: aula)
     monkeypatch.setattr(menu_app, "carregar_exercicios_pygame", lambda mundo: {"1": {"id": 1}})
 
@@ -132,6 +133,32 @@ def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
     assert app.trilha_indice == 0
     assert app.exercicio_indice == 0
     assert app.screen_name == "lesson"
+
+
+def test_iniciar_mundo_2_bloqueia_quando_mundo_1_incompleto(monkeypatch):
+    usuario = Usuario(nome="Ada", idade=12)
+    chamadas_aula = []
+
+    monkeypatch.setattr(menu_app, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(
+        menu_app,
+        "exercicio_foi_concluido",
+        lambda mundo, exercicio_id, usuario: int(exercicio_id) < 15,
+    )
+    monkeypatch.setattr(menu_app, "carregar_aula_pygame", lambda mundo, aula_id: chamadas_aula.append((mundo, aula_id)))
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = usuario
+    app.status_message = ""
+    app.status_kind = "normal"
+    app.screen_name = "worlds"
+
+    app._iniciar_mundo_2()
+
+    assert chamadas_aula == []
+    assert app.screen_name == "worlds"
+    assert app.status_kind == "error"
+    assert "15 exercícios do Mundo 1" in app.status_message
 
 
 def test_conclusao_do_mundo_2_aponta_para_mundo_3():
