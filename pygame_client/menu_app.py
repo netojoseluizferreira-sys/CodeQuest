@@ -271,7 +271,7 @@ class CodeQuestPygameMenu:
         if self.screen_name == "profile":
             return [Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE)]
         if self.screen_name == "credits":
-            return [self._botao_voltar_hub(**_KW_VERDE) if self.usuario else self._botao_voltar_inicio(**_KW_VERDE)]
+            return [self._botao_voltar_inicio(**_KW_VERDE)]
         if self.screen_name == "cutscene":
             return []
         if self.screen_name == "lesson":
@@ -2085,7 +2085,7 @@ class CodeQuestPygameMenu:
         """Navega para a tela anterior mais lógica com base em screen_name atual.
 
         "hub"/"create" → tela inicial; "worlds"/"profile"/"complete"/"cutscene" → hub;
-        "lesson" → mundos; "credits" → hub (logado) ou início (sem usuário); outros → sair.
+        "lesson" → mundos; "credits" → início; outros → sair.
         """
         if self.screen_name in {"hub", "create"}:
             self._voltar_inicio()
@@ -2094,7 +2094,7 @@ class CodeQuestPygameMenu:
         elif self.screen_name == "lesson":
             self._abrir_mundos()
         elif self.screen_name == "credits":
-            self._abrir_hub() if self.usuario else self._voltar_inicio()
+            self._voltar_inicio()
         else:
             self._sair()
 

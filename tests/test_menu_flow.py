@@ -52,6 +52,34 @@ def test_continuar_carrega_save_existente_sem_criar_usuario(monkeypatch):
     assert app.screen_name == "hub"
 
 
+def test_botao_creditos_volta_para_inicio_mesmo_com_usuario():
+    usuario = Usuario(nome="Ada", idade=12)
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = usuario
+    app.screen_name = "credits"
+
+    botoes = app._botoes_tela()
+
+    assert len(botoes) == 1
+    assert botoes[0].action.__name__ == "_voltar_inicio"
+
+
+def test_voltar_contextual_creditos_vai_para_inicio_mesmo_com_usuario():
+    usuario = Usuario(nome="Ada", idade=12)
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = usuario
+    app.screen_name = "credits"
+    app.status_message = ""
+    app.status_kind = "normal"
+
+    app._voltar_contextual()
+
+    assert app.screen_name == "start"
+    assert app.status_message == "Bem-vindo ao CodeQuest."
+
+
 def test_pula_exercicios_concluidos_ate_proximo_pendente(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
     concluidos = {"1", "2"}
