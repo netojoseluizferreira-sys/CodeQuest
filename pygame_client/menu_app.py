@@ -1376,7 +1376,9 @@ class CodeQuestPygameMenu:
             _ltxt = "Assistir Aula Completa (YouTube)"
             _lsurf = self.font_lesson_content.render(_ltxt, True, _VERDE_CLARO)
             _cta_h = len(_cta_lines) * _cta_lh + _lsurf.get_height() + 44
-            _cta_rect = pygame.Rect(_MARG - 18, _panel_rect.bottom + 18, _cw + 36, _cta_h)
+            _cta_content_w = max([_cta_font.size(_linha)[0] for _linha in _cta_lines] + [_lsurf.get_width()])
+            _cta_w = min(_cw + 36, _cta_content_w + 92)
+            _cta_rect = pygame.Rect(WINDOW.width // 2 - _cta_w // 2, _panel_rect.bottom + 18, _cta_w, _cta_h)
             _cta = pygame.Surface(_cta_rect.size, pygame.SRCALPHA)
             pygame.draw.rect(_cta, (0, 0, 0, 112), _cta.get_rect(), border_radius=8)
             pygame.draw.rect(_cta, (*_VERDE_CLARO, 150), _cta.get_rect(), width=2, border_radius=8)
