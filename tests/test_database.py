@@ -127,6 +127,16 @@ def test_status_de_mundos_respeita_configuracao_de_desbloqueio(banco_temporario)
     assert database.obter_status_mundo("mundo_2", usuario)["estado"] == database.STATUS_DISPONIVEL
 
 
+def test_mundo_9_exige_apenas_mundo_1_concluido(banco_temporario):
+    usuario = database.criar_usuario("Teste", 12)
+
+    assert database.obter_status_mundo("mundo_9", usuario)["estado"] == database.STATUS_BLOQUEADO
+
+    database.marcar_mundo_concluido("mundo_1", usuario)
+
+    assert database.obter_status_mundo("mundo_9", usuario)["estado"] == database.STATUS_DISPONIVEL
+
+
 def test_mundo_nao_implementado_aparece_em_breve(banco_temporario):
     usuario = database.criar_usuario("Teste", 12)
     database.marcar_mundo_concluido("mundo_9", usuario)

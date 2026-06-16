@@ -99,7 +99,7 @@
     "assunto": "Recursividade",
     "nome": "Citadela do Espelho Infinito",
     "implementado": true,
-    "requer": "mundo_8",
+    "requer": "mundo_1",
     "aula_inicial": "aula_1",
     "exercicios_obrigatorios": []
   }
