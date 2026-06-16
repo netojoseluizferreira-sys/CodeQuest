@@ -160,6 +160,11 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self.mundos_frame_paths = sorted(glob.glob(os.path.join(_mundos_frames_dir, "*.jpg")))
         self.mundos_frame_index = 0
         self.mundos_frame_timer = 0
+        _mundo9_cutscene_dir = os.path.join(_data_dir, "mundo_9_cutscene_frames")
+        self.mundo9_cutscene_frame_paths = sorted(glob.glob(os.path.join(_mundo9_cutscene_dir, "*.jpg")))
+        self.mundo9_cutscene_frame_index = 0
+        self.mundo9_cutscene_frame_acc = 0.0
+        self.mundo9_cutscene_audio_started = False
         self.mundos_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         self.mundos_overlay.fill((0, 0, 0, 150))
         self.mundos_glow_timer = 0
@@ -175,7 +180,9 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
     def run(self):
         """Inicia a trilha sonora e executa o loop principal a 60 fps até self.running ser False."""
         while self.running:
-            self.audio.tocar_trilha(self._contexto_musica_atual())
+            contexto_musica = self._contexto_musica_atual()
+            if contexto_musica is not None:
+                self.audio.tocar_trilha(contexto_musica)
             self._processar_eventos()
             self._renderizar()
             self.clock.tick(WINDOW.fps)
@@ -192,6 +199,8 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         """
         if self.screen_name == "lesson":
             segmento = self._segmento_atual()
+            if segmento and segmento["tipo"] == "cutscene_video":
+                return None
             if segmento and segmento["tipo"] == "exercicios":
                 return "exercise"
             return "lesson"

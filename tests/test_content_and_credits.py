@@ -280,6 +280,27 @@ def test_carregar_exercicios_mundo_8():
     assert obter_exercicio(exercicios, 15)["resposta"] == 2
 
 
+def test_carregar_aula_mundo_9_tem_aula_cutscene_e_textos_finais():
+    aula = carregar_aula_pygame("mundo_9", "aula_1")
+
+    assert aula is not None
+    assert aula["titulo"] == "Aula 9: Recursividade"
+    assert [bloco["tipo"] for bloco in aula["trilha"]] == [
+        "aula",
+        "cutscene_video",
+        "final_text",
+        "final_text",
+    ]
+    assert aula["trilha"][0]["titulo"] == "Recursividade"
+    assert len(aula["trilha"][0]["conteudo"]) == 3
+    assert aula["trilha"][1]["frames_dir"] == "mundo_9_cutscene_frames"
+    assert aula["trilha"][1]["audio"] == "mundo_9_cutscene.mp3"
+    assert "Faísca" in aula["trilha"][2]["conteudo"][1]
+    assert aula["trilha"][3]["titulo"] == "Agradecimentos"
+    assert (DATA_DIR / "music" / "mundo_9_cutscene.mp3").is_file()
+    assert len(list((DATA_DIR / "mundo_9_cutscene_frames").glob("*.jpg"))) == 240
+
+
 def test_mundos_3_a_8_usam_fundos_tematicos_com_overlay_leve():
     mundos = json.loads((DATA_DIR / "mundos.json").read_text(encoding="utf-8"))
 
@@ -312,5 +333,7 @@ def test_creditos_removem_referencias_antigas_e_mantem_tecnologias_atuais():
 
     assert "Streamlit" not in texto
     assert "FastAPI" not in texto
+    assert "Agradecimentos" not in texto
+    assert "Obrigado por embarcar nessa jornada" not in texto
     assert "Pygame" in texto
     assert "SQLite" in texto

@@ -11,6 +11,7 @@ from utils.database import (
     carregar_usuario,
     criar_usuario,
     exercicio_foi_concluido,
+    marcar_mundo_concluido,
     obter_status_mundo,
     resetar_banco_de_dados,
 )
@@ -260,6 +261,7 @@ class NavigationMixin:
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
+        self._resetar_cutscene_mundo_9()
         self._definir_status("Leia com calma e avance no seu ritmo.")
         self.screen_name = "lesson"
         self._pular_exercicios_concluidos()
@@ -330,10 +332,19 @@ class NavigationMixin:
         self.exercicio_indice = 0
         self.resposta_texto = ""
         self.exercicio_respondido = False
+        self._resetar_cutscene_mundo_9()
         self._pular_exercicios_concluidos()
         self._definir_status("")
         if self._segmento_atual() is None:
+            if self.mundo_ativo == "mundo_9":
+                marcar_mundo_concluido(self.mundo_ativo, self.usuario)
             self.screen_name = "complete"
+
+    def _resetar_cutscene_mundo_9(self):
+        """Reinicia o estado da cutscene em frames do Mundo 9."""
+        self.mundo9_cutscene_frame_index = 0
+        self.mundo9_cutscene_frame_acc = 0.0
+        self.mundo9_cutscene_audio_started = False
 
     def _avancar_exercicio(self):
         """Vai para o próximo exercício do bloco ou avança para o próximo segmento ao esgotar a lista."""

@@ -148,6 +148,15 @@ class ButtonMixin:
                 self._botao_voltar_mundos(**_KW_VERDE),
             ]
 
+        if segmento["tipo"] == "final_text":
+            return [
+                Button(pygame.Rect(WINDOW.width - 310, WINDOW.height - 88, 250, 52), "Continuar", self._avancar_segmento, **_KW_VERDE),
+                self._botao_voltar_mundos(**_KW_VERDE),
+            ]
+
+        if segmento["tipo"] == "cutscene_video":
+            return []
+
         if self.exercicio_respondido:
             return [
                 Button(pygame.Rect(WINDOW.width - 340, WINDOW.height - 88, 250, 52), "Próximo", self._avancar_exercicio, **_KW_VERDE),

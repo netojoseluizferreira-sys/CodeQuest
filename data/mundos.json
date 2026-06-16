@@ -98,7 +98,7 @@
     "numero": "Mundo 9",
     "assunto": "Recursividade",
     "nome": "Citadela do Espelho Infinito",
-    "implementado": false,
+    "implementado": true,
     "requer": "mundo_8",
     "aula_inicial": "aula_1",
     "exercicios_obrigatorios": []

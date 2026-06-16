@@ -121,6 +121,26 @@ class AudioController:
         if self.enabled and self.credit_sound:
             self.credit_sound.play()
 
+    def tocar_arquivo_uma_vez(self, nome_arquivo, chave=None, volume=0.34):
+        """Toca um arquivo de musica uma unica vez, sem loop."""
+        if not self.enabled:
+            return
+
+        track_key = chave or nome_arquivo
+        if self.current_track == track_key and pygame.mixer.music.get_busy():
+            return
+
+        caminho = os.path.join(self.music_dir, nome_arquivo)
+        try:
+            pygame.mixer.music.load(caminho)
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play(loops=0)
+            if self.music_channel:
+                self.music_channel.stop()
+            self.current_track = track_key
+        except pygame.error:
+            return
+
     def encerrar(self):
         """Finaliza o mixer do Pygame quando o áudio estiver ativo."""
         if self.enabled:

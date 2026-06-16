@@ -619,5 +619,58 @@
         }
       ]
     }
+  },
+  "mundo_9": {
+    "aula_1": {
+      "titulo": "Aula 9: Recursividade",
+      "trilha": [
+        {
+          "tipo": "aula",
+          "id": "texto_1",
+          "titulo": "Recursividade",
+          "conteudo": [
+            "Recursividade acontece quando uma função chama a si mesma para resolver um problema. Em vez de resolver tudo de uma vez, ela divide a tarefa em partes menores, repetindo o mesmo processo até chegar a uma situação simples o suficiente para parar.",
+            "O ponto mais importante da recursividade é o caso base. Ele funciona como a condição de parada da função. Sem um caso base, a função continua chamando a si mesma sem fim, causando erro ou travando a execução.",
+            "Em Python, recursividade pode ser usada para resolver problemas como contagem regressiva, fatorial, sequências matemáticas e estruturas que se repetem. Ela é poderosa, mas precisa ser usada com cuidado, pois cada chamada ocupa memória até que a função consiga retornar."
+          ]
+        },
+        {
+          "tipo": "cutscene_video",
+          "id": "cutscene_final",
+          "titulo": "A Última Chamada",
+          "frames_dir": "mundo_9_cutscene_frames",
+          "audio": "mundo_9_cutscene.mp3",
+          "fps": 24
+        },
+        {
+          "tipo": "final_text",
+          "id": "texto_final",
+          "titulo": "O Portal",
+          "conteudo": [
+            "Parabéns, [nome do jogador].",
+            "Faísca atravessou o Arquipélago de Bythos ao seu lado. Cada módulo, cada guardião, cada desafio, ele encarou tudo com você. Juntos, vocês chegaram até onde poucos chegam.",
+            "Mas, no último mundo, Faísca cometeu um erro.",
+            "Ele entendeu a recursividade tarde demais.",
+            "Esqueceu o caso base.",
+            "E agora está preso dentro de uma chamada que nunca retorna.",
+            "O portal se abriu para você.",
+            "Mas Faísca ficou para trás.",
+            "Será que ele conseguirá encontrar uma condição de parada?",
+            "Será que algum dia ele voltará para casa?"
+          ]
+        },
+        {
+          "tipo": "final_text",
+          "id": "agradecimentos",
+          "titulo": "Agradecimentos",
+          "conteudo": [
+            "Este projeto foi desenvolvido por Mayanderson, Neto e Anthony, alunos do primeiro período da Universidade Federal de Alagoas.",
+            "Ficamos imensamente gratos por você ter embarcado nessa jornada com a gente. Esperamos que, de alguma forma, o CodeQuest tenha acendido uma centelha no seu interesse por programação, uma área tão ampla, tão desafiadora e tão cheia de possibilidades.",
+            "Desejamos sorte no seu progresso.",
+            "E que sua jornada esteja apenas começando."
+          ]
+        }
+      ]
+    }
   }
 }

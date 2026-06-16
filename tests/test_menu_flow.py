@@ -417,6 +417,18 @@ def test_conclusao_do_mundo_8_aponta_para_mundo_9():
     assert "Mundo 9" in app._texto_conclusao_mundo(label)
 
 
+def test_conclusao_do_mundo_9_aponta_para_mundos():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.mundo_ativo = "mundo_9"
+    app.status_message = ""
+    app.status_kind = "normal"
+
+    label, acao = app._proximo_mundo_conclusao()
+
+    assert label == "Mundos"
+    assert callable(acao)
+
+
 def test_contexto_musical_diferencia_aula_e_exercicio():
     app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
     app.screen_name = "lesson"
@@ -433,6 +445,38 @@ def test_contexto_musical_diferencia_aula_e_exercicio():
     app.trilha_indice = 1
 
     assert app._contexto_musica_atual() == "exercise"
+
+
+def test_contexto_musical_cutscene_do_mundo_9_nao_sobrescreve_audio():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.screen_name = "lesson"
+    app.aula = {"trilha": [{"tipo": "cutscene_video"}]}
+    app.trilha_indice = 0
+
+    assert app._contexto_musica_atual() is None
+
+
+def test_avancar_ultimo_segmento_do_mundo_9_marca_conclusao(monkeypatch):
+    usuario = Usuario(nome="Ada", idade=12)
+    marcados = []
+
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: usuario)
+    monkeypatch.setattr(menu_navigation, "marcar_mundo_concluido", lambda mundo, usuario_arg: marcados.append((mundo, usuario_arg)))
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = usuario
+    app.mundo_ativo = "mundo_9"
+    app.aula = {"trilha": [{"tipo": "final_text", "conteudo": []}]}
+    app.trilha_indice = 0
+    app.exercicio_indice = 0
+    app.resposta_texto = ""
+    app.exercicio_respondido = False
+    app.screen_name = "lesson"
+
+    app._avancar_segmento()
+
+    assert app.screen_name == "complete"
+    assert marcados == [("mundo_9", usuario)]
 
 
 def test_contexto_musical_create_usa_tela_inicial():

@@ -26,6 +26,10 @@ class LearningRenderMixin:
             return
         if segmento["tipo"] == "aula":
             self._renderizar_segmento_aula(segmento)
+        elif segmento["tipo"] == "cutscene_video":
+            self._renderizar_cutscene_video(segmento)
+        elif segmento["tipo"] == "final_text":
+            self._renderizar_texto_final(segmento)
         else:
             self._renderizar_segmento_exercicio(segmento)
 
@@ -181,6 +185,74 @@ class LearningRenderMixin:
             self.link_rect = None
 
         self.btn_continuar_y = None
+
+    def _renderizar_cutscene_video(self, segmento):
+        """Renderiza a cutscene final do Mundo 9 a partir de frames e audio."""
+        frame_paths = getattr(self, "mundo9_cutscene_frame_paths", [])
+        if not frame_paths:
+            self._avancar_segmento()
+            return
+
+        if not getattr(self, "mundo9_cutscene_audio_started", False):
+            audio = segmento.get("audio")
+            if audio:
+                self.audio.tocar_arquivo_uma_vez(audio, "mundo9_cutscene")
+            self.mundo9_cutscene_audio_started = True
+
+        indice = int(getattr(self, "mundo9_cutscene_frame_acc", 0.0))
+        if indice >= len(frame_paths):
+            self._avancar_segmento()
+            return
+
+        frame = self._obter_frame_animado(frame_paths, indice)
+        if frame:
+            self.screen.blit(frame, (0, 0))
+
+        fps = float(segmento.get("fps", 24))
+        self.mundo9_cutscene_frame_index = indice
+        self.mundo9_cutscene_frame_acc = getattr(self, "mundo9_cutscene_frame_acc", 0.0) + (fps / WINDOW.fps)
+
+    def _renderizar_texto_final(self, segmento):
+        """Renderiza os textos narrativos finais do jogo."""
+        self._desenhar_fundo_aprendizado()
+
+        titulo = segmento["titulo"]
+        titulo_font = self.font_lesson_title
+        titulo_sombra = titulo_font.render(titulo, True, (0, 0, 0))
+        titulo_surface = titulo_font.render(titulo, True, _BRANCO)
+        self.screen.blit(titulo_sombra, titulo_sombra.get_rect(center=(WINDOW.width // 2 + 3, 77)))
+        self.screen.blit(titulo_surface, titulo_surface.get_rect(center=(WINDOW.width // 2, 74)))
+
+        nome = self.usuario.nome if self.usuario else "jogador"
+        paragrafos = [texto.replace("[nome do jogador]", nome) for texto in segmento.get("conteudo", [])]
+
+        font = self.font_lesson_body
+        largura_texto = 860
+        linhas = []
+        for paragrafo in paragrafos:
+            linhas.extend(quebrar_texto(paragrafo, font, largura_texto))
+            linhas.append("")
+        if linhas and linhas[-1] == "":
+            linhas.pop()
+
+        linha_altura = font.get_linesize() + 3
+        panel_h = min(560, max(220, len(linhas) * linha_altura + 52))
+        panel_rect = pygame.Rect(WINDOW.width // 2 - 500, 145, 1000, panel_h)
+        panel = pygame.Surface(panel_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(panel, (0, 0, 0, 130), panel.get_rect(), border_radius=8)
+        pygame.draw.rect(panel, (*_VERDE_CLARO, 145), panel.get_rect(), width=2, border_radius=8)
+        self.screen.blit(panel, panel_rect.topleft)
+
+        y = panel_rect.y + 26
+        max_y = panel_rect.bottom - 24
+        for linha in linhas:
+            if y + linha_altura > max_y:
+                break
+            if linha:
+                sombra = font.render(linha, True, (0, 0, 0))
+                self.screen.blit(sombra, (panel_rect.x + 72 + 2, y + 2))
+                self.screen.blit(font.render(linha, True, _BRANCO), (panel_rect.x + 72, y))
+            y += linha_altura
 
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercício atual dentro de um bloco de prática.
