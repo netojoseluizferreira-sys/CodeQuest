@@ -20,6 +20,7 @@ O projeto está em versão jogável local, centralizado no Pygame. A antiga abor
 - Bloqueio do Mundo 2 até o Mundo 1 estar marcado como concluído.
 - Exercícios concluídos são pulados ao reiniciar o app, preservando os textos de aula.
 - XP dinâmico: começa em 10, perde 2 por erro e respeita mínimo de 2 XP.
+- Níveis dinâmicos de 1 a 10, distribuídos pelo XP máximo do conteúdo implementado.
 - Bloqueio de XP duplicado por exercício concluído.
 - Conquistas persistidas em SQLite, configuradas por `data/conquistas.json`.
 - Trilhas sonoras por contexto: menu, hub, cutscene, mundos, aula, exercícios, perfil e créditos.

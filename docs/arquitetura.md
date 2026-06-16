@@ -124,6 +124,10 @@ Cada exercício começa valendo 10 XP. A cada erro, o ganho potencial cai 2 pont
 
 Exercícios já concluídos não concedem XP novamente.
 
+O nível do jogador vai de 1 a 10. Os limiares são calculados dinamicamente a partir
+do XP máximo disponível nos mundos implementados, então o nível máximo acompanha a
+expansão do conteúdo sem depender de valores fixos no código.
+
 ## Conquistas
 
 As conquistas são configuradas em `data/conquistas.json`. Cada entrada define `id`, `nome`, `dica`, descrição, imagem desbloqueada, imagem bloqueada e a condição conceitual. O Pygame não conhece as regras; ele chama `listar_conquistas_com_estado()` e apenas renderiza slots com a imagem bloqueada ou real.
