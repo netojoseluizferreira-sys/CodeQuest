@@ -206,7 +206,14 @@ class LearningRenderMixin:
 
         frame = self._obter_frame_animado(frame_paths, indice)
         if frame:
-            self.screen.blit(frame, (0, 0))
+            self._desenhar_fundo_aprendizado()
+            video_rect = pygame.Rect(0, 0, 900, 500)
+            video_rect.center = (WINDOW.width // 2, WINDOW.height // 2)
+            moldura_rect = video_rect.inflate(24, 24)
+            pygame.draw.rect(self.screen, (0, 0, 0), moldura_rect, border_radius=8)
+            pygame.draw.rect(self.screen, _VERDE_CLARO, moldura_rect, width=8, border_radius=8)
+            frame_menor = pygame.transform.scale(frame, video_rect.size)
+            self.screen.blit(frame_menor, video_rect.topleft)
 
         fps = float(segmento.get("fps", 24))
         self.mundo9_cutscene_frame_index = indice
@@ -231,12 +238,14 @@ class LearningRenderMixin:
         linhas = []
         for paragrafo in paragrafos:
             linhas.extend(quebrar_texto(paragrafo, font, largura_texto))
-            linhas.append("")
-        if linhas and linhas[-1] == "":
+            linhas.append(None)
+        if linhas and linhas[-1] is None:
             linhas.pop()
 
         linha_altura = font.get_linesize() + 3
-        panel_h = min(560, max(220, len(linhas) * linha_altura + 52))
+        quebra_altura = 8
+        altura_texto = sum(quebra_altura if linha is None else linha_altura for linha in linhas)
+        panel_h = min(560, max(220, altura_texto + 52))
         panel_rect = pygame.Rect(WINDOW.width // 2 - 500, 145, 1000, panel_h)
         panel = pygame.Surface(panel_rect.size, pygame.SRCALPHA)
         pygame.draw.rect(panel, (0, 0, 0, 130), panel.get_rect(), border_radius=8)
@@ -246,12 +255,14 @@ class LearningRenderMixin:
         y = panel_rect.y + 26
         max_y = panel_rect.bottom - 24
         for linha in linhas:
+            if linha is None:
+                y += quebra_altura
+                continue
             if y + linha_altura > max_y:
                 break
-            if linha:
-                sombra = font.render(linha, True, (0, 0, 0))
-                self.screen.blit(sombra, (panel_rect.x + 72 + 2, y + 2))
-                self.screen.blit(font.render(linha, True, _BRANCO), (panel_rect.x + 72, y))
+            sombra = font.render(linha, True, (0, 0, 0))
+            self.screen.blit(sombra, (panel_rect.x + 72 + 2, y + 2))
+            self.screen.blit(font.render(linha, True, _BRANCO), (panel_rect.x + 72, y))
             y += linha_altura
 
     def _renderizar_segmento_exercicio(self, segmento):

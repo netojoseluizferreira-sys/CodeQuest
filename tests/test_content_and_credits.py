@@ -296,6 +296,7 @@ def test_carregar_aula_mundo_9_tem_aula_cutscene_e_textos_finais():
     assert aula["trilha"][1]["frames_dir"] == "mundo_9_cutscene_frames"
     assert aula["trilha"][1]["audio"] == "mundo_9_cutscene.mp3"
     assert "Faísca" in aula["trilha"][2]["conteudo"][1]
+    assert len(aula["trilha"][2]["conteudo"]) == 6
     assert aula["trilha"][3]["titulo"] == "Agradecimentos"
     assert (DATA_DIR / "music" / "mundo_9_cutscene.mp3").is_file()
     assert len(list((DATA_DIR / "mundo_9_cutscene_frames").glob("*.jpg"))) == 240

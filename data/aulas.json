@@ -649,12 +649,8 @@
           "conteudo": [
             "Parabéns, [nome do jogador].",
             "Faísca atravessou o Arquipélago de Bythos ao seu lado. Cada módulo, cada guardião, cada desafio, ele encarou tudo com você. Juntos, vocês chegaram até onde poucos chegam.",
-            "Mas, no último mundo, Faísca cometeu um erro.",
-            "Ele entendeu a recursividade tarde demais.",
-            "Esqueceu o caso base.",
-            "E agora está preso dentro de uma chamada que nunca retorna.",
-            "O portal se abriu para você.",
-            "Mas Faísca ficou para trás.",
+            "Mas, no último mundo, Faísca cometeu um erro. Ele entendeu a recursividade tarde demais. Esqueceu o caso base.",
+            "E agora está preso dentro de uma chamada que nunca retorna. O portal se abriu para você. Mas Faísca ficou para trás.",
             "Será que ele conseguirá encontrar uma condição de parada?",
             "Será que algum dia ele voltará para casa?"
           ]
