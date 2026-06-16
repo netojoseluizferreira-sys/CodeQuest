@@ -7,7 +7,7 @@ import pygame
 from pygame_client.menu_config import _BRANCO, _VERDE, _VERDE_CLARO
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
-from pygame_client.ui import desenhar_texto_centralizado, quebrar_texto
+from pygame_client.ui import desenhar_texto_centralizado, quebrar_texto, quebrar_texto_multilinha
 
 
 class LearningRenderMixin:
@@ -434,7 +434,7 @@ class LearningRenderMixin:
         if self.status_kind in {"success", "error"}:
             color = PALETTE.success if self.status_kind == "success" else PALETTE.error
             font = self.font_hub_subtitle if self.status_kind == "error" else self.font_body
-            linhas = quebrar_texto(self.status_message, font, self.content_width - 80)
+            linhas = quebrar_texto_multilinha(self.status_message, font, self.content_width - 80)
             linha_altura = font.get_linesize()
             if self.status_kind == "error":
                 texto_y = y - (len(linhas) * linha_altura) // 2

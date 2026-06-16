@@ -6,7 +6,7 @@ os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
 import pygame
 
-from pygame_client.ui import Button, quebrar_texto
+from pygame_client.ui import Button, quebrar_texto, quebrar_texto_multilinha
 from pygame_client.menu_learning_rendering import LearningRenderMixin
 
 
@@ -35,6 +35,14 @@ def test_quebrar_texto_retorna_texto_original_quando_sem_palavras():
     fonte = pygame.font.Font(None, 24)
 
     assert quebrar_texto("", fonte, 120) == [""]
+
+
+def test_quebrar_texto_multilinha_preserva_quebras_explicitas():
+    fonte = pygame.font.Font(None, 24)
+
+    linhas = quebrar_texto_multilinha("Conquista desbloqueada\nNome\nVá ao perfil", fonte, 300)
+
+    assert linhas == ["Conquista desbloqueada", "Nome", "Vá ao perfil"]
 
 
 def test_button_handle_event_executa_acao_ao_clicar_dentro():

@@ -331,7 +331,7 @@ class NavigationMixin:
         self.resposta_texto = ""
         self.exercicio_respondido = False
         self._pular_exercicios_concluidos()
-        self._definir_status("Continue sua jornada.")
+        self._definir_status("")
         if self._segmento_atual() is None:
             self.screen_name = "complete"
 
@@ -348,7 +348,7 @@ class NavigationMixin:
             self.resposta_texto = ""
             self.exercicio_respondido = False
             self._pular_exercicios_concluidos()
-            self._definir_status("Próximo desafio.")
+            self._definir_status("")
 
     def _responder_texto_livre(self):
         """Valida que o campo de resposta não está vazio e encaminha para _responder_exercicio."""

@@ -207,6 +207,63 @@ def test_pula_bloco_concluido_mas_preserva_texto_de_aula(monkeypatch):
     assert app.screen_name == "lesson"
 
 
+def test_mensagem_conquista_desbloqueada_usa_tres_linhas():
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+
+    mensagem = app._mensagem_conquistas_desbloqueadas([{"nome": "Melhor professor da UFAL"}])
+
+    assert mensagem == (
+        "Conquista desbloqueada!\n"
+        "Melhor professor da UFAL\n"
+        "Vá ao perfil para visualizar."
+    )
+
+
+def test_avancar_exercicio_nao_exibe_texto_generico_de_proximo_desafio(monkeypatch):
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: Usuario(nome="Ada", idade=12))
+    monkeypatch.setattr(menu_navigation, "exercicio_foi_concluido", lambda *_args: False)
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = Usuario(nome="Ada", idade=12)
+    app.mundo_ativo = "mundo_1"
+    app.aula = {"trilha": [{"tipo": "exercicios", "exercicios": ["1", "2"]}]}
+    app.trilha_indice = 0
+    app.exercicio_indice = 0
+    app.resposta_texto = "ok"
+    app.exercicio_respondido = True
+    app.status_message = "mensagem antiga"
+    app.status_kind = "success"
+    app.screen_name = "lesson"
+
+    app._avancar_exercicio()
+
+    assert app.exercicio_indice == 1
+    assert app.status_message == ""
+    assert "Próximo desafio" not in app.status_message
+
+
+def test_avancar_segmento_nao_exibe_texto_generico_de_jornada(monkeypatch):
+    monkeypatch.setattr(menu_navigation, "carregar_usuario", lambda: Usuario(nome="Ada", idade=12))
+
+    app = menu_app.CodeQuestPygameMenu.__new__(menu_app.CodeQuestPygameMenu)
+    app.usuario = Usuario(nome="Ada", idade=12)
+    app.mundo_ativo = "mundo_1"
+    app.aula = {"trilha": [{"tipo": "aula"}, {"tipo": "aula"}]}
+    app.trilha_indice = 0
+    app.exercicio_indice = 0
+    app.resposta_texto = "ok"
+    app.exercicio_respondido = True
+    app.status_message = "mensagem antiga"
+    app.status_kind = "success"
+    app.screen_name = "lesson"
+
+    app._avancar_segmento()
+
+    assert app.trilha_indice == 1
+    assert app.status_message == ""
+    assert "Continue sua jornada" not in app.status_message
+
+
 def test_iniciar_mundo_2_define_estado_da_aula(monkeypatch):
     usuario = Usuario(nome="Ada", idade=12)
     aula = {"titulo": "Aula 2", "trilha": [{"tipo": "aula", "conteudo": ["Texto"]}]}

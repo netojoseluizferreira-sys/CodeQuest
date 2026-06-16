@@ -9,7 +9,7 @@ from backend.xp_system import xp_para_proximo_nivel
 from pygame_client.menu_config import CUTSCENE_TEXTS, _BRANCO, _VERDE, _VERDE_CLARO
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
-from pygame_client.ui import quebrar_texto
+from pygame_client.ui import quebrar_texto, quebrar_texto_multilinha
 from utils.database import carregar_usuario, listar_conquistas_com_estado
 
 
@@ -274,7 +274,7 @@ class RenderMixin:
         """
         color = PALETTE.success if self.status_kind == "success" else PALETTE.error
         font = self.font_hub_subtitle if self.status_kind == "error" else self.font_status_success
-        linhas = quebrar_texto(self.status_message, font, WINDOW.width - 200)
+        linhas = quebrar_texto_multilinha(self.status_message, font, WINDOW.width - 200)
         linha_altura = font.get_linesize()
         if self.status_kind == "error":
             texto_y = y - (len(linhas) * linha_altura) // 2

@@ -140,3 +140,11 @@ def quebrar_texto(texto, font, largura_maxima):
         linhas.append(linha_atual)
 
     return linhas or [texto]
+
+
+def quebrar_texto_multilinha(texto, font, largura_maxima):
+    """Quebra texto preservando quebras de linha explicitas."""
+    linhas = []
+    for parte in str(texto).splitlines() or [""]:
+        linhas.extend(quebrar_texto(parte, font, largura_maxima))
+    return linhas
