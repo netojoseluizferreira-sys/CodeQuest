@@ -124,9 +124,9 @@ Cada exercício começa valendo 10 XP. A cada erro, o ganho potencial cai 2 pont
 
 Exercícios já concluídos não concedem XP novamente.
 
-O nível do jogador vai de 1 a 10. Os limiares são calculados dinamicamente a partir
-do XP máximo disponível nos mundos implementados, então o nível máximo acompanha a
-expansão do conteúdo sem depender de valores fixos no código.
+O nível do jogador vai de 1 a 5, alinhado ao teto atual de 1200 XP:
+nível 1 até 100 XP, nível 2 até 200 XP, nível 3 até 300 XP, nível 4 até
+600 XP e nível 5 até 1200 XP.
 
 ## Conquistas
 
