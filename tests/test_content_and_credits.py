@@ -1,5 +1,8 @@
 """Testes de carregamento de conteúdo pedagógico e créditos."""
 
+import json
+from pathlib import Path
+
 from pygame_client.content import (
     carregar_aula_pygame,
     carregar_exercicios_pygame,
@@ -7,6 +10,10 @@ from pygame_client.content import (
     obter_exercicio,
 )
 from pygame_client.credits import obter_linhas_creditos
+
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+DATA_DIR = ROOT_DIR / "data"
 
 
 def test_carregar_aula_pygame_retorna_aula_existente():
@@ -271,6 +278,25 @@ def test_carregar_exercicios_mundo_8():
     assert obter_exercicio(exercicios, 3)["tipo"] == "completar"
     assert obter_exercicio(exercicios, 11)["resposta"] == 3
     assert obter_exercicio(exercicios, 15)["resposta"] == 2
+
+
+def test_mundos_3_a_8_usam_fundos_tematicos_com_overlay_leve():
+    mundos = json.loads((DATA_DIR / "mundos.json").read_text(encoding="utf-8"))
+
+    fundos_esperados = {
+        "mundo_3": ("mundo_3_background.jpeg", 120),
+        "mundo_4": ("mundo_4_background.jpeg", 105),
+        "mundo_5": ("mundo_5_background.jpeg", 100),
+        "mundo_6": ("mundo_6_background.jpeg", 115),
+        "mundo_7": ("mundo_7_background.jpeg", 105),
+        "mundo_8": ("mundo_8_background.jpeg", 125),
+    }
+
+    for mundo_id, (background, overlay_alpha) in fundos_esperados.items():
+        assert mundos[mundo_id]["background"] == background
+        assert mundos[mundo_id]["overlay_alpha"] == overlay_alpha
+        assert 90 <= overlay_alpha <= 130
+        assert (DATA_DIR / background).is_file()
 
 
 def test_corrigir_conteudo_preserva_tipos_e_corrige_recursivamente():

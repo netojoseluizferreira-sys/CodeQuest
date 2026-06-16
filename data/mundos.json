@@ -29,8 +29,8 @@
     "implementado": true,
     "requer": "mundo_2",
     "aula_inicial": "aula_1",
-    "background": "mundo_2_background.jpeg",
-    "overlay_alpha": 185,
+    "background": "mundo_3_background.jpeg",
+    "overlay_alpha": 120,
     "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_4": {
@@ -41,8 +41,8 @@
     "implementado": true,
     "requer": "mundo_3",
     "aula_inicial": "aula_1",
-    "background": "mundo_2_background.jpeg",
-    "overlay_alpha": 185,
+    "background": "mundo_4_background.jpeg",
+    "overlay_alpha": 105,
     "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_5": {
@@ -53,8 +53,8 @@
     "implementado": true,
     "requer": "mundo_4",
     "aula_inicial": "aula_1",
-    "background": "mundo_2_background.jpeg",
-    "overlay_alpha": 185,
+    "background": "mundo_5_background.jpeg",
+    "overlay_alpha": 100,
     "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_6": {
@@ -65,8 +65,8 @@
     "implementado": true,
     "requer": "mundo_5",
     "aula_inicial": "aula_1",
-    "background": "mundo_2_background.jpeg",
-    "overlay_alpha": 185,
+    "background": "mundo_6_background.jpeg",
+    "overlay_alpha": 115,
     "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_7": {
@@ -77,8 +77,8 @@
     "implementado": true,
     "requer": "mundo_6",
     "aula_inicial": "aula_1",
-    "background": "mundo_2_background.jpeg",
-    "overlay_alpha": 185,
+    "background": "mundo_7_background.jpeg",
+    "overlay_alpha": 105,
     "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_8": {
@@ -89,8 +89,8 @@
     "implementado": true,
     "requer": "mundo_7",
     "aula_inicial": "aula_1",
-    "background": "mundo_2_background.jpeg",
-    "overlay_alpha": 185,
+    "background": "mundo_8_background.jpeg",
+    "overlay_alpha": 125,
     "exercicios_obrigatorios": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   },
   "mundo_9": {
