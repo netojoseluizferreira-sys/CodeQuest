@@ -25,6 +25,6 @@ CUTSCENE_TEXTS = [
     "De volta ao quarto, deixou o pen-drive de lado e voltou ao que estava fazendo. Ainda tinha muito jogo pela frente.",
     "O cansaço começou a tomar conta e, pouco a pouco, Faísca sentia seus olhos ficarem mais pesados. Era hora de descansar.",
     "Ele desligou o monitor e se levantou da cadeira, pronto para ir dormir. Ao se levantar, tropeçou em algo no chão. Era o pen-drive. Olhou para ele por alguns segundos, intrigado e...",
-    "CATAPLÉFITE!!! Assim que conectou o pen-drive, a tela acendeu sozinha. Letras vermelhas piscavam na tela: ERRO! Você está sendo transferido para o Arquipélago de Bythos...",
+    "CATAPLÓFT!!! Assim que conectou o pen-drive, a tela acendeu sozinha. Letras vermelhas piscavam na tela: ERRO! Você está sendo transferido para o Arquipélago de Bythos...",
     "Antes que Faísca pudesse reagir, uma luz verde brilhante começou a engoli-lo. Ele sentiu seu corpo sendo puxado, sugado para dentro da tela do computador. Tudo ficou escuro. Ele estava sendo transferido para outra dimensão.",
 ]
