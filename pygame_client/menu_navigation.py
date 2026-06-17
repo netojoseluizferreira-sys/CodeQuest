@@ -185,6 +185,12 @@ class NavigationMixin:
         Retorna:
             str: Texto orientando o jogador a ver o perfil ou seguir adiante.
         """
+        if self.mundo_ativo == "mundo_9":
+            return (
+                "Volte aos mundos para rever as aulas. A jornada por aqui já terminou, "
+                "mas a jornada pela programação ainda é bem longa."
+            )
+
         return (
             f"Você completou o {nome_mundo(self.mundo_ativo)}. Agora pode visitar o perfil para ver seu progresso "
             f"ou seguir para o {proximo_label} e continuar sua jornada."

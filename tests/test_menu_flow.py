@@ -427,6 +427,10 @@ def test_conclusao_do_mundo_9_aponta_para_mundos():
 
     assert label == "Mundos"
     assert callable(acao)
+    texto = app._texto_conclusao_mundo(label)
+    assert "Volte aos mundos" in texto
+    assert "jornada por aqui já terminou" in texto
+    assert "jornada pela programação ainda é bem longa" in texto
 
 
 def test_contexto_musical_diferencia_aula_e_exercicio():

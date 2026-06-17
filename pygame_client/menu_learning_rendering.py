@@ -286,19 +286,20 @@ class LearningRenderMixin:
         self.screen.blit(subtitulo_sombra, subtitulo_sombra.get_rect(center=(WINDOW.width // 2 + 2, 130)))
         self.screen.blit(subtitulo_surface, subtitulo_surface.get_rect(center=(WINDOW.width // 2, 128)))
 
-        panel_rect = pygame.Rect(WINDOW.width // 2 - 505, 175, 1010, 430)
+        panel_rect = pygame.Rect(0, 0, 960, 330)
+        panel_rect.center = (WINDOW.width // 2, WINDOW.height // 2)
         panel = pygame.Surface(panel_rect.size, pygame.SRCALPHA)
         pygame.draw.rect(panel, (0, 0, 0, 142), panel.get_rect(), border_radius=10)
         pygame.draw.rect(panel, (*_VERDE_CLARO, 170), panel.get_rect(), width=4, border_radius=10)
         self.screen.blit(panel, panel_rect.topleft)
 
         nomes = ("Mayanderson", "Neto", "Anthony")
-        badge_w = 250
-        badge_h = 54
-        gap = 28
+        badge_w = 230
+        badge_h = 48
+        gap = 24
         total_w = len(nomes) * badge_w + (len(nomes) - 1) * gap
         x = WINDOW.width // 2 - total_w // 2
-        y = panel_rect.y + 34
+        y = panel_rect.y + 24
         for nome in nomes:
             badge = pygame.Rect(x, y, badge_w, badge_h)
             pygame.draw.rect(self.screen, (18, 72, 36), badge, border_radius=8)
@@ -307,8 +308,8 @@ class LearningRenderMixin:
             self.screen.blit(surface, surface.get_rect(center=badge.center))
             x += badge_w + gap
 
-        intro_linhas = quebrar_texto(segmento.get("conteudo", [""])[0], self.font_lesson_body, 840)
-        intro_y = panel_rect.y + 98
+        intro_linhas = quebrar_texto(segmento.get("conteudo", [""])[0], self.font_lesson_body, 800)
+        intro_y = panel_rect.y + 82
         for linha in intro_linhas:
             sombra = self.font_lesson_body.render(linha, True, (0, 0, 0))
             texto = self.font_lesson_body.render(linha, True, _VERDE_CLARO)
@@ -326,7 +327,7 @@ class LearningRenderMixin:
 
         linha_altura = texto_font.get_linesize() + 3
         quebra_altura = 9
-        texto_y = max(panel_rect.y + 164, intro_y + 16)
+        texto_y = max(panel_rect.y + 142, intro_y + 10)
         for linha in linhas:
             if linha is None:
                 texto_y += quebra_altura
@@ -340,8 +341,9 @@ class LearningRenderMixin:
         rodape = "E que sua jornada esteja apenas começando."
         rodape_sombra = self.font_status_success.render(rodape, True, (0, 0, 0))
         rodape_surface = self.font_status_success.render(rodape, True, _VERDE_CLARO)
-        self.screen.blit(rodape_sombra, rodape_sombra.get_rect(center=(WINDOW.width // 2 + 2, 655)))
-        self.screen.blit(rodape_surface, rodape_surface.get_rect(center=(WINDOW.width // 2, 653)))
+        rodape_y = panel_rect.bottom + 42
+        self.screen.blit(rodape_sombra, rodape_sombra.get_rect(center=(WINDOW.width // 2 + 2, rodape_y + 2)))
+        self.screen.blit(rodape_surface, rodape_surface.get_rect(center=(WINDOW.width // 2, rodape_y)))
 
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercício atual dentro de um bloco de prática.
