@@ -1,6 +1,6 @@
 """Fluxos de navegação, mundos, usuário e respostas do menu Pygame."""
 
-from backend.worlds import MUNDO_2_ID, MUNDO_3_ID, MUNDO_INICIAL, aula_inicial, nome_mundo, proximo_mundo
+from backend.worlds import MUNDO_2_ID, MUNDO_INICIAL, aula_inicial, nome_mundo, proximo_mundo
 from pygame_client.content import carregar_aula_pygame, carregar_exercicios_pygame, obter_exercicio
 from pygame_client.learning_progress import registrar_resposta
 from pygame_client.menu_config import CUTSCENE_TEXTS
@@ -157,14 +157,6 @@ class NavigationMixin:
             kind,
         )
 
-    def _mostrar_mundo_3_em_breve(self):
-        """Mostra o aviso de indisponibilidade do Mundo 3 na tela de conclusão.
-
-        Retorna:
-            None: Atualiza a mensagem de status exibida na tela atual.
-        """
-        self._mostrar_mundo_em_breve(MUNDO_3_ID)
-
     def _proximo_mundo_conclusao(self):
         """Define o botão de próximo mundo exibido na tela de conclusão.
 
@@ -247,7 +239,7 @@ class NavigationMixin:
         """Carrega uma aula de mundo e inicia o fluxo visual de aprendizagem.
 
         Recebe:
-            mundo (str): Chave do mundo em data/aulas.json e data/exercicios.json.
+            mundo (str): Chave do mundo nos JSONs de data/content.
             aula_id (str): Chave da aula dentro do mundo.
         """
         self.usuario = carregar_usuario()

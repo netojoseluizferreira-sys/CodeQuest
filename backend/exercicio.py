@@ -1,58 +1,54 @@
-"""Leitura dos arquivos JSON de aulas e exercícios do CodeQuest."""
+"""Leitura dos arquivos JSON de aulas e exercicios do CodeQuest."""
 
 import json
-import os
+
+from utils.asset_paths import content_path
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+AULAS_PATH = content_path("aulas.json")
+EXERCICIOS_PATH = content_path("exercicios.json")
 
 
 def carregar_aula(mundo, aula_id):
-    """Lê e retorna os dados de uma aula do arquivo data/aulas.json.
+    """Retorna uma aula configurada para o mundo informado.
 
-    Recebe:
-        mundo (str): Chave de primeiro nível no JSON, ex.: "mundo_1".
-        aula_id (str): Chave de segundo nível dentro do mundo, ex.: "aula_1".
+    Args:
+        mundo: Identificador do mundo, como ``"mundo_1"``.
+        aula_id: Identificador da aula dentro do mundo, como ``"aula_1"``.
 
-    Retorna:
-        dict | None: Dicionário com os dados da aula (título, trilha, conteúdo)
-        ou None quando o arquivo não existir ou as chaves não forem encontradas.
-        Imprime uma mensagem de erro descritiva no stdout em caso de falha.
+    Returns:
+        Dicionario da aula quando existe; ``None`` quando o arquivo ou as chaves
+        nao forem encontrados.
     """
-    caminho_aula = os.path.join(BASE_DIR, "data", "aulas.json")
-
     try:
-        with open(caminho_aula, "r", encoding="utf-8") as arquivo:
+        with open(AULAS_PATH, "r", encoding="utf-8") as arquivo:
             dados = json.load(arquivo)
             return dados[mundo][aula_id]
     except FileNotFoundError:
-        print(f"ERRO: Arquivo não encontrado em: {os.path.abspath(caminho_aula)}")
+        print(f"ERRO: Arquivo nao encontrado em: {AULAS_PATH}")
         return None
     except KeyError:
-        print(f"ERRO: Mundo '{mundo}' ou aula '{aula_id}' não encontrado")
+        print(f"ERRO: Mundo '{mundo}' ou aula '{aula_id}' nao encontrado")
         return None
 
 
 def carregar_exercicios(mundo):
-    """Lê e retorna os exercícios de um mundo do arquivo data/exercicios.json.
+    """Retorna os exercicios configurados para um mundo.
 
-    Recebe:
-        mundo (str): Chave de primeiro nível no JSON, ex.: "mundo_1".
+    Args:
+        mundo: Identificador do mundo, como ``"mundo_1"``.
 
-    Retorna:
-        dict: Dicionário de exercícios do mundo indexado por ID string,
-        ou dicionário vazio quando o mundo não existir, o arquivo não for
-        encontrado ou o JSON estiver malformado. Imprime mensagem de erro no stdout.
+    Returns:
+        Dicionario indexado por ID de exercicio. Retorna vazio quando o mundo
+        nao existe, o arquivo nao existe ou o JSON esta invalido.
     """
-    caminho_exercicios = os.path.join(BASE_DIR, "data", "exercicios.json")
-
     try:
-        with open(caminho_exercicios, "r", encoding="utf-8") as arquivo:
+        with open(EXERCICIOS_PATH, "r", encoding="utf-8") as arquivo:
             dados = json.load(arquivo)
             return dados.get(mundo, {})
     except FileNotFoundError:
-        print(f"ERRO: Arquivo não encontrado em: {os.path.abspath(caminho_exercicios)}")
+        print(f"ERRO: Arquivo nao encontrado em: {EXERCICIOS_PATH}")
         return {}
     except json.JSONDecodeError:
-        print(f"ERRO: Arquivo JSON inválido em: {caminho_exercicios}")
+        print(f"ERRO: Arquivo JSON invalido em: {EXERCICIOS_PATH}")
         return {}

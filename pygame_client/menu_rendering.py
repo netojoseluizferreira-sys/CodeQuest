@@ -1,8 +1,6 @@
 """Renderização das telas gerais do CodeQuest em Pygame."""
 
 import math
-import os
-
 import pygame
 
 from backend.xp_system import xp_para_proximo_nivel
@@ -10,6 +8,7 @@ from pygame_client.menu_config import CUTSCENE_TEXTS, _BRANCO, _VERDE, _VERDE_CL
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
 from pygame_client.ui import quebrar_texto, quebrar_texto_multilinha
+from utils.asset_paths import data_path
 from utils.database import carregar_usuario, listar_conquistas_com_estado
 
 
@@ -495,15 +494,14 @@ class RenderMixin:
         """Carrega e escala um icone de conquista usando cache local."""
         if not hasattr(self, "_achievement_image_cache"):
             self._achievement_image_cache = {}
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        caminho = os.path.join(base_dir, caminho_relativo)
+        caminho = data_path(caminho_relativo)
         chave = (caminho, tamanho)
         if chave in self._achievement_image_cache:
             return self._achievement_image_cache[chave]
-        if not os.path.exists(caminho):
+        if not caminho.exists():
             return None
 
-        imagem = pygame.image.load(caminho).convert_alpha()
+        imagem = pygame.image.load(str(caminho)).convert_alpha()
         imagem = pygame.transform.smoothscale(imagem, (tamanho, tamanho))
         self._achievement_image_cache[chave] = imagem
         return imagem

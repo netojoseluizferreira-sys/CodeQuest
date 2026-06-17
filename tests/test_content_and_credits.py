@@ -14,6 +14,10 @@ from pygame_client.credits import obter_linhas_creditos
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT_DIR / "data"
+CONTENT_DIR = DATA_DIR / "content"
+BACKGROUNDS_DIR = DATA_DIR / "images" / "backgrounds"
+VIDEO_DIR = DATA_DIR / "video"
+MUSIC_DIR = DATA_DIR / "audio" / "music"
 
 
 def test_carregar_aula_pygame_retorna_aula_existente():
@@ -293,17 +297,17 @@ def test_carregar_aula_mundo_9_tem_aula_cutscene_e_textos_finais():
     ]
     assert aula["trilha"][0]["titulo"] == "Recursividade"
     assert len(aula["trilha"][0]["conteudo"]) == 3
-    assert aula["trilha"][1]["frames_dir"] == "mundo_9_cutscene_frames"
+    assert aula["trilha"][1]["frames_dir"] == "mundo_9_cutscene"
     assert aula["trilha"][1]["audio"] == "mundo_9_cutscene.mp3"
     assert "Faísca" in aula["trilha"][2]["conteudo"][1]
     assert len(aula["trilha"][2]["conteudo"]) == 6
     assert aula["trilha"][3]["titulo"] == "Agradecimentos"
-    assert (DATA_DIR / "music" / "mundo_9_cutscene.mp3").is_file()
-    assert len(list((DATA_DIR / "mundo_9_cutscene_frames").glob("*.jpg"))) == 240
+    assert (MUSIC_DIR / "mundo_9_cutscene.mp3").is_file()
+    assert len(list((VIDEO_DIR / "mundo_9_cutscene").glob("*.jpg"))) == 240
 
 
 def test_mundos_3_a_9_usam_fundos_tematicos_com_overlay_leve():
-    mundos = json.loads((DATA_DIR / "mundos.json").read_text(encoding="utf-8"))
+    mundos = json.loads((CONTENT_DIR / "mundos.json").read_text(encoding="utf-8"))
 
     fundos_esperados = {
         "mundo_3": ("mundo_3_background.jpeg", 120),
@@ -319,7 +323,7 @@ def test_mundos_3_a_9_usam_fundos_tematicos_com_overlay_leve():
         assert mundos[mundo_id]["background"] == background
         assert mundos[mundo_id]["overlay_alpha"] == overlay_alpha
         assert 90 <= overlay_alpha <= 130
-        assert (DATA_DIR / background).is_file()
+        assert (BACKGROUNDS_DIR / background).is_file()
 
 
 def test_corrigir_conteudo_preserva_tipos_e_corrige_recursivamente():

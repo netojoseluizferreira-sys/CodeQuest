@@ -1,15 +1,14 @@
 """Repositorio SQLite e configuracao das conquistas do jogador."""
 
 import json
-import os
 from contextlib import closing
 
+from utils.asset_paths import content_path
 from utils.database_connection import conectar, inicializar_banco
 from utils.user_repository import obter_usuario_id
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONQUISTAS_CONFIG_PATH = os.path.join(BASE_DIR, "data", "conquistas.json")
+CONQUISTAS_CONFIG_PATH = content_path("conquistas.json")
 
 
 def carregar_conquistas_config():

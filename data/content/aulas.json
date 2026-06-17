@@ -638,7 +638,7 @@
           "tipo": "cutscene_video",
           "id": "cutscene_final",
           "titulo": "A Última Chamada",
-          "frames_dir": "mundo_9_cutscene_frames",
+          "frames_dir": "mundo_9_cutscene",
           "audio": "mundo_9_cutscene.mp3",
           "fps": 24
         },

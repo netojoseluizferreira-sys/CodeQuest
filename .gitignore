@@ -1,5 +1,6 @@
 **/__pycache__/
 data/*.json
+data/content/*.json
 data/*.db
 data/*.db-shm
 data/*.db-wal
@@ -7,12 +8,11 @@ data/*.sqlite
 data/*.sqlite3
 data/*.log
 
-!data/.gitkeep
-!data/aulas.json
-!data/conquistas.json
-!data/exercicios.json
-!data/achievements/
-!data/achievements/*.png
+!data/content/
+!data/content/*.json
+!data/images/
+!data/images/achievements/
+!data/images/achievements/*.png
 
 __pycache__/
 *.py[cod]

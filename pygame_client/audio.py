@@ -6,6 +6,8 @@ from array import array
 
 import pygame
 
+from utils.asset_paths import MUSIC_DIR
+
 
 TRACK_FILES = {
     "start": "terran_1.mp3",
@@ -30,11 +32,10 @@ class AudioController:
             sample_rate (int): Taxa de amostragem em Hz usada na geração de áudio.
             O mixer só é aberto quando inicializar() for chamado.
             music_dir (str | None): Diretório com os arquivos MP3. Quando None,
-            usa data/music na raiz do projeto.
+            usa data/audio/music na raiz do projeto.
         """
         self.sample_rate = sample_rate
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.music_dir = music_dir or os.path.join(base_dir, "data", "music")
+        self.music_dir = music_dir or str(MUSIC_DIR)
         self.enabled = False
         self.music_channel = None
         self.button_sound = None

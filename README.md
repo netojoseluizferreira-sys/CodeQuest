@@ -1,37 +1,28 @@
 # CodeQuest
 
-**Versão 1.5**
+**Versao 2.0**
 
-CodeQuest é um jogo educacional em Pygame para ensinar lógica de programação e Python por meio de aulas curtas, exercícios, XP, níveis, persistência local e progressão por mundos no Arquipélago de Bythos.
+CodeQuest e um jogo educacional em Pygame para ensinar logica de programacao e Python por meio de aulas curtas, exercicios, XP, niveis, conquistas, persistencia local e progressao por mundos no Arquipelago de Bythos.
 
 ## Status
 
-O projeto está em versão jogável local, centralizado no Pygame. A antiga abordagem com Streamlit/API foi removida do fluxo principal; o jogo agora roda por `app.py`, usa SQLite para salvar progresso e mantém aulas/exercícios em JSON versionado.
+O projeto esta em versao jogavel local. O fluxo principal roda por `app.py`, usa SQLite para salvar progresso e mantem conteudo pedagogico em JSON versionado. A abordagem antiga com Streamlit/API nao faz parte do fluxo atual.
 
-### Já Implementado
+## Ja Implementado
 
-- Menu inicial com Novo jogo, Continuar, Créditos e Sair.
-- Criação de personagem e hub de jornada.
-- Tela de perfil com nome, idade, XP, nível, progresso e conquistas visuais.
-- Cutscene inicial com imagens, texto e avanço manual.
-- Arquipélago de Bythos com seleção de mundos.
-- Mundo 1 completo com textos de aula e exercícios definidos na configuração.
-- Mundo 2 inicial: textos e exercícios no mesmo padrão visual do Mundo 1.
-- Bloqueio do Mundo 2 até o Mundo 1 estar marcado como concluído.
-- Exercícios concluídos são pulados ao reiniciar o app, preservando os textos de aula.
-- XP dinâmico: começa em 10, perde 2 por erro e respeita mínimo de 2 XP.
-- Níveis de 1 a 5 alinhados ao teto atual de 1200 XP.
-- Bloqueio de XP duplicado por exercício concluído.
-- Conquistas persistidas em SQLite, configuradas por `data/conquistas.json`.
-- Trilhas sonoras por contexto: menu, hub, cutscene, mundos, aula, exercícios, perfil e créditos.
-- Testes unitários em `tests/` cobrindo banco, XP, conteúdo, áudio, UI e fluxo de menu.
-- Documentação técnica em `docs/`.
-
-### Em Implementação
-
-- Expansão dos mundos 3 a 9.
-- Mais exercícios e textos de revisão.
-- Melhorias de acessibilidade visual e empacotamento para execução local mais simples.
+- Menu inicial com Novo jogo, Continuar, Creditos e Sair.
+- Criacao de personagem, hub de jornada, perfil e selecao de mundos.
+- Cutscene inicial, telas de aula, exercicios e encerramento do Mundo 9.
+- Mundos 1 a 9 implementados, incluindo recursividade e cutscene final.
+- Bloqueio/desbloqueio de mundos por metadados em JSON.
+- Exercicios concluidos sao pulados ao reiniciar o app, preservando textos de aula para revisao.
+- XP dinamico: 10 XP por acerto perfeito, perda de 2 XP por erro e piso de 2 XP.
+- Niveis de 1 a 5 alinhados ao teto atual de 1200 XP.
+- Bloqueio de XP duplicado por exercicio concluido.
+- Conquistas persistidas em SQLite e configuradas por `data/content/conquistas.json`.
+- Trilhas sonoras por contexto e cutscene final com audio proprio.
+- Testes unitarios em `tests/` cobrindo banco, XP, conteudo, conquistas, audio, UI e fluxo de menu.
+- Documentacao tecnica em `docs/`.
 
 ## Como Rodar
 
@@ -41,7 +32,7 @@ Crie e ative um ambiente virtual:
 python -m venv venv
 ```
 
-Instale as dependências:
+Instale as dependencias:
 
 ```bash
 pip install -r requirements.txt
@@ -62,51 +53,55 @@ CodeQuest/
 |   |-- achievements.py
 |   |-- exercicio.py
 |   |-- usuario.py
+|   |-- worlds.py
 |   `-- xp_system.py
 |-- data/
-|   |-- aulas.json
-|   |-- conquistas.json
-|   |-- exercicios.json
-|   |-- mundos.json
-|   |-- achievements/
-|   |-- cutscenes/
-|   |-- music/
-|   |-- hub_frames/
-|   |-- mundos_frames/
-|   |-- perfil_frames/
-|   |-- creditos_frames/
-|   `-- video_frames/
+|   |-- audio/
+|   |   `-- music/
+|   |-- content/
+|   |   |-- aulas.json
+|   |   |-- conquistas.json
+|   |   |-- exercicios.json
+|   |   `-- mundos.json
+|   |-- fonts/
+|   |-- images/
+|   |   |-- achievements/
+|   |   |-- backgrounds/
+|   |   `-- cutscenes/
+|   `-- video/
+|       |-- credits/
+|       |-- hub/
+|       |-- mundo_9_cutscene/
+|       |-- profile/
+|       |-- start/
+|       `-- worlds/
 |-- docs/
-|   `-- arquitetura.md
+|   |-- arquitetura.md
+|   `-- testes_pytest.md
 |-- pygame_client/
-|   |-- audio.py
-|   |-- content.py
-|   |-- credits.py
-|   |-- learning_progress.py
-|   |-- menu_app.py
-|   |-- menu_buttons.py
-|   |-- menu_config.py
-|   |-- menu_events.py
-|   |-- menu_learning_rendering.py
-|   |-- menu_navigation.py
-|   |-- menu_rendering.py
-|   |-- palette.py
-|   |-- settings.py
-|   `-- ui.py
 |-- tests/
 |-- utils/
+|   |-- asset_paths.py
+|   `-- ...
 |-- requirements.txt
 `-- README.md
 ```
 
-## Dados e Persistência
+## Dados e Persistencia
 
-Conteúdo versionado:
+Conteudo versionado:
 
-- `data/aulas.json`
-- `data/conquistas.json`
-- `data/exercicios.json`
-- `data/mundos.json`
+- `data/content/aulas.json`
+- `data/content/conquistas.json`
+- `data/content/exercicios.json`
+- `data/content/mundos.json`
+
+Assets versionados:
+
+- Fontes em `data/fonts/`.
+- Fundos e imagens em `data/images/`.
+- Frames de video em `data/video/`.
+- Musicas em `data/audio/music/`.
 
 Progresso local:
 
@@ -115,20 +110,20 @@ Progresso local:
 Tabelas principais:
 
 - `usuarios`: save ativo do jogador.
-- `exercicios_concluidos`: impede XP duplicado e permite pular exercícios já feitos.
-- `exercicio_erros`: registra erros por usuário, mundo e exercício para calcular XP potencial.
-- `mundos_concluidos`: registra conclusão de mundos por usuário e desbloqueia novos mundos.
-- `usuario_conquistas`: registra conquistas desbloqueadas por usuário sem duplicidade.
+- `exercicios_concluidos`: impede XP duplicado e permite pular exercicios ja feitos.
+- `exercicio_erros`: registra erros por usuario, mundo e exercicio para calcular XP potencial.
+- `mundos_concluidos`: registra conclusao de mundos por usuario e desbloqueia novos mundos.
+- `usuario_conquistas`: registra conquistas desbloqueadas por usuario sem duplicidade.
 
 ## Conquistas
 
-As conquistas iniciais são:
+As conquistas iniciais sao:
 
-- `melhor_professor_ufal`: desbloqueada ao criar usuário com variações normalizadas de Alexandre Barbosa, como `barbosa`, `alexandre`, `prof barbosa` e `alexandre barbosa`.
-- `fenomeno`: desbloqueada ao atingir o XP máximo do conteúdo implementado.
-- `quase_hexa`: desbloqueada ao concluir todo o conteúdo implementado com o XP mínimo possível.
+- `melhor_professor_ufal`: desbloqueada ao criar usuario com variacoes normalizadas de Alexandre Barbosa.
+- `fenomeno`: desbloqueada ao atingir o XP maximo do conteudo implementado.
+- `quase_hexa`: desbloqueada ao concluir todo o conteudo implementado com o XP minimo possivel.
 
-No perfil, conquistas bloqueadas usam `data/achievements/locked_question.png`; conquistas desbloqueadas mostram seu ícone real.
+No perfil, conquistas bloqueadas usam `data/images/achievements/locked_question.png`; conquistas desbloqueadas mostram seu icone real.
 
 ## Testes
 
@@ -136,14 +131,14 @@ No perfil, conquistas bloqueadas usam `data/achievements/locked_question.png`; c
 python -m pytest tests
 ```
 
-## Documentação Técnica
+Leia [docs/testes_pytest.md](docs/testes_pytest.md) para entender a organizacao dos testes e como criar novos casos.
 
-Veja [docs/arquitetura.md](docs/arquitetura.md) para detalhes sobre módulos, fluxo de telas, persistência, regras de XP e pontos de extensão.
+## Documentacao Tecnica
+
+Veja [docs/arquitetura.md](docs/arquitetura.md) para detalhes sobre modulos, fluxo de telas, persistencia, regras de XP e pontos de extensao.
 
 ## Roadmap
 
-- Implementar Mundo 3: Operadores.
-- Implementar mundos 4 a 9.
-- Adicionar mais feedback visual de progresso.
+- Polir acessibilidade visual e feedbacks de progresso.
 - Revisar licenciamento/autoria de assets externos.
-- Empacotar versão executável para distribuição local.
+- Empacotar uma versao executavel para distribuicao local.

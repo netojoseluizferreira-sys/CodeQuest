@@ -14,6 +14,13 @@ from pygame_client.menu_learning_rendering import LearningRenderMixin
 from pygame_client.menu_navigation import NavigationMixin
 from pygame_client.menu_rendering import RenderMixin
 from pygame_client.settings import WINDOW
+from utils.asset_paths import (
+    BACKGROUNDS_DIR,
+    CUTSCENE_IMAGES_DIR,
+    background_path,
+    font_path,
+    video_frames_dir,
+)
 from utils.database import carregar_usuario
 
 
@@ -25,7 +32,7 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
 
         Configura a janela 1280×800, o AudioController, as fontes PressStart2P,
         RammettoOne e WendyOne, os frames de vídeo de fundo (start, hub, créditos, perfil),
-        as imagens da cutscene (data/cutscenes/1-10.jpeg) e os atributos de estado
+        as imagens da cutscene em data/images/cutscenes e os atributos de estado
         de tela, campo ativo, cutscene fade e fluxo de aprendizagem.
         """
         pygame.init()
@@ -34,40 +41,39 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self.clock = pygame.time.Clock()
         self.audio = AudioController()
         self.audio.inicializar()
-        _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-        _wendyone = os.path.join(_data_dir, "WendyOne-Regular.ttf")
-        _pressstart = os.path.join(_data_dir, "PressStart2P-Regular.ttf")
-        _rammetto = os.path.join(_data_dir, "RammettoOne-Regular.ttf")
-        self.font_title = pygame.font.Font(_pressstart, 52)
-        self.font_title_large = pygame.font.Font(_pressstart, 64)
-        self.font_hub_subtitle = pygame.font.Font(_rammetto, 28)
-        self.font_subtitle = pygame.font.Font(_rammetto, 28)
+        _wendyone = font_path("WendyOne-Regular.ttf")
+        _pressstart = font_path("PressStart2P-Regular.ttf")
+        _rammetto = font_path("RammettoOne-Regular.ttf")
+        self.font_title = pygame.font.Font(str(_pressstart), 52)
+        self.font_title_large = pygame.font.Font(str(_pressstart), 64)
+        self.font_hub_subtitle = pygame.font.Font(str(_rammetto), 28)
+        self.font_subtitle = pygame.font.Font(str(_rammetto), 28)
         _titulo_w = sum(self.font_title_large.size(c)[0] for c in "CodeQuest") + 2 * 8
         _sub_size = 22
         _sub_texto = "Uma Jornada pelo Arquipélago de Bythos"
-        _font_sub = pygame.font.Font(_rammetto, _sub_size)
+        _font_sub = pygame.font.Font(str(_rammetto), _sub_size)
         while _font_sub.size(_sub_texto)[0] > _titulo_w and _sub_size > 8:
             _sub_size -= 1
-            _font_sub = pygame.font.Font(_rammetto, _sub_size)
+            _font_sub = pygame.font.Font(str(_rammetto), _sub_size)
         self.font_subtitle_small = _font_sub
-        self.font_start_btn = pygame.font.Font(_wendyone, 21)
-        self.font_welcome = pygame.font.Font(_wendyone, 20)
-        self.font_body = pygame.font.Font(_wendyone, 21)
-        self.font_small = pygame.font.Font(_wendyone, 17)
-        self.font_tiny = pygame.font.Font(_wendyone, 15)
-        self.font_block_title = pygame.font.Font(_rammetto, 16)
-        self.font_block_body = pygame.font.Font(_wendyone, 20)
-        self.font_credit_section = pygame.font.Font(_rammetto, 23)
-        self.font_credit_body_bold = pygame.font.Font(_wendyone, 22)
-        self.font_cutscene_text = pygame.font.Font(_wendyone, 26)
-        self.font_credit_body = pygame.font.Font(_wendyone, 22)
-        self.font_credit_small_bold = pygame.font.Font(_rammetto, 16)
-        self.font_credit_small_reg = pygame.font.Font(_wendyone, 20)
-        self.font_credit_quote = pygame.font.Font(_wendyone, 18)
-        self.font_credit_footer_bold = pygame.font.Font(_wendyone, 16)
-        self.font_status_success = pygame.font.Font(_wendyone, 24)
-        self.font_profile_label = pygame.font.Font(_rammetto, 19)
-        self.font_profile_value = pygame.font.Font(_wendyone, 38)
+        self.font_start_btn = pygame.font.Font(str(_wendyone), 21)
+        self.font_welcome = pygame.font.Font(str(_wendyone), 20)
+        self.font_body = pygame.font.Font(str(_wendyone), 21)
+        self.font_small = pygame.font.Font(str(_wendyone), 17)
+        self.font_tiny = pygame.font.Font(str(_wendyone), 15)
+        self.font_block_title = pygame.font.Font(str(_rammetto), 16)
+        self.font_block_body = pygame.font.Font(str(_wendyone), 20)
+        self.font_credit_section = pygame.font.Font(str(_rammetto), 23)
+        self.font_credit_body_bold = pygame.font.Font(str(_wendyone), 22)
+        self.font_cutscene_text = pygame.font.Font(str(_wendyone), 26)
+        self.font_credit_body = pygame.font.Font(str(_wendyone), 22)
+        self.font_credit_small_bold = pygame.font.Font(str(_rammetto), 16)
+        self.font_credit_small_reg = pygame.font.Font(str(_wendyone), 20)
+        self.font_credit_quote = pygame.font.Font(str(_wendyone), 18)
+        self.font_credit_footer_bold = pygame.font.Font(str(_wendyone), 16)
+        self.font_status_success = pygame.font.Font(str(_wendyone), 24)
+        self.font_profile_label = pygame.font.Font(str(_rammetto), 19)
+        self.font_profile_value = pygame.font.Font(str(_wendyone), 38)
         self.content_x = 150
         self.content_width = WINDOW.width - (self.content_x * 2)
         self.running = True
@@ -94,30 +100,29 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self._frame_cache = {}
         self._achievement_image_cache = {}
         self.achievement_slot_rects = []
-        _frames_dir = os.path.join(_data_dir, "video_frames")
+        _frames_dir = video_frames_dir("start")
         self.video_frame_paths = sorted(glob.glob(os.path.join(_frames_dir, "*.jpg")))
         self.video_frame_index = 0
         self.video_frame_timer = 0
         self.glow_timer = 0
         self.start_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         self.start_overlay.fill((0, 0, 0, 140))
-        _hub_frames_dir = os.path.join(_data_dir, "hub_frames")
+        _hub_frames_dir = video_frames_dir("hub")
         self.hub_frame_paths = sorted(glob.glob(os.path.join(_hub_frames_dir, "*.jpg")))
         self.hub_frame_index = 0
         self.hub_frame_timer = 0
         self.hub_glow_timer = 0
         self.hub_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         self.hub_overlay.fill((0, 0, 0, 140))
-        _creditos_frames_dir = os.path.join(_data_dir, "creditos_frames")
+        _creditos_frames_dir = video_frames_dir("credits")
         self.creditos_frame_paths = sorted(glob.glob(os.path.join(_creditos_frames_dir, "*.jpg")))
         self.creditos_frame_index = 0
         self.creditos_frame_timer = 0
-        _cutscenes_dir = os.path.join(_data_dir, "cutscenes")
         self.cutscene_images = []
         for _i in range(1, 11):
-            _cpath = os.path.join(_cutscenes_dir, f"{_i}.jpeg")
+            _cpath = CUTSCENE_IMAGES_DIR / f"{_i}.jpeg"
             if os.path.exists(_cpath):
-                _cimg = pygame.image.load(_cpath).convert()
+                _cimg = pygame.image.load(str(_cpath)).convert()
                 self.cutscene_images.append(pygame.transform.scale(_cimg, (900, 500)))
             else:
                 self.cutscene_images.append(None)
@@ -128,12 +133,12 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self._cutscene_prev_frame = None
         _cut_bg_path = None
         for _ext in ("jpeg", "jpg", "png"):
-            _p = os.path.join(_data_dir, f"imagem_cut.{_ext}")
+            _p = BACKGROUNDS_DIR / f"imagem_cut.{_ext}"
             if os.path.exists(_p):
                 _cut_bg_path = _p
                 break
         if _cut_bg_path:
-            _cbg = pygame.image.load(_cut_bg_path).convert()
+            _cbg = pygame.image.load(str(_cut_bg_path)).convert()
             self.cutscene_bg = pygame.transform.scale(_cbg, (WINDOW.width, WINDOW.height))
         else:
             self.cutscene_bg = None
@@ -143,24 +148,24 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
             _background = _mundo.get("background")
             if not _background:
                 continue
-            _bg_path = os.path.join(_data_dir, _background)
+            _bg_path = background_path(_background)
             if os.path.exists(_bg_path):
-                _bg = pygame.image.load(_bg_path).convert()
+                _bg = pygame.image.load(str(_bg_path)).convert()
                 self.world_backgrounds[_mundo["id"]] = pygame.transform.scale(_bg, (WINDOW.width, WINDOW.height))
                 _overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
                 _overlay.fill((0, 0, 0, int(_mundo.get("overlay_alpha", 185))))
                 self.world_overlays[_mundo["id"]] = _overlay
-        _perfil_frames_dir = os.path.join(_data_dir, "perfil_frames")
+        _perfil_frames_dir = video_frames_dir("profile")
         self.perfil_frame_paths = sorted(glob.glob(os.path.join(_perfil_frames_dir, "*.jpg")))
         self.perfil_frame_index = 0
         self.perfil_frame_timer = 0
         self.perfil_overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         self.perfil_overlay.fill((0, 0, 0, 120))
-        _mundos_frames_dir = os.path.join(_data_dir, "mundos_frames")
+        _mundos_frames_dir = video_frames_dir("worlds")
         self.mundos_frame_paths = sorted(glob.glob(os.path.join(_mundos_frames_dir, "*.jpg")))
         self.mundos_frame_index = 0
         self.mundos_frame_timer = 0
-        _mundo9_cutscene_dir = os.path.join(_data_dir, "mundo_9_cutscene_frames")
+        _mundo9_cutscene_dir = video_frames_dir("mundo_9_cutscene")
         self.mundo9_cutscene_frame_paths = sorted(glob.glob(os.path.join(_mundo9_cutscene_dir, "*.jpg")))
         self.mundo9_cutscene_frame_index = 0
         self.mundo9_cutscene_frame_acc = 0.0
@@ -169,10 +174,10 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
         self.mundos_overlay.fill((0, 0, 0, 150))
         self.mundos_glow_timer = 0
         self.lesson_glow_timer = 0
-        self.font_lesson_title = pygame.font.Font(_pressstart, 28)
-        self.font_lesson_practice_title = pygame.font.Font(_pressstart, 24)
-        self.font_lesson_content = pygame.font.Font(_wendyone, 20)
-        self.font_lesson_body = pygame.font.Font(_wendyone, 20)
+        self.font_lesson_title = pygame.font.Font(str(_pressstart), 28)
+        self.font_lesson_practice_title = pygame.font.Font(str(_pressstart), 24)
+        self.font_lesson_content = pygame.font.Font(str(_wendyone), 20)
+        self.font_lesson_body = pygame.font.Font(str(_wendyone), 20)
         _less_ov = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
         _less_ov.fill((0, 0, 0, 160))
         self.lesson_overlay = _less_ov

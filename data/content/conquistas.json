@@ -4,8 +4,8 @@
     "nome": "Melhor professor da UFAL",
     "dica": "Quem é o melhor professor da UFAL?",
     "descricao": "Desbloqueada ao criar um perfil com uma variação relacionada ao professor Alexandre Barbosa.",
-    "imagem_desbloqueada": "data/achievements/melhor_professor_ufal.png",
-    "imagem_bloqueada": "data/achievements/locked_question.png",
+    "imagem_desbloqueada": "images/achievements/melhor_professor_ufal.png",
+    "imagem_bloqueada": "images/achievements/locked_question.png",
     "secreta": true
   },
   {
@@ -13,8 +13,8 @@
     "nome": "E é o Fenômeno é?",
     "dica": "Faça história.",
     "descricao": "Desbloqueada ao atingir o XP máximo possível do conteúdo disponível.",
-    "imagem_desbloqueada": "data/achievements/fenomeno.png",
-    "imagem_bloqueada": "data/achievements/locked_question.png",
+    "imagem_desbloqueada": "images/achievements/fenomeno.png",
+    "imagem_bloqueada": "images/achievements/locked_question.png",
     "secreta": false
   },
   {
@@ -22,8 +22,8 @@
     "nome": "Faltou isso aqui 🤏 pro Hexa",
     "dica": "Seja persistente.",
     "descricao": "Desbloqueada ao concluir todo o conteúdo disponível com o menor XP possível.",
-    "imagem_desbloqueada": "data/achievements/quase_hexa.png",
-    "imagem_bloqueada": "data/achievements/locked_question.png",
+    "imagem_desbloqueada": "images/achievements/quase_hexa.png",
+    "imagem_bloqueada": "images/achievements/locked_question.png",
     "secreta": false
   }
 ]
