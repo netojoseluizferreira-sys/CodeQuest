@@ -4,7 +4,8 @@ import math
 import pygame
 
 from backend.xp_system import xp_para_proximo_nivel
-from pygame_client.menu_config import CUTSCENE_TEXTS, _BRANCO, _VERDE, _VERDE_CLARO
+from backend.worlds import obter_mundo
+from pygame_client.menu_config import CUTSCENE_TEXTS, WORLD_MAP_BASE_SIZE, WORLD_MAP_HOTSPOTS, _BRANCO, _VERDE, _VERDE_CLARO
 from pygame_client.palette import PALETTE
 from pygame_client.settings import WINDOW
 from pygame_client.ui import quebrar_texto, quebrar_texto_multilinha
@@ -32,7 +33,7 @@ class RenderMixin:
             self._renderizar_fundo_perfil()
             self._renderizar_perfil()
         elif self.screen_name == "worlds":
-            self._renderizar_fundo_mundos()
+            self._renderizar_fundo_mapa_mundos()
             self._renderizar_mundos()
         elif self.screen_name == "cutscene":
             self._renderizar_cutscene()
@@ -104,6 +105,50 @@ class RenderMixin:
             self.mundos_frame_timer = 0
             self.mundos_frame_index = (self.mundos_frame_index + 1) % len(self.mundos_frame_paths)
         self.screen.blit(self._obter_frame_animado(self.mundos_frame_paths, self.mundos_frame_index), (0, 0))
+
+    def _renderizar_fundo_mapa_mundos(self):
+        """Desenha o fundo do castelo escurecido para o mapa do arquipelago."""
+        fundo = self.world_backgrounds.get("mundo_9")
+        if fundo:
+            self.screen.blit(fundo, (0, 0))
+        else:
+            self._renderizar_fundo_mundos()
+        sombra = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
+        sombra.fill((0, 0, 0, 172))
+        self.screen.blit(sombra, (0, 0))
+
+    def _retangulo_mapa_mundos(self):
+        """Retorna a moldura do mapa, mantendo a proporcao da imagem original."""
+        base_w, base_h = WORLD_MAP_BASE_SIZE
+        max_w, max_h = 900, 506
+        escala = min(max_w / base_w, max_h / base_h)
+        largura = int(base_w * escala)
+        altura = int(base_h * escala)
+        rect = pygame.Rect(0, 0, largura, altura)
+        rect.center = (WINDOW.width // 2, 362)
+        return rect
+
+    def _hotspots_mapa_mundos(self):
+        """Calcula as areas clicaveis dos mundos dentro do mapa renderizado."""
+        mapa_rect = self._retangulo_mapa_mundos()
+        hotspots = []
+        for mundo_id, dados in WORLD_MAP_HOTSPOTS.items():
+            x, y, w, h = dados["rect"]
+            rect = pygame.Rect(
+                mapa_rect.x + int(mapa_rect.w * x / 100),
+                mapa_rect.y + int(mapa_rect.h * y / 100),
+                int(mapa_rect.w * w / 100),
+                int(mapa_rect.h * h / 100),
+            )
+            hotspots.append((mundo_id, dados, rect))
+        return hotspots
+
+    def _mundo_no_mapa(self, pos):
+        """Retorna o mundo clicado no mapa ou None."""
+        for mundo_id, _dados, rect in self._hotspots_mapa_mundos():
+            if rect.collidepoint(pos):
+                return mundo_id
+        return None
 
     def _renderizar_inicio(self):
         """Renderiza o overlay, título "CodeQuest" com glow pulsante e subtítulo da tela inicial."""
@@ -299,7 +344,7 @@ class RenderMixin:
             self.screen.blit(surface, surface.get_rect(center=(rect.centerx, texto_y + linha_altura // 2)))
             texto_y += linha_altura
 
-    def _renderizar_mundos(self):
+    def _renderizar_mundos_grade_antiga(self):
         """Renderiza a tela de seleção de mundos com fundo animado, título com glow e caixa de aviso."""
         self.screen.blit(self.mundos_overlay, (0, 0))
 
@@ -368,6 +413,138 @@ class RenderMixin:
             _ss = _aviso_font.render(_l, True, _BRANCO)
             self.screen.blit(_ss, _ss.get_rect(center=(_aviso_rect.centerx, _ty + _lh // 2)))
             _ty += _lh
+
+    def _renderizar_mundos(self):
+        """Renderiza o mapa clicavel do Arquipelago de Bythos."""
+        _titulo = "Arquipelago de Bythos"
+        _gap = 2
+        _char_w = [self.font_title.size(c)[0] for c in _titulo]
+        _total_w = sum(_char_w) + _gap * (len(_titulo) - 1)
+        _tx0 = WINDOW.width // 2 - _total_w // 2
+        _char_h = self.font_title.get_height()
+        _tcy = 58
+
+        self.mundos_glow_timer += 1
+        _glow_alpha = int(40 + 80 * abs(math.sin(self.mundos_glow_timer * 0.04)))
+        _glow_surfs = [self.font_title.render(c, True, _VERDE_CLARO) for c in _titulo]
+        for _surf in _glow_surfs:
+            _surf.set_alpha(_glow_alpha)
+        for _spread in (8, 5, 2):
+            for _dx in (-_spread, 0, _spread):
+                for _dy in (-_spread, 0, _spread):
+                    if _dx == 0 and _dy == 0:
+                        continue
+                    _x = _tx0
+                    for _idx, _surf in enumerate(_glow_surfs):
+                        self.screen.blit(_surf, (_x + _dx, _tcy - _char_h // 2 + _dy))
+                        _x += _char_w[_idx] + _gap
+
+        _x = _tx0
+        for _idx, _char in enumerate(_titulo):
+            self.screen.blit(self.font_title.render(_char, True, (0, 0, 0)), (_x + 3, _tcy - _char_h // 2 + 3))
+            _x += _char_w[_idx] + _gap
+        _x = _tx0
+        for _idx, _char in enumerate(_titulo):
+            self.screen.blit(self.font_title.render(_char, True, _BRANCO), (_x, _tcy - _char_h // 2))
+            _x += _char_w[_idx] + _gap
+
+        _sub = "Clique em uma construcao para entrar no mundo"
+        _sub_shadow = self.font_small.render(_sub, True, (0, 0, 0))
+        _sub_surf = self.font_small.render(_sub, True, _VERDE_CLARO)
+        self.screen.blit(_sub_shadow, _sub_shadow.get_rect(center=(WINDOW.width // 2 + 2, 104)))
+        self.screen.blit(_sub_surf, _sub_surf.get_rect(center=(WINDOW.width // 2, 102)))
+
+        _mapa_rect = self._retangulo_mapa_mundos()
+        _moldura_rect = _mapa_rect.inflate(24, 24)
+        pygame.draw.rect(self.screen, (5, 18, 12), _moldura_rect, border_radius=10)
+        pygame.draw.rect(self.screen, _VERDE_CLARO, _moldura_rect, width=8, border_radius=10)
+        pygame.draw.rect(self.screen, (215, 255, 205), _mapa_rect.inflate(6, 6), width=2, border_radius=6)
+
+        if self.bythos_world_map:
+            _mapa = pygame.transform.smoothscale(self.bythos_world_map, _mapa_rect.size)
+            self.screen.blit(_mapa, _mapa_rect.topleft)
+        else:
+            pygame.draw.rect(self.screen, (10, 38, 24), _mapa_rect)
+
+        _mouse_pos = pygame.mouse.get_pos()
+        _hovered = None
+        _pulse = int(8 + 5 * abs(math.sin(self.mundos_glow_timer * 0.08)))
+        for _mundo_id, _dados, _rect in self._hotspots_mapa_mundos():
+            _foco = _rect.collidepoint(_mouse_pos)
+            if _foco:
+                _hovered = (_mundo_id, _dados, _rect)
+            _cx, _cy = _rect.center
+            _raio = _pulse + (5 if _foco else 0)
+            pygame.draw.circle(self.screen, (80, 255, 120), (_cx, _cy), _raio, 2)
+            pygame.draw.circle(self.screen, (17, 120, 52), (_cx, _cy), 7)
+            pygame.draw.circle(self.screen, (230, 255, 210), (_cx, _cy), 3)
+
+        self._renderizar_info_mapa_mundos(_hovered)
+
+    def _renderizar_info_mapa_mundos(self, hovered):
+        """Desenha apenas nome e descricao do mundo sob o mouse."""
+        _titulo_font = self.font_block_title
+        _body_font = self.font_small
+
+        if self.status_kind == "error" and self.status_message:
+            _titulo = "Acesso bloqueado"
+            _linhas = []
+            for _parte in self.status_message.splitlines():
+                _linhas.extend(quebrar_texto(_parte, _body_font, 760))
+            _cor = PALETTE.error
+        elif self.status_message.startswith("EM BREVE!"):
+            _titulo = "Em breve"
+            _linhas = []
+            for _parte in self.status_message.splitlines():
+                _linhas.extend(quebrar_texto(_parte, _body_font, 760))
+            _cor = _VERDE_CLARO
+        elif hovered is None:
+            _titulo = "Passe o mouse sobre um local"
+            _linhas = ["Clique em uma construcao do mapa para acessar a aula."]
+            _cor = _VERDE_CLARO
+        else:
+            _mundo_id, _dados, _rect = hovered
+            _mundo = obter_mundo(_mundo_id)
+            if _mundo:
+                _titulo = f"{_mundo['numero']} - {_mundo['nome']}"
+            else:
+                _titulo = _dados["titulo"]
+            _linhas = [_dados["descricao"]]
+            _cor = _VERDE_CLARO
+
+        _linhas_quebradas = []
+        for _linha in _linhas:
+            _linhas_quebradas.extend(quebrar_texto(_linha, _body_font, 760))
+
+        _max_text_w = _titulo_font.size(_titulo)[0]
+        for _linha in _linhas_quebradas:
+            _max_text_w = max(_max_text_w, _body_font.size(_linha)[0])
+        _panel_w = min(max(_max_text_w + 56, 420), WINDOW.width - 360)
+        _title_h = _titulo_font.get_linesize()
+        _body_h = _body_font.get_linesize()
+        _panel_h = min(86, max(58, 18 + _title_h + 4 + len(_linhas_quebradas) * _body_h + 12))
+        _mapa_rect = self._retangulo_mapa_mundos()
+        _panel_y = min(_mapa_rect.bottom + 46, WINDOW.height - 92 - _panel_h)
+        _panel_rect = pygame.Rect(WINDOW.width // 2 - _panel_w // 2, _panel_y, _panel_w, _panel_h)
+
+        pygame.draw.rect(self.screen, (7, 22, 14), _panel_rect, border_radius=10)
+        pygame.draw.rect(self.screen, _VERDE_CLARO, _panel_rect, width=2, border_radius=10)
+
+        _titulo_sombra = _titulo_font.render(_titulo, True, (0, 0, 0))
+        _titulo_surf = _titulo_font.render(_titulo, True, _cor)
+        _y = _panel_rect.y + 10
+        self.screen.blit(_titulo_sombra, _titulo_sombra.get_rect(center=(_panel_rect.centerx + 2, _y + _title_h // 2 + 2)))
+        self.screen.blit(_titulo_surf, _titulo_surf.get_rect(center=(_panel_rect.centerx, _y + _title_h // 2)))
+
+        _y += _title_h + 4
+        for _linha in _linhas_quebradas:
+            if _y + _body_h > _panel_rect.bottom - 8:
+                break
+            _sombra = _body_font.render(_linha, True, (0, 0, 0))
+            _texto = _body_font.render(_linha, True, _BRANCO)
+            self.screen.blit(_sombra, _sombra.get_rect(center=(_panel_rect.centerx + 1, _y + _body_h // 2 + 1)))
+            self.screen.blit(_texto, _texto.get_rect(center=(_panel_rect.centerx, _y + _body_h // 2)))
+            _y += _body_h
 
     def _renderizar_perfil(self):
         """Renderiza o perfil do usuário com quatro cards de estatísticas e seção de conquistas."""

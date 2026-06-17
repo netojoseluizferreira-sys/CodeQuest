@@ -19,6 +19,7 @@ from utils.asset_paths import (
     CUTSCENE_IMAGES_DIR,
     background_path,
     font_path,
+    map_path,
     video_frames_dir,
 )
 from utils.database import carregar_usuario
@@ -155,6 +156,11 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
                 _overlay = pygame.Surface((WINDOW.width, WINDOW.height), pygame.SRCALPHA)
                 _overlay.fill((0, 0, 0, int(_mundo.get("overlay_alpha", 185))))
                 self.world_overlays[_mundo["id"]] = _overlay
+        _map_path = map_path("bythos_map.png")
+        if os.path.exists(_map_path):
+            self.bythos_world_map = pygame.image.load(str(_map_path)).convert()
+        else:
+            self.bythos_world_map = None
         _perfil_frames_dir = video_frames_dir("profile")
         self.perfil_frame_paths = sorted(glob.glob(os.path.join(_perfil_frames_dir, "*.jpg")))
         self.perfil_frame_index = 0
@@ -249,6 +255,8 @@ class CodeQuestPygameMenu(ButtonMixin, EventMixin, RenderMixin, LearningRenderMi
     def _deve_mostrar_cursor_mao(self, mouse_pos, botoes):
         """Retorna True quando o mouse está sobre algo clicável."""
         if any(button.rect.collidepoint(mouse_pos) for button in botoes):
+            return True
+        if self.screen_name == "worlds" and self._mundo_no_mapa(mouse_pos):
             return True
         if self.screen_name == "lesson" and self.link_rect and self.link_rect.collidepoint(mouse_pos):
             return True

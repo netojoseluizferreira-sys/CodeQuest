@@ -97,7 +97,7 @@ class ButtonMixin:
             Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Perfil", self._abrir_perfil, **_KW_VERDE),
         ]
 
-    def _botoes_mundos(self):
+    def _botoes_mundos_grade_antiga(self):
         """Constrói os botões da tela de seleção de mundos em grade.
 
         Retorna:
@@ -126,6 +126,10 @@ class ButtonMixin:
             )
         botoes.append(Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE))
         return botoes
+
+    def _botoes_mundos(self):
+        """Constroi os botoes da tela de mapa dos mundos."""
+        return [Button(pygame.Rect(30, WINDOW.height - 75, 160, 45), "Voltar", self._abrir_hub, **_KW_VERDE)]
 
     def _botoes_fluxo_aprendizado(self):
         """Constrói os botões do segmento de aula ou exercício atualmente exibido.

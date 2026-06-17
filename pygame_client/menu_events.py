@@ -51,6 +51,12 @@ class EventMixin:
             elif pygame.Rect(_cs_bx1, _cs_by, _cs_bw, _cs_bh).collidepoint(event.pos):
                 self._abrir_mundos()
 
+        if self.screen_name == "worlds":
+            mundo_id = self._mundo_no_mapa(event.pos)
+            if mundo_id:
+                self._selecionar_mundo(mundo_id)
+                return
+
         if self.screen_name == "lesson":
             segmento = self._segmento_atual()
 

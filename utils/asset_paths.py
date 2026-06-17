@@ -11,6 +11,7 @@ IMAGES_DIR = DATA_DIR / "images"
 BACKGROUNDS_DIR = IMAGES_DIR / "backgrounds"
 CUTSCENE_IMAGES_DIR = IMAGES_DIR / "cutscenes"
 ACHIEVEMENT_IMAGES_DIR = IMAGES_DIR / "achievements"
+MAPS_DIR = IMAGES_DIR / "maps"
 VIDEO_DIR = DATA_DIR / "video"
 AUDIO_DIR = DATA_DIR / "audio"
 MUSIC_DIR = AUDIO_DIR / "music"
@@ -29,6 +30,11 @@ def font_path(filename):
 def background_path(filename):
     """Retorna o caminho absoluto de uma imagem de fundo em `data/images/backgrounds`."""
     return BACKGROUNDS_DIR / filename
+
+
+def map_path(filename):
+    """Retorna o caminho absoluto de uma imagem de mapa em `data/images/maps`."""
+    return MAPS_DIR / filename
 
 
 def video_frames_dir(name):
