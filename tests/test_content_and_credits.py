@@ -302,7 +302,7 @@ def test_carregar_aula_mundo_9_tem_aula_cutscene_e_textos_finais():
     assert len(list((DATA_DIR / "mundo_9_cutscene_frames").glob("*.jpg"))) == 240
 
 
-def test_mundos_3_a_8_usam_fundos_tematicos_com_overlay_leve():
+def test_mundos_3_a_9_usam_fundos_tematicos_com_overlay_leve():
     mundos = json.loads((DATA_DIR / "mundos.json").read_text(encoding="utf-8"))
 
     fundos_esperados = {
@@ -312,6 +312,7 @@ def test_mundos_3_a_8_usam_fundos_tematicos_com_overlay_leve():
         "mundo_6": ("mundo_6_background.jpeg", 115),
         "mundo_7": ("mundo_7_background.jpeg", 105),
         "mundo_8": ("mundo_8_background.jpeg", 125),
+        "mundo_9": ("mundo_9_background.jpeg", 115),
     }
 
     for mundo_id, (background, overlay_alpha) in fundos_esperados.items():

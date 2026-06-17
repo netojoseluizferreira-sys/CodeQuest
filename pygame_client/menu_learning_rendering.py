@@ -221,6 +221,10 @@ class LearningRenderMixin:
 
     def _renderizar_texto_final(self, segmento):
         """Renderiza os textos narrativos finais do jogo."""
+        if segmento.get("id") == "agradecimentos":
+            self._renderizar_agradecimentos_final(segmento)
+            return
+
         self._desenhar_fundo_aprendizado()
 
         titulo = segmento["titulo"]
@@ -264,6 +268,80 @@ class LearningRenderMixin:
             self.screen.blit(sombra, (panel_rect.x + 72 + 2, y + 2))
             self.screen.blit(font.render(linha, True, _BRANCO), (panel_rect.x + 72, y))
             y += linha_altura
+
+    def _renderizar_agradecimentos_final(self, segmento):
+        """Renderiza a tela final de agradecimentos com composicao destacada."""
+        self._desenhar_fundo_aprendizado()
+
+        titulo_font = self.font_lesson_title
+        titulo = segmento["titulo"]
+        titulo_sombra = titulo_font.render(titulo, True, (0, 0, 0))
+        titulo_surface = titulo_font.render(titulo, True, _BRANCO)
+        self.screen.blit(titulo_sombra, titulo_sombra.get_rect(center=(WINDOW.width // 2 + 3, 76)))
+        self.screen.blit(titulo_surface, titulo_surface.get_rect(center=(WINDOW.width // 2, 73)))
+
+        subtitulo = "Obrigado por jogar CodeQuest"
+        subtitulo_sombra = self.font_hub_subtitle.render(subtitulo, True, (0, 0, 0))
+        subtitulo_surface = self.font_hub_subtitle.render(subtitulo, True, _VERDE_CLARO)
+        self.screen.blit(subtitulo_sombra, subtitulo_sombra.get_rect(center=(WINDOW.width // 2 + 2, 130)))
+        self.screen.blit(subtitulo_surface, subtitulo_surface.get_rect(center=(WINDOW.width // 2, 128)))
+
+        panel_rect = pygame.Rect(WINDOW.width // 2 - 505, 175, 1010, 430)
+        panel = pygame.Surface(panel_rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(panel, (0, 0, 0, 142), panel.get_rect(), border_radius=10)
+        pygame.draw.rect(panel, (*_VERDE_CLARO, 170), panel.get_rect(), width=4, border_radius=10)
+        self.screen.blit(panel, panel_rect.topleft)
+
+        nomes = ("Mayanderson", "Neto", "Anthony")
+        badge_w = 250
+        badge_h = 54
+        gap = 28
+        total_w = len(nomes) * badge_w + (len(nomes) - 1) * gap
+        x = WINDOW.width // 2 - total_w // 2
+        y = panel_rect.y + 34
+        for nome in nomes:
+            badge = pygame.Rect(x, y, badge_w, badge_h)
+            pygame.draw.rect(self.screen, (18, 72, 36), badge, border_radius=8)
+            pygame.draw.rect(self.screen, _VERDE_CLARO, badge, width=3, border_radius=8)
+            surface = self.font_status_success.render(nome, True, _BRANCO)
+            self.screen.blit(surface, surface.get_rect(center=badge.center))
+            x += badge_w + gap
+
+        intro_linhas = quebrar_texto(segmento.get("conteudo", [""])[0], self.font_lesson_body, 840)
+        intro_y = panel_rect.y + 98
+        for linha in intro_linhas:
+            sombra = self.font_lesson_body.render(linha, True, (0, 0, 0))
+            texto = self.font_lesson_body.render(linha, True, _VERDE_CLARO)
+            self.screen.blit(sombra, sombra.get_rect(center=(WINDOW.width // 2 + 2, intro_y + 12 + 2)))
+            self.screen.blit(texto, texto.get_rect(center=(WINDOW.width // 2, intro_y + 12)))
+            intro_y += self.font_lesson_body.get_linesize()
+
+        texto_font = self.font_lesson_body
+        linhas = []
+        for paragrafo in segmento.get("conteudo", [])[1:-1]:
+            linhas.extend(quebrar_texto(paragrafo, texto_font, 820))
+            linhas.append(None)
+        if linhas and linhas[-1] is None:
+            linhas.pop()
+
+        linha_altura = texto_font.get_linesize() + 3
+        quebra_altura = 9
+        texto_y = max(panel_rect.y + 164, intro_y + 16)
+        for linha in linhas:
+            if linha is None:
+                texto_y += quebra_altura
+                continue
+            sombra = texto_font.render(linha, True, (0, 0, 0))
+            texto = texto_font.render(linha, True, _BRANCO)
+            self.screen.blit(sombra, sombra.get_rect(center=(WINDOW.width // 2 + 2, texto_y + linha_altura // 2 + 2)))
+            self.screen.blit(texto, texto.get_rect(center=(WINDOW.width // 2, texto_y + linha_altura // 2)))
+            texto_y += linha_altura
+
+        rodape = "E que sua jornada esteja apenas começando."
+        rodape_sombra = self.font_status_success.render(rodape, True, (0, 0, 0))
+        rodape_surface = self.font_status_success.render(rodape, True, _VERDE_CLARO)
+        self.screen.blit(rodape_sombra, rodape_sombra.get_rect(center=(WINDOW.width // 2 + 2, 655)))
+        self.screen.blit(rodape_surface, rodape_surface.get_rect(center=(WINDOW.width // 2, 653)))
 
     def _renderizar_segmento_exercicio(self, segmento):
         """Renderiza o exercício atual dentro de um bloco de prática.
