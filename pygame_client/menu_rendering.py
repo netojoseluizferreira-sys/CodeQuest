@@ -416,7 +416,7 @@ class RenderMixin:
 
     def _renderizar_mundos(self):
         """Renderiza o mapa clicavel do Arquipelago de Bythos."""
-        _titulo = "Arquipelago de Bythos"
+        _titulo = "Arquipélago de Bythos"
         _gap = 2
         _char_w = [self.font_title.size(c)[0] for c in _titulo]
         _total_w = sum(_char_w) + _gap * (len(_titulo) - 1)
@@ -448,7 +448,7 @@ class RenderMixin:
             self.screen.blit(self.font_title.render(_char, True, _BRANCO), (_x, _tcy - _char_h // 2))
             _x += _char_w[_idx] + _gap
 
-        _sub = "Clique em uma construcao para entrar no mundo"
+        _sub = "Clique em uma construção para entrar no mundo"
         _sub_shadow = self.font_small.render(_sub, True, (0, 0, 0))
         _sub_surf = self.font_small.render(_sub, True, _VERDE_CLARO)
         self.screen.blit(_sub_shadow, _sub_shadow.get_rect(center=(WINDOW.width // 2 + 2, 104)))
@@ -500,7 +500,7 @@ class RenderMixin:
             _cor = _VERDE_CLARO
         elif hovered is None:
             _titulo = "Passe o mouse sobre um local"
-            _linhas = ["Clique em uma construcao do mapa para acessar a aula."]
+            _linhas = ["Clique em uma construção do mapa para acessar a aula."]
             _cor = _VERDE_CLARO
         else:
             _mundo_id, _dados, _rect = hovered

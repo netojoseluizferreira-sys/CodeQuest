@@ -33,38 +33,38 @@ WORLD_MAP_BASE_SIZE = (1248, 702)
 
 WORLD_MAP_HOTSPOTS = {
     "mundo_1": {
-        "titulo": "Cabana do oraculo",
-        "descricao": "Aqui Faisca e voce aprendem os conceitos de programacao e os primeiros passos para pensar como programador.",
-        "rect": (14, 60, 14, 24),
+        "titulo": "Cabana do Oráculo",
+        "descricao": "Aqui Faísca e você aprendem os conceitos de programação e os primeiros passos para pensar como programador.",
+        "rect": (8, 30, 14, 22),
     },
     "mundo_2": {
         "titulo": "Tenda do Iniciado",
-        "descricao": "O ponto de partida pratico para escrever os primeiros comandos em Python.",
-        "rect": (8, 30, 14, 22),
+        "descricao": "O ponto de partida prático para escrever os primeiros comandos em Python.",
+        "rect": (14, 60, 14, 24),
     },
     "mundo_3": {
-        "titulo": "Forja Runica",
-        "descricao": "Onde operadores aritmeticos, relacionais e logicos sao moldados em codigo.",
+        "titulo": "Forja Rúnica",
+        "descricao": "Onde operadores aritméticos, relacionais e lógicos são moldados em código.",
         "rect": (22, 12, 14, 22),
     },
     "mundo_4": {
         "titulo": "Torre dos Julgamentos",
-        "descricao": "O lugar das decisoes: if, else, elif e caminhos condicionais.",
+        "descricao": "O lugar das decisões: if, else, elif e caminhos condicionais.",
         "rect": (41, 4, 10, 22),
     },
     "mundo_5": {
         "titulo": "Moinho dos Ventos Arcanos",
-        "descricao": "As repeticoes giram aqui: while, for e loops aninhados.",
+        "descricao": "As repetições giram aqui: while, for e loops aninhados.",
         "rect": (40, 32, 14, 26),
     },
     "mundo_6": {
-        "titulo": "Circulo das Runas",
-        "descricao": "Funcoes, parametros, retornos e escopo convergem no centro da ilha.",
+        "titulo": "Círculo das Runas",
+        "descricao": "Funções, parâmetros, retornos e escopo convergem no centro da ilha.",
         "rect": (51, 55, 16, 22),
     },
     "mundo_7": {
-        "titulo": "Biblioteca Eterea",
-        "descricao": "Listas, indices e percursos ficam guardados entre pergaminhos flutuantes.",
+        "titulo": "Biblioteca Etérea",
+        "descricao": "Listas, índices e percursos ficam guardados entre pergaminhos flutuantes.",
         "rect": (56, 4, 14, 24),
     },
     "mundo_8": {
@@ -74,7 +74,7 @@ WORLD_MAP_HOTSPOTS = {
     },
     "mundo_9": {
         "titulo": "Castelo de Esmeralda",
-        "descricao": "O ultimo portal: recursividade, caso base e o fim da jornada.",
+        "descricao": "O último portal: recursividade, caso base e o fim da jornada.",
         "rect": (76, 45, 18, 36),
     },
 }

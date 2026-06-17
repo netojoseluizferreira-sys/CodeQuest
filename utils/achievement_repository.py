@@ -101,7 +101,7 @@ def listar_conquistas_com_estado(usuario):
                 "desbloqueada": desbloqueada,
                 "imagem": caminho_imagem,
                 "tooltip_titulo": conquista["nome"] if desbloqueada else "???",
-                "tooltip_texto": "Conquista desbloqueada." if desbloqueada else f"Dica: {conquista['dica']}",
+                "tooltip_texto": "Conquista desbloqueada:" if desbloqueada else f"Dica: {conquista['dica']}",
             }
         )
 

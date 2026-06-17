@@ -39,13 +39,13 @@ class NavigationMixin:
         """Monta o texto de aviso para conquistas recem-desbloqueadas."""
         if len(conquistas) == 1:
             return (
-                "Conquista desbloqueada!\n"
+                "Conquista desbloqueada:\n"
                 f"{conquistas[0]['nome']}\n"
                 "Vá ao perfil para visualizar."
             )
 
         nomes = ", ".join(conquista["nome"] for conquista in conquistas)
-        return f"Conquistas desbloqueadas!\n{nomes}\nVá ao perfil para visualizar."
+        return f"Conquistas desbloqueadas:\n{nomes}\nVá ao perfil para visualizar."
 
     def _novo_jogo(self):
         """Reseta o banco de dados, limpa o estado do usuário e navega para a criação de personagem."""

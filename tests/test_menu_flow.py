@@ -213,7 +213,7 @@ def test_mensagem_conquista_desbloqueada_usa_tres_linhas():
     mensagem = app._mensagem_conquistas_desbloqueadas([{"nome": "Melhor professor da UFAL"}])
 
     assert mensagem == (
-        "Conquista desbloqueada!\n"
+        "Conquista desbloqueada:\n"
         "Melhor professor da UFAL\n"
         "Vá ao perfil para visualizar."
     )
